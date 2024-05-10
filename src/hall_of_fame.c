@@ -26,7 +26,7 @@
 #include "constants/songs.h"
 #include "constants/maps.h"
 
-#define HALL_OF_FAME_MAX_TEAMS 50
+#define HALL_OF_FAME_MAX_TEAMS 2
 #define HALL_OF_FAME_BG_PAL    RGB(22, 24, 29)
 
 struct HallofFameMon
