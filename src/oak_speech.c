@@ -1474,7 +1474,7 @@ static void Task_OakSpeech_HandleConfirmNameInput(u8 taskId)
     case MENU_B_PRESSED:
         PlaySE(SE_SELECT);
         if (sOakSpeechResources->hasPlayerBeenNamed == FALSE)
-            gTasks[taskId].func = Task_OakSpeech_FadeOutForPlayerNamingScreen;
+            gTasks[taskId].func = Task_OakSpeech_TellMeALittleAboutYourself;
         else
             gTasks[taskId].func = Task_OakSpeech_RepeatNameQuestion;
         break;
