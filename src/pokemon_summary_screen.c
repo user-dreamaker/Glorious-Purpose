@@ -2631,8 +2631,30 @@ static void PrintInfoPage(void)
     }
 }
 
+static const u8 sIVMarks_00[] = INCBIN_U8( "graphics/interface/ivs/00.4bpp");
+static const u8 sIVMarks_01[] = INCBIN_U8( "graphics/interface/ivs/01.4bpp");
+static const u8 sIVMarks_XX[] = INCBIN_U8( "graphics/interface/ivs/XX.4bpp");
+static const u8 sIVMarks_30[] = INCBIN_U8( "graphics/interface/ivs/30.4bpp");
+static const u8 sIVMarks_31[] = INCBIN_U8( "graphics/interface/ivs/31.4bpp");
+
+static const u8 * const sIVMarks_Images[] = 
+{
+    [00] = sIVMarks_00,
+    [01] = sIVMarks_01,
+    [02 ... 29] = sIVMarks_XX,
+    [30] = sIVMarks_30,
+    [31] = sIVMarks_31,
+};
+
 static void PrintSkillsPage(void)
 {
+    u8 hpIv, atkIv, defIv, spAtkIv, spDefIv, spdIv;
+    hpIv = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_IV);
+    atkIv = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK_IV);
+    defIv = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF_IV);
+    spAtkIv = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK_IV);
+    spDefIv = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF_IV);
+    spdIv = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED_IV);
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 14 + sMonSkillsPrinterXpos->curHpStr, 4, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.curHpStrBuf);
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->atkStr, 22, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK]);
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->defStr, 35, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF]);
@@ -2641,6 +2663,12 @@ static void PrintSkillsPage(void)
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->speStr, 74, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE]);
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 15 + sMonSkillsPrinterXpos->expStr, 87, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.expPointsStrBuf);
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 15 + sMonSkillsPrinterXpos->toNextLevel, 100, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.expToNextLevelStrBuf);
+    BlitBitmapRectToWindow(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], sIVMarks_Images[hpIv], 0, 0, 8, 8, 75, 7, 8, 8);
+    BlitBitmapRectToWindow(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], sIVMarks_Images[atkIv], 0, 0, 8, 8, 75, 25, 8, 8);
+    BlitBitmapRectToWindow(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], sIVMarks_Images[defIv], 0, 0, 8, 8, 75, 38, 8, 8);
+    BlitBitmapRectToWindow(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], sIVMarks_Images[spAtkIv], 0, 0, 8, 8, 75, 51, 8, 8);
+    BlitBitmapRectToWindow(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], sIVMarks_Images[spDefIv], 0, 0, 8, 8, 75, 64, 8, 8);
+    BlitBitmapRectToWindow(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], sIVMarks_Images[spdIv], 0, 0, 8, 8, 75, 77, 8, 8);
 }
 
 #define GetMoveNamePrinterYpos(x) ((x) * 28 + 5)
