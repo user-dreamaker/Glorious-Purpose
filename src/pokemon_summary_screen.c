@@ -34,9 +34,13 @@
 #include "mon_markings.h"
 #include "pokemon_storage_system.h"
 #include "constants/sound.h"
+#include "constants/weather.h"
+#include "field_weather.h"
+#include "battle_setup.h"
 
 // needs conflicting header to match (curIndex is s8 in the function, but has to be defined as u8 here)
 extern s16 SeekToNextMonInBox(struct BoxPokemon * boxMons, u8 curIndex, u8 maxIndex, u8 flags);
+extern const u16 gNaturePowerMoves[];
 
 static void BufferSelectedMonData(struct Pokemon * mon);
 static void CB2_SetUpPSS(void);
@@ -91,7 +95,7 @@ static void BufferMonInfo(void);
 static void BufferMonSkills(void);
 static void BufferMonMoves(void);
 static u8 StatusToAilment(u32 status);
-static void BufferMonMoveI(u8);
+static void BufferMonMoveI(u32);
 static u16 GetMonMoveBySlotId(struct Pokemon * mon, u8 moveSlot);
 static u16 GetMonPpByMoveSlot(struct Pokemon * mon, u8 moveSlot);
 static void CreateShinyStarObj(u16, u16);
@@ -2387,10 +2391,18 @@ static void BufferMonMoves(void)
 
 #define GetRightAlignXpos_NDigits(a, b) ((6 * (a)) - StringLength((b)) * 6)
 
-static void BufferMonMoveI(u8 i)
+static void BufferMonMoveI(u32 i)
 {
+    u32 type;
+    u32 terrainType;
+    u32 monFriendship = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_FRIENDSHIP);
+    s32 power;
+    u32 accuracy;
+
+
     if (i < 4)
         sMonSummaryScreen->moveIds[i] = GetMonMoveBySlotId(&sMonSummaryScreen->currentMon, i);
+
 
     if (sMonSummaryScreen->moveIds[i] == 0)
     {
@@ -2403,9 +2415,48 @@ static void BufferMonMoveI(u8 i)
         return;
     }
 
+
+    power = gBattleMoves[sMonSummaryScreen->moveIds[i]].power;
+    type = gBattleMoves[sMonSummaryScreen->moveIds[i]].type;
+    accuracy = gBattleMoves[sMonSummaryScreen->moveIds[i]].accuracy;
+
+
+    switch(sMonSummaryScreen->moveIds[i])
+    {
+        case MOVE_HIDDEN_POWER:
+            type = GetHiddenPowerType(&sMonSummaryScreen->currentMon);
+            break;
+        case MOVE_RETURN:
+            power = (10 * monFriendship / 25);
+            if(power == 0)
+                power = 1;
+            break;
+        case MOVE_FRUSTRATION:
+            power = (10 * (MAX_FRIENDSHIP - monFriendship) / 25);
+            if(power == 0)
+                power = 1;
+            break;
+        case MOVE_WEATHER_BALL:
+            type = GetWeatherBallType();
+            if(type == TYPE_NORMAL)
+                power = 50;
+            else
+                power = 100;
+            break;
+        case MOVE_NATURE_POWER:
+            if (gMain.inBattle)
+                terrainType = gBattleTerrain;
+            else
+                terrainType = BattleSetup_GetTerrainId();
+            type = gBattleMoves[gNaturePowerMoves[terrainType]].type;
+            power = gBattleMoves[gNaturePowerMoves[terrainType]].power;
+            accuracy = gBattleMoves[gNaturePowerMoves[terrainType]].accuracy;
+            break;
+    }
     sMonSummaryScreen->numMoves++;
-    sMonSummaryScreen->moveTypes[i] = gBattleMoves[sMonSummaryScreen->moveIds[i]].type;
+    sMonSummaryScreen->moveTypes[i] = type;
     StringCopy(sMonSummaryScreen->summary.moveNameStrBufs[i], gMoveNames[sMonSummaryScreen->moveIds[i]]);
+
 
     if (i >= 4 && sMonSummaryScreen->mode == PSS_MODE_SELECT_MOVE)
     {
@@ -2423,18 +2474,21 @@ static void BufferMonMoveI(u8 i)
                                    STR_CONV_MODE_LEFT_ALIGN, 3);
     }
 
+
     sMonSkillsPrinterXpos->curPp[i] = GetRightAlignXpos_NDigits(2, sMonSummaryScreen->summary.moveCurPpStrBufs[i]);
     sMonSkillsPrinterXpos->maxPp[i] = GetRightAlignXpos_NDigits(2, sMonSummaryScreen->summary.moveMaxPpStrBufs[i]);
 
-    if (gBattleMoves[sMonSummaryScreen->moveIds[i]].power <= 1)
+
+    if (power <= 1 && sMonSummaryScreen->moveIds[i] != MOVE_RETURN && sMonSummaryScreen->moveIds[i] != MOVE_FRUSTRATION)
         StringCopy(sMonSummaryScreen->summary.movePowerStrBufs[i], gText_ThreeHyphens);
     else
-        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.movePowerStrBufs[i], gBattleMoves[sMonSummaryScreen->moveIds[i]].power, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.movePowerStrBufs[i], power, STR_CONV_MODE_RIGHT_ALIGN, 3);
 
-    if (gBattleMoves[sMonSummaryScreen->moveIds[i]].accuracy == 0)
+
+    if (accuracy == 0)
         StringCopy(sMonSummaryScreen->summary.moveAccuracyStrBufs[i], gText_ThreeHyphens);
     else
-        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.moveAccuracyStrBufs[i], gBattleMoves[sMonSummaryScreen->moveIds[i]].accuracy, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.moveAccuracyStrBufs[i], accuracy, STR_CONV_MODE_RIGHT_ALIGN, 3);
 }
 
 static u8 PokeSum_HandleCreateSprites(void)
@@ -5384,4 +5438,55 @@ static bool32 MapSecIsInKantoOrSevii(u8 mapSec)
 static void ShowPokemonSummaryScreen_NullParty(void)
 {
     ShowPokemonSummaryScreen(NULL, 0, 0, CB2_ReturnToField, PSS_MODE_NORMAL);
+}
+
+u8 GetHiddenPowerType(struct Pokemon * mon)
+{
+    u8 typeBits  = ((GetMonData(mon, MON_DATA_HP_IV) & 1) << 0)
+                    | ((GetMonData(mon, MON_DATA_ATK_IV) & 1) << 1)
+                    | ((GetMonData(mon, MON_DATA_DEF_IV) & 1) << 2)
+                    | ((GetMonData(mon, MON_DATA_SPEED_IV) & 1) << 3)
+                    | ((GetMonData(mon, MON_DATA_SPATK_IV) & 1) << 4)
+                    | ((GetMonData(mon, MON_DATA_SPDEF_IV) & 1) << 5);
+
+    u8 type = (15 * typeBits) / 63 + 1;
+    if (type >= TYPE_MYSTERY)
+        type++;
+    type |= 0xC0;
+    return(type & 0x3F);
+}
+
+u8 GetWeatherBallType(void)
+{
+    if (gMain.inBattle)
+    {
+        if (gBattleWeather & B_WEATHER_RAIN)
+            return TYPE_WATER;
+        else if (gBattleWeather & B_WEATHER_SANDSTORM)
+            return TYPE_ROCK;
+        else if (gBattleWeather & B_WEATHER_SUN)
+            return TYPE_FIRE;
+        else if (gBattleWeather & B_WEATHER_HAIL)
+            return TYPE_ICE;
+        else
+            return TYPE_NORMAL;
+    }
+    else
+    {
+        switch (gWeatherPtr->currWeather)
+        {
+        case WEATHER_RAIN:
+        case WEATHER_RAIN_THUNDERSTORM:
+        case WEATHER_DOWNPOUR:
+            return TYPE_WATER;
+        case WEATHER_SANDSTORM:
+            return TYPE_ROCK;
+        case WEATHER_DROUGHT:
+            return TYPE_FIRE;
+        //case WEATHER_SNOW:
+        //    return TYPE_ICE;
+        default:
+            return TYPE_NORMAL;
+        }
+    }
 }
