@@ -3136,11 +3136,14 @@ static void PokeSum_DrawMoveTypeIcons(void)
         if (sMonSummaryScreen->moveIds[i] == MOVE_NONE)
             continue;
 
-        BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], sMonSummaryScreen->moveTypes[i] + 1, 3, GetMoveNamePrinterYpos(i));
+        BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], sMonSummaryScreen->moveTypes[i] + 1, 3, GetMoveNamePrinterYpos(i) - 1);
+        BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], gBattleMoves[sMonSummaryScreen->moveIds[i]].category + MENU_INFO_ICON_PHYSICAL, 3, GetMoveNamePrinterYpos(i) + 11);
     }
 
-    if (sMonSummaryScreen->mode == PSS_MODE_SELECT_MOVE)
-        BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], sMonSummaryScreen->moveTypes[4] + 1, 3, GetMoveNamePrinterYpos(4));
+    if (sMonSummaryScreen->mode == PSS_MODE_SELECT_MOVE)  {
+        BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], sMonSummaryScreen->moveTypes[4] + 1, 3, GetMoveNamePrinterYpos(4) - 1);
+        BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], gBattleMoves[sMonSummaryScreen->moveIds[4]].category + MENU_INFO_ICON_PHYSICAL, 3, GetMoveNamePrinterYpos(4) + 11);
+}
 }
 
 static void PokeSum_PrintPageHeaderText(u8 curPageIndex)
