@@ -203,41 +203,41 @@ static const struct WindowTemplate sStandardBattleWindowTemplates[] = {
         .paletteNum = 5,
         .baseBlock = 0x330
     },
-    [B_WIN_PP] = {
+    [B_WIN_MOVE_TYPE] = {
         .bg = 0,
         .tilemapLeft = 21,
         .tilemapTop = 55,
-        .width = 3,
+        .width = 4,
+        .height = 2,
+        .paletteNum = 10,
+        .baseBlock = 0x280
+    },
+    [B_WIN_PSS_ICON] = {
+        .bg = 0,
+        .tilemapLeft = 25,
+        .tilemapTop = 55,
+        .width = 4,
+        .height = 2,
+        .paletteNum = 10,
+        .baseBlock = 0x288
+    },
+    [B_WIN_MOVE_POWER] = {
+        .bg = 0,
+        .tilemapLeft = 21,
+        .tilemapTop = 57,
+        .width = 4,
         .height = 2,
         .paletteNum = 5,
         .baseBlock = 0x290
     },
-    [B_WIN_MOVE_TYPE] = {
-        .bg = 0,
-        .tilemapLeft = 21,
-        .tilemapTop = 57,
-        .width = 8,
-        .height = 2,
-        .paletteNum = 5,
-        .baseBlock = 0x296
-    },
     [B_WIN_PP_REMAINING] = {
-        .bg = 0,
-        .tilemapLeft = 24,
-        .tilemapTop = 55,
-        .width = 5,
-        .height = 2,
-        .paletteNum = 5,
-        .baseBlock = 0x2a6
-    },
-    [B_WIN_DUMMY] = {
         .bg = 0,
         .tilemapLeft = 25,
         .tilemapTop = 57,
-        .width = 0,
-        .height = 0,
+        .width = 4,
+        .height = 2,
         .paletteNum = 5,
-        .baseBlock = 0x2b0
+        .baseBlock = 0x29A
     },
     [B_WIN_SWITCH_PROMPT] = {
         .bg = 0,
