@@ -538,7 +538,7 @@ struct DaycareMon
 struct DayCare
 {
     struct DaycareMon mons[DAYCARE_MON_COUNT];
-    u16 offspringPersonality;
+    u32 offspringPersonality;
     u8 stepCounter;
 };
 
