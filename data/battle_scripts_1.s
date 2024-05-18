@@ -235,6 +235,7 @@ gBattleScriptsForMoveEffects::
 	.4byte BattleScript_EffectCalmMind               @ EFFECT_CALM_MIND
 	.4byte BattleScript_EffectDragonDance            @ EFFECT_DRAGON_DANCE
 	.4byte BattleScript_EffectCamouflage             @ EFFECT_CAMOUFLAGE
+	.4byte BattleScript_EffectGrowth                 @ EFFECT_GROWTH
 
 BattleScript_EffectHit::
 	jumpifnotmove MOVE_SURF, BattleScript_HitFromAtkCanceler
@@ -4401,3 +4402,42 @@ BattleScript_ActionSelectionItemsCantBeUsed::
 BattleScript_FlushMessageBox::
 	printstring STRINGID_EMPTYSTRING3
 	return
+
+BattleScript_EffectGrowth::
+	attackcanceler
+	attackstring
+	ppreduce
+	jumpifstat BS_ATTACKER, CMP_LESS_THAN, STAT_ATK, MAX_STAT_STAGE, BattleScript_GrowthDoMoveAnim
+	jumpifstat BS_ATTACKER, CMP_EQUAL, STAT_SPATK, MAX_STAT_STAGE, BattleScript_CantRaiseMultipleStats
+BattleScript_GrowthDoMoveAnim::
+	attackanimation
+	waitanimation
+	setbyte sSTAT_ANIM_PLAYED, FALSE
+	playstatchangeanimation BS_ATTACKER, BIT_ATK | BIT_SPATK, 0
+	jumpifabilitypresent ABILITY_CLOUD_NINE, BattleScript_GrowthAtk1
+	jumpifabilitypresent ABILITY_AIR_LOCK, BattleScript_GrowthAtk1
+	jumpifhalfword CMP_NO_COMMON_BITS, gBattleWeather, B_WEATHER_SUN, BattleScript_GrowthAtk1
+	setstatchanger STAT_ATK, 2, FALSE
+	goto BattleScript_GrowthAtk
+BattleScript_GrowthAtk1:
+	setstatchanger STAT_ATK, 1, FALSE
+BattleScript_GrowthAtk:
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_CHANGE_ALLOW_PTR, BattleScript_GrowthTrySpAtk
+	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, B_MSG_STAT_WONT_INCREASE, BattleScript_GrowthTrySpAtk
+	printfromtable gStatUpStringIds
+	waitmessage B_WAIT_TIME_LONG
+BattleScript_GrowthTrySpAtk::
+	jumpifabilitypresent ABILITY_CLOUD_NINE, BattleScript_GrowthSpAtk1
+	jumpifabilitypresent ABILITY_AIR_LOCK, BattleScript_GrowthSpAtk1
+	jumpifhalfword CMP_NO_COMMON_BITS, gBattleWeather, B_WEATHER_SUN, BattleScript_GrowthSpAtk1
+	setstatchanger STAT_SPATK, 2, FALSE
+	goto BattleScript_GrowthSpAtk
+BattleScript_GrowthSpAtk1:
+	setstatchanger STAT_SPATK, 1, FALSE
+BattleScript_GrowthSpAtk:
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_CHANGE_ALLOW_PTR, BattleScript_GrowthEnd
+	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, B_MSG_STAT_WONT_INCREASE, BattleScript_GrowthEnd
+	printfromtable gStatUpStringIds
+	waitmessage B_WAIT_TIME_LONG
+BattleScript_GrowthEnd:
+	goto BattleScript_MoveEnd
