@@ -12,7 +12,6 @@ const struct FlashSetupInfo * const sSetupInfos[] =
 
 u16 IdentifyFlash(void)
 {
-    u16 result;
     u16 flashId;
     const struct FlashSetupInfo * const *setupInfo;
 
@@ -21,21 +20,6 @@ u16 IdentifyFlash(void)
     flashId = ReadFlashId();
 
     setupInfo = sSetupInfos;
-    result = 1;
-
-    for (;;)
-    {
-        if ((*setupInfo)->type.ids.separate.makerId == 0)
-            break;
-
-        if (flashId == (*setupInfo)->type.ids.joined)
-        {
-            result = 0;
-            break;
-        }
-
-        setupInfo++;
-    }
 
     ProgramFlashByte = (*setupInfo)->programFlashByte;
     ProgramFlashSector = (*setupInfo)->programFlashSector;
@@ -45,7 +29,7 @@ u16 IdentifyFlash(void)
     gFlashMaxTime = (*setupInfo)->maxTime;
     gFlash = &(*setupInfo)->type;
 
-    return result;
+    return 0;
 }
 
 u16 WaitForFlashWrite_Common(u8 phase, u8 *addr, u8 lastData)

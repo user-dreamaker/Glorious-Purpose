@@ -232,6 +232,7 @@ static void Task_SetWin0BldRegsAndCheckSaveFile(u8 taskId)
         switch (gSaveFileStatus)
         {
         case SAVE_STATUS_OK:
+        case SAVE_STATUS_ERROR:
             LoadUserFrameToBg(0);
             if (IsMysteryGiftEnabled() == TRUE)
             {
@@ -248,19 +249,19 @@ static void Task_SetWin0BldRegsAndCheckSaveFile(u8 taskId)
             gTasks[taskId].tMenuType = MAIN_MENU_NEWGAME;
             PrintSaveErrorStatus(taskId, gText_SaveFileHasBeenDeleted);
             break;
-        case SAVE_STATUS_ERROR:
-            SetStdFrame0OnBg(0);
-            gTasks[taskId].tMenuType = MAIN_MENU_CONTINUE;
-            PrintSaveErrorStatus(taskId, gText_SaveFileCorrupted);
-            if (IsMysteryGiftEnabled() == TRUE)
-            {
-                gTasks[taskId].tMenuType = MAIN_MENU_MYSTERYGIFT;
-            }
-            else
-            {
-                gTasks[taskId].tMenuType = MAIN_MENU_CONTINUE;
-            }
-            break;
+//        case SAVE_STATUS_ERROR:
+//            SetStdFrame0OnBg(0);
+//            gTasks[taskId].tMenuType = MAIN_MENU_CONTINUE;
+//            PrintSaveErrorStatus(taskId, gText_SaveFileCorrupted);
+//            if (IsMysteryGiftEnabled() == TRUE)
+//            {
+//                gTasks[taskId].tMenuType = MAIN_MENU_MYSTERYGIFT;
+//            }
+//            else
+//            {
+//                gTasks[taskId].tMenuType = MAIN_MENU_CONTINUE;
+//            }
+//            break;
         case SAVE_STATUS_EMPTY:
         default:
             LoadUserFrameToBg(0);
