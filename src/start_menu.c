@@ -744,11 +744,13 @@ static u8 SaveDialogCB_AskSaveHandleInput(void)
 static u8 SaveDialogCB_PrintAskOverwriteText(void)
 {
     if (gDifferentSaveFile == TRUE)
+    {
         PrintSaveTextWithFollowupFunc(gText_DifferentGameFile, SaveDialogCB_AskReplacePreviousFilePrintYesNoMenu);
+        return SAVECB_RETURN_CONTINUE;
+    }
     else
-        PrintSaveTextWithFollowupFunc(gText_AlreadySaveFile_WouldLikeToOverwrite, SaveDialogCB_AskOverwritePrintYesNoMenu);
-    return SAVECB_RETURN_CONTINUE;
-}
+        return SaveDialogCB_PrintSavingDontTurnOffPower();
+} 
 
 static u8 SaveDialogCB_AskOverwritePrintYesNoMenu(void)
 {
