@@ -1025,8 +1025,8 @@ static void InitRegionMapType(void)
     {
         sRegionMap->permissions[i] = sRegionMapPermissions[sRegionMap->type][i];
     }
-    if (!FlagGet(FLAG_SYS_SEVII_MAP_123))
-        sRegionMap->permissions[MAPPERM_HAS_SWITCH_BUTTON] = FALSE;
+    //if (!FlagGet(FLAG_SYS_SEVII_MAP_123))
+        sRegionMap->permissions[MAPPERM_HAS_SWITCH_BUTTON] = FlagGet(FLAG_SYS_SEVII_MAP_123);
     region = REGIONMAP_KANTO;
     j = REGIONMAP_KANTO;
     if (gMapHeader.regionMapSectionId >= MAPSECS_SEVII_123)
