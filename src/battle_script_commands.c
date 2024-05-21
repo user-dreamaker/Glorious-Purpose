@@ -7634,7 +7634,7 @@ static void Cmd_disablelastusedattack(void)
         PREPARE_MOVE_BUFFER(gBattleTextBuff1, gBattleMons[gBattlerTarget].moves[i])
 
         gDisableStructs[gBattlerTarget].disabledMove = gBattleMons[gBattlerTarget].moves[i];
-        gDisableStructs[gBattlerTarget].disableTimer = (Random() & 3) + 2;
+        gDisableStructs[gBattlerTarget].disableTimer = 4;
         gDisableStructs[gBattlerTarget].disableTimerStartValue = gDisableStructs[gBattlerTarget].disableTimer; // used to save the random amount of turns?
         gBattlescriptCurrInstr += 5;
     }
