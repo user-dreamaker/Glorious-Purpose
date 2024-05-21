@@ -8778,8 +8778,8 @@ static void Cmd_settaunt(void)
 {
     if (gDisableStructs[gBattlerTarget].tauntTimer == 0)
     {
-        gDisableStructs[gBattlerTarget].tauntTimer = 2;
-        gDisableStructs[gBattlerTarget].tauntTimer2 = 2;
+        gDisableStructs[gBattlerTarget].tauntTimer = 3;
+        gDisableStructs[gBattlerTarget].tauntTimer2 = 3;
         gBattlescriptCurrInstr += 5;
     }
     else
