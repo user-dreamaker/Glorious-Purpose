@@ -632,6 +632,7 @@ BattleScript_DoMultiHit::
 	datahpupdate BS_TARGET
 	critmessage
 	waitmessage B_WAIT_TIME_LONG
+	seteffectwithchance
 	printstring STRINGID_EMPTYSTRING3
 	waitmessage 1
 	addbyte sMULTIHIT_STRING + 4, 1
@@ -649,7 +650,6 @@ BattleScript_MultiHitPrintStrings::
 	printstring STRINGID_HITXTIMES
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_MultiHitEnd::
-	seteffectwithchance
 	tryfaintmon BS_TARGET
 	moveendcase MOVEEND_SYNCHRONIZE_TARGET
 	moveendfrom MOVEEND_IMMUNITY_ABILITIES
