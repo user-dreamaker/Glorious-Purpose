@@ -2807,7 +2807,6 @@ static void Cmd_seteffectwithchance(void)
     }
 
     gBattleCommunication[MOVE_EFFECT_BYTE] = 0;
-    gBattleScripting.multihitMoveEffect = 0;
 }
 
 static void Cmd_seteffectprimary(void)
