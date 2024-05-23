@@ -85,7 +85,7 @@ gBattleScriptsForMoveEffects::
 	.4byte BattleScript_EffectHit                    @ EFFECT_SPECIAL_ATTACK_DOWN_2
 	.4byte BattleScript_EffectSpecialDefenseDown2    @ EFFECT_SPECIAL_DEFENSE_DOWN_2
 	.4byte BattleScript_EffectHit                    @ EFFECT_ACCURACY_DOWN_2
-	.4byte BattleScript_EffectHit                    @ EFFECT_EVASION_DOWN_2
+	.4byte BattleScript_EffectEvasionDown2           @ EFFECT_EVASION_DOWN_2
 	.4byte BattleScript_EffectReflect                @ EFFECT_REFLECT
 	.4byte BattleScript_EffectPoison                 @ EFFECT_POISON
 	.4byte BattleScript_EffectParalyze               @ EFFECT_PARALYZE
@@ -533,6 +533,10 @@ BattleScript_EffectAccuracyDown::
 	setstatchanger STAT_ACC, 1, TRUE
 	goto BattleScript_EffectStatDown
 
+BattleScript_EffectEvasionDown2::
+	setstatchanger STAT_EVASION, 2, TRUE
+	goto BattleScript_EffectStatDown
+	
 BattleScript_EffectEvasionDown::
 	setstatchanger STAT_EVASION, 1, TRUE
 BattleScript_EffectStatDown::
