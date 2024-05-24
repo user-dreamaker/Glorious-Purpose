@@ -266,6 +266,7 @@ BattleScript_HitFromAtkAnimation::
 	resultmessage
 	waitmessage B_WAIT_TIME_LONG
 	seteffectwithchance
+BattleScript_EffectRechargeHack::	
 	tryfaintmon BS_TARGET
 BattleScript_MoveEnd::
 	moveendall
@@ -1107,8 +1108,28 @@ BattleScript_AlreadyHasSubstitute::
 BattleScript_EffectRecharge::
 	attackcanceler
 	accuracycheck BattleScript_PrintMoveMissed, ACC_CURR_MOVE
+	attackstring
+	ppreduce
+	critcalc
+	damagecalc
+	typecalc
+	adjustnormaldamage
+	attackanimation
+	waitanimation
+	effectivenesssound
+	hitanimation BS_TARGET
+	waitstate
+	healthbarupdate BS_TARGET
+	datahpupdate BS_TARGET
+	critmessage
+	waitmessage B_WAIT_TIME_LONG
+	resultmessage
+	waitmessage B_WAIT_TIME_LONG
+	jumpifhasnohp BS_TARGET, BattleScript_EffectRechargeHack
+	jumpifstatus2 BS_TARGET, STATUS2_SUBSTITUTE, BattleScript_EffectRechargeHack
 	setmoveeffect MOVE_EFFECT_RECHARGE | MOVE_EFFECT_AFFECTS_USER | MOVE_EFFECT_CERTAIN
-	goto BattleScript_HitFromAtkString
+	seteffectwithchance
+	goto BattleScript_EffectRechargeHack
 
 BattleScript_MoveUsedMustRecharge::
 	printstring STRINGID_PKMNMUSTRECHARGE
