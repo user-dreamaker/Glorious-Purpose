@@ -94,5 +94,6 @@ void HandleAction_RunBattleScript(void);
 u8 GetMoveTarget(u16 move, u8 setTarget);
 u8 IsMonDisobedient(void);
 bool8 GhostUnTrap(u8 battler);
+u8 GhostUpdate(u8 battler);
 
 #endif // GUARD_BATTLE_UTIL_H

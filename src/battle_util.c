@@ -3275,3 +3275,17 @@ bool8 GhostUnTrap(u8 battler)
     else
         return TRUE;
 }
+
+u8 GhostUpdate(u8 battler)
+{
+    u8 i;
+    if (IS_BATTLER_OF_TYPE(battler, TYPE_GHOST))
+        return 0;
+    if ((i = ABILITY_ON_OPPOSING_FIELD(battler, ABILITY_SHADOW_TAG)) != 0 && gBattleMons[battler].ability != ABILITY_SHADOW_TAG)
+        return i;
+    if ((i = ABILITY_ON_OPPOSING_FIELD(battler, ABILITY_ARENA_TRAP)) && !IS_BATTLER_OF_TYPE(battler, TYPE_FLYING) && gBattleMons[battler].ability != ABILITY_LEVITATE)
+        return i;
+    if ((i = ABILITY_ON_OPPOSING_FIELD(battler, ABILITY_MAGNET_PULL)) && IS_BATTLER_OF_TYPE(battler, TYPE_STEEL))
+        return i;
+    return 0;
+}
