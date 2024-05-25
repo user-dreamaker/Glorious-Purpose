@@ -883,7 +883,7 @@ u8 DoBattlerEndTurnEffects(void)
                         gBattleTextBuff1[3] = *(gBattleStruct->wrappedMove + gActiveBattler * 2 + 1);
                         gBattleTextBuff1[4] = EOS;
                         gBattlescriptCurrInstr = BattleScript_WrapTurnDmg;
-                        gBattleMoveDamage = gBattleMons[gActiveBattler].maxHP / 16;
+                        gBattleMoveDamage = gBattleMons[gActiveBattler].maxHP / 8;
                         if (gBattleMoveDamage == 0)
                             gBattleMoveDamage = 1;
                     }
@@ -3262,4 +3262,16 @@ u8 IsMonDisobedient(void)
             return 1;
         }
     }
+}
+
+bool8 GhostUnTrap(u8 battler)
+{
+    if (IS_BATTLER_OF_TYPE(battler, TYPE_GHOST))
+        return TRUE;
+    else if (gBattleMons[battler].status2 & (STATUS2_ESCAPE_PREVENTION | STATUS2_WRAPPED))
+        return FALSE;
+    else if (gStatuses3[battler] & STATUS3_ROOTED)
+        return FALSE;
+    else
+        return TRUE;
 }
