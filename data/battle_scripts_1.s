@@ -1142,7 +1142,7 @@ BattleScript_EffectRage::
 	accuracycheck BattleScript_RageMiss, ACC_CURR_MOVE
 	setmoveeffect MOVE_EFFECT_RAGE
 	seteffectprimary
-	setmoveeffect 0
+	setmoveeffect MOVE_EFFECT_ATK_PLUS_1 | MOVE_EFFECT_AFFECTS_USER | MOVE_EFFECT_CERTAIN
 	goto BattleScript_HitFromAtkString
 BattleScript_RageMiss::
 	setmoveeffect MOVE_EFFECT_RAGE
