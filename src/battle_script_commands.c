@@ -997,6 +997,12 @@ static bool8 AccuracyCalcHelper(u16 move)
         return TRUE;
     }
 
+    if (gBattleMoves[move].accuracy == 0)
+    {
+        JumpIfMoveFailed(7, move);
+        return TRUE;
+    }	
+
     return FALSE;
 }
 
