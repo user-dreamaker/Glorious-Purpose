@@ -1310,7 +1310,7 @@ static void Cmd_typecalc(void)
         gBattleMoveDamage = gBattleMoveDamage / 10;
     }
 
-    if (gBattleMons[gBattlerTarget].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND)
+    if (gBattleMons[gBattlerTarget].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
     {
         gLastUsedAbility = gBattleMons[gBattlerTarget].ability;
         gMoveResultFlags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
@@ -1334,11 +1334,19 @@ static void Cmd_typecalc(void)
             {
                 // check type1
                 if (TYPE_EFFECT_DEF_TYPE(i) == gBattleMons[gBattlerTarget].type1)
-                    ModulateDmgByType(TYPE_EFFECT_MULTIPLIER(i));
+                {
+                    if (!(gCurrentMove == MOVE_BONEMERANG && moveType == TYPE_GROUND && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT
+                        && (gBattleMons[gBattlerTarget].type1 == TYPE_FLYING || gBattleMons[gBattlerTarget].type2 == TYPE_FLYING)))
+                        ModulateDmgByType(TYPE_EFFECT_MULTIPLIER(i));
+                }
                 // check type2
                 if (TYPE_EFFECT_DEF_TYPE(i) == gBattleMons[gBattlerTarget].type2 &&
                     gBattleMons[gBattlerTarget].type1 != gBattleMons[gBattlerTarget].type2)
-                    ModulateDmgByType(TYPE_EFFECT_MULTIPLIER(i));
+                {
+                    if (!(gCurrentMove == MOVE_BONEMERANG && moveType == TYPE_GROUND && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT
+                        && (gBattleMons[gBattlerTarget].type1 == TYPE_FLYING || gBattleMons[gBattlerTarget].type2 == TYPE_FLYING)))
+                        ModulateDmgByType(TYPE_EFFECT_MULTIPLIER(i));
+                }
             }
             i += 3;
         }
@@ -1372,7 +1380,7 @@ static void CheckWonderGuardAndLevitate(void)
 
     GET_MOVE_TYPE(gCurrentMove, moveType);
 
-    if (gBattleMons[gBattlerTarget].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND)
+    if (gBattleMons[gBattlerTarget].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
     {
         gLastUsedAbility = ABILITY_LEVITATE;
         gBattleCommunication[MISS_TYPE] = B_MSG_GROUND_MISS;
@@ -1395,15 +1403,23 @@ static void CheckWonderGuardAndLevitate(void)
             if (TYPE_EFFECT_DEF_TYPE(i) == gBattleMons[gBattlerTarget].type1
                 && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT)
             {
-                gMoveResultFlags |= MOVE_RESULT_DOESNT_AFFECT_FOE;
-                gProtectStructs[gBattlerAttacker].targetNotAffected = 1;
+                if (!(gCurrentMove == MOVE_BONEMERANG && moveType == TYPE_GROUND
+                    && (gBattleMons[gBattlerTarget].type1 == TYPE_FLYING || gBattleMons[gBattlerTarget].type2 == TYPE_FLYING)))
+                {
+                    gMoveResultFlags |= MOVE_RESULT_DOESNT_AFFECT_FOE;
+                    gProtectStructs[gBattlerAttacker].targetNotAffected = 1;
+                }
             }
             if (TYPE_EFFECT_DEF_TYPE(i) == gBattleMons[gBattlerTarget].type2 &&
                 gBattleMons[gBattlerTarget].type1 != gBattleMons[gBattlerTarget].type2 &&
                 TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT)
             {
-                gMoveResultFlags |= MOVE_RESULT_DOESNT_AFFECT_FOE;
-                gProtectStructs[gBattlerAttacker].targetNotAffected = 1;
+                if (!(gCurrentMove == MOVE_BONEMERANG && moveType == TYPE_GROUND
+                    && (gBattleMons[gBattlerTarget].type1 == TYPE_FLYING || gBattleMons[gBattlerTarget].type2 == TYPE_FLYING)))
+                {
+                    gMoveResultFlags |= MOVE_RESULT_DOESNT_AFFECT_FOE;
+                    gProtectStructs[gBattlerAttacker].targetNotAffected = 1;
+                }
             }
 
             // check super effective
@@ -1489,7 +1505,7 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
         gBattleMoveDamage = gBattleMoveDamage / 10;
     }
 
-    if (gBattleMons[defender].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND)
+    if (gBattleMons[defender].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND && move != MOVE_BONEMERANG)
     {
         flags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
     }
@@ -1509,11 +1525,27 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
             {
                 // check type1
                 if (TYPE_EFFECT_DEF_TYPE(i) == gBattleMons[defender].type1)
+                {
+                    if (move == MOVE_BONEMERANG && moveType == TYPE_GROUND && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT
+                        && (gBattleMons[defender].type1 == TYPE_FLYING || gBattleMons[defender].type2 == TYPE_FLYING))
+                    {
+                        i += 3;
+                        continue;
+                    }
                     ModulateDmgByType2(TYPE_EFFECT_MULTIPLIER(i), move, &flags);
+                }
                 // check type2
                 if (TYPE_EFFECT_DEF_TYPE(i) == gBattleMons[defender].type2 &&
                     gBattleMons[defender].type1 != gBattleMons[defender].type2)
+                {
+                    if (move == MOVE_BONEMERANG && moveType == TYPE_GROUND && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT
+                        && (gBattleMons[defender].type1 == TYPE_FLYING || gBattleMons[defender].type2 == TYPE_FLYING))
+                    {
+                        i += 3;
+                        continue;
+                    }
                     ModulateDmgByType2(TYPE_EFFECT_MULTIPLIER(i), move, &flags);
+                }
             }
             i += 3;
         }
@@ -1541,7 +1573,7 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
 
     moveType = gBattleMoves[move].type;
 
-    if (targetAbility == ABILITY_LEVITATE && moveType == TYPE_GROUND)
+    if (targetAbility == ABILITY_LEVITATE && moveType == TYPE_GROUND && move != MOVE_BONEMERANG)
     {
         flags = MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE;
     }
@@ -1558,10 +1590,26 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
             {
                 // check type1
                 if (TYPE_EFFECT_DEF_TYPE(i) == type1)
+                {
+                    if (move == MOVE_BONEMERANG && moveType == TYPE_GROUND && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT
+                        && (type1 == TYPE_FLYING || type2 == TYPE_FLYING))
+                    {
+                        i += 3;
+                        continue;
+                    }
                     ModulateDmgByType2(TYPE_EFFECT_MULTIPLIER(i), move, &flags);
+                }
                 // check type2
                 if (TYPE_EFFECT_DEF_TYPE(i) == type2 && type1 != type2)
+                {
+                    if (move == MOVE_BONEMERANG && moveType == TYPE_GROUND && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT
+                        && (type1 == TYPE_FLYING || type2 == TYPE_FLYING))
+                    {
+                        i += 3;
+                        continue;
+                    }
                     ModulateDmgByType2(TYPE_EFFECT_MULTIPLIER(i), move, &flags);
+                }
             }
             i += 3;
         }
@@ -4367,7 +4415,7 @@ static void Cmd_typecalc2(void)
     s32 i = 0;
     u8 moveType = gBattleMoves[gCurrentMove].type;
 
-    if (gBattleMons[gBattlerTarget].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND)
+    if (gBattleMons[gBattlerTarget].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
     {
         gLastUsedAbility = gBattleMons[gBattlerTarget].ability;
         gMoveResultFlags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
@@ -4399,8 +4447,12 @@ static void Cmd_typecalc2(void)
                 {
                     if (TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT)
                     {
-                        gMoveResultFlags |= MOVE_RESULT_DOESNT_AFFECT_FOE;
-                        break;
+                        if (!(gCurrentMove == MOVE_BONEMERANG && moveType == TYPE_GROUND
+                            && (gBattleMons[gBattlerTarget].type1 == TYPE_FLYING || gBattleMons[gBattlerTarget].type2 == TYPE_FLYING)))
+                        {
+                            gMoveResultFlags |= MOVE_RESULT_DOESNT_AFFECT_FOE;
+                            break;
+                        }
                     }
                     if (TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NOT_EFFECTIVE)
                     {
@@ -4417,8 +4469,12 @@ static void Cmd_typecalc2(void)
                     if (gBattleMons[gBattlerTarget].type1 != gBattleMons[gBattlerTarget].type2
                         && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_NO_EFFECT)
                     {
-                        gMoveResultFlags |= MOVE_RESULT_DOESNT_AFFECT_FOE;
-                        break;
+                        if (!(gCurrentMove == MOVE_BONEMERANG && moveType == TYPE_GROUND
+                            && (gBattleMons[gBattlerTarget].type1 == TYPE_FLYING || gBattleMons[gBattlerTarget].type2 == TYPE_FLYING)))
+                        {
+                            gMoveResultFlags |= MOVE_RESULT_DOESNT_AFFECT_FOE;
+                            break;
+                        }
                     }
                     if (TYPE_EFFECT_DEF_TYPE(i) == gBattleMons[gBattlerTarget].type2
                         && gBattleMons[gBattlerTarget].type1 != gBattleMons[gBattlerTarget].type2
