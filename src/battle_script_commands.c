@@ -1295,6 +1295,12 @@ static void Cmd_typecalc(void)
         return;
     }
 
+    if (gBattleMoves[gCurrentMove].flags & FLAG_BYPASSES_TYPE_IMMUNITY)
+    {
+        gBattlescriptCurrInstr++;
+        return;
+    }
+
     GET_MOVE_TYPE(gCurrentMove, moveType);
 
     // check stab
