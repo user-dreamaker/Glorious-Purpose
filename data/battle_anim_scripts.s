@@ -2974,54 +2974,20 @@ Move_BARRAGE:
 	end
 
 Move_SKY_ATTACK:
+	loadspritegfx ANIM_TAG_ROUND_SHADOW
+	loadspritegfx ANIM_TAG_IMPACT
 	choosetwoturnanim SkyAttackSetUp, SkyAttackUnleash
+
 SkyAttackEnd:
+	waitforvisualfinish
 	end
 
 SkyAttackSetUp:
-	monbg ANIM_DEF_PARTNER
-	setalpha 12, 11
-	createvisualtask AnimTask_GetTargetIsAttackerPartner, 5, ARG_RET_ID
-	jumpretfalse SkyAttackSetUpAgainstOpponent
-	goto SkyAttackSetUpAgainstPartner
-
-SkyAttackSetUpAgainstOpponent:
-	createvisualtask AnimTask_BlendBattleAnimPal, 10, F_PAL_BG | F_PAL_ATK_SIDE | F_PAL_DEF_PARTNER, 1, 0, 12, RGB_BLACK
-	waitforvisualfinish
-	delay 12
-	createvisualtask AnimTask_BlendBattleAnimPal, 10, F_PAL_ATTACKER, 1, 8, 0, RGB_BLACK
-	createvisualtask AnimTask_HorizontalShake, 5, ANIM_ATTACKER, 2, 16
-	loopsewithpan SE_M_STAT_INCREASE, SOUND_PAN_ATTACKER, 4, 8
-	createvisualtask AnimTask_BlendBattleAnimPal, 10, F_PAL_ATTACKER, 1, 0, 15, RGB_WHITE
-	delay 20
-	createvisualtask AnimTask_BlendBattleAnimPal, 10, F_PAL_ATTACKER, 1, 15, 0, RGB_WHITE
-	waitforvisualfinish
-	createvisualtask AnimTask_BlendBattleAnimPal, 10, F_PAL_BG | F_PAL_ATK_PARTNER | F_PAL_DEF_PARTNER, 1, 8, 0, RGB_BLACK
-	waitforvisualfinish
-	clearmonbg ANIM_DEF_PARTNER
-	blendoff
-	goto SkyAttackEnd
-
-SkyAttackSetUpAgainstPartner:
-	createvisualtask AnimTask_BlendBattleAnimPalExclude, 10, ANIM_TARGET, 1, 0, 12, RGB_BLACK
-	waitforvisualfinish
-	delay 12
-	createvisualtask AnimTask_BlendBattleAnimPal, 10, F_PAL_ATTACKER, 1, 8, 0, RGB_BLACK
-	createvisualtask AnimTask_HorizontalShake, 5, ANIM_ATTACKER, 2, 16
-	playsewithpan SE_M_STAT_INCREASE, SOUND_PAN_ATTACKER
-	delay 8
-	createvisualtask AnimTask_BlendBattleAnimPal, 10, F_PAL_ATTACKER, 1, 0, 15, RGB_WHITE
-	delay 20
-	createvisualtask AnimTask_BlendBattleAnimPal, 10, F_PAL_ATTACKER, 1, 15, 0, RGB_WHITE
-	waitforvisualfinish
-	createvisualtask AnimTask_BlendBattleAnimPalExclude, 10, 4, 1, 8, 0, RGB_BLACK
-	waitforvisualfinish
-	clearmonbg ANIM_DEF_PARTNER
-	blendoff
+	playsewithpan SE_M_FLY, SOUND_PAN_ATTACKER
+	createsprite gFlyBallUpSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, 13, 336
 	goto SkyAttackEnd
 
 SkyAttackUnleash:
-	loadspritegfx ANIM_TAG_IMPACT
 	loadspritegfx ANIM_TAG_BIRD
 	call SetSkyBg
 	monbg ANIM_ATTACKER
