@@ -8089,16 +8089,8 @@ static void Cmd_healpartystatus(void)
         else
             party = gEnemyParty;
 
-        if (gBattleMons[gBattlerAttacker].ability != ABILITY_SOUNDPROOF)
-        {
-            gBattleMons[gBattlerAttacker].status1 = 0;
-            gBattleMons[gBattlerAttacker].status2 &= ~STATUS2_NIGHTMARE;
-        }
-        else
-        {
-            RecordAbilityBattle(gBattlerAttacker, gBattleMons[gBattlerAttacker].ability);
-            gBattleCommunication[MULTISTRING_CHOOSER] |= B_MSG_BELL_SOUNDPROOF_ATTACKER;
-        }
+        gBattleMons[gBattlerAttacker].status1 = 0;
+        gBattleMons[gBattlerAttacker].status2 &= ~STATUS2_NIGHTMARE;
 
         gActiveBattler = gBattleScripting.battler = GetBattlerAtPosition(GetBattlerPosition(gBattlerAttacker) ^ BIT_FLANK);
 
@@ -8117,29 +8109,12 @@ static void Cmd_healpartystatus(void)
             }
         }
 
-        // Because the above MULTISTRING_CHOOSER are ORd, if both are set then it will be B_MSG_BELL_BOTH_SOUNDPROOF
-
         for (i = 0; i < PARTY_SIZE; i++)
         {
             u16 species = GetMonData(&party[i], MON_DATA_SPECIES_OR_EGG);
-            u8 abilityNum = GetMonData(&party[i], MON_DATA_ABILITY_NUM);
 
             if (species != SPECIES_NONE && species != SPECIES_EGG)
-            {
-                u8 ability;
-
-                if (gBattlerPartyIndexes[gBattlerAttacker] == i)
-                    ability = gBattleMons[gBattlerAttacker].ability;
-                else if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE
-                         && gBattlerPartyIndexes[gActiveBattler] == i
-                         && !(gAbsentBattlerFlags & gBitTable[gActiveBattler]))
-                    ability = gBattleMons[gActiveBattler].ability;
-                else
-                    ability = GetAbilityBySpecies(species, abilityNum);
-
-                if (ability != ABILITY_SOUNDPROOF)
-                    toHeal |= (1 << i);
-            }
+                toHeal |= (1 << i);
         }
     }
     else // Aromatherapy
