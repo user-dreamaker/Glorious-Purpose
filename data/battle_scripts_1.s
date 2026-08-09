@@ -1061,11 +1061,10 @@ BattleScript_EffectAccuracyDownHit::
 	goto BattleScript_EffectHit
 
 BattleScript_EffectSkyAttack::
-	jumpifstatus2 BS_ATTACKER, STATUS2_MULTIPLETURNS, BattleScript_TwoTurnMovesSecondTurn
-	jumpifword CMP_COMMON_BITS, gHitMarker, HITMARKER_NO_ATTACKSTRING, BattleScript_TwoTurnMovesSecondTurn
+	jumpifstatus2 BS_ATTACKER, STATUS2_MULTIPLETURNS, BattleScript_SecondTurnSemiInvulnerable
+	jumpifword CMP_COMMON_BITS, gHitMarker, HITMARKER_NO_ATTACKSTRING, BattleScript_SecondTurnSemiInvulnerable
 	setbyte sTWOTURN_STRINGID, B_MSG_TURN1_SKY_ATTACK
-	call BattleScriptFirstChargingTurn
-	goto BattleScript_MoveEnd
+	goto BattleScript_FirstTurnSemiInvulnerable
 
 BattleScript_EffectConfuseHit::
 	setmoveeffect MOVE_EFFECT_CONFUSION
@@ -1994,6 +1993,7 @@ BattleScript_EffectSemiInvulnerable::
 	jumpifmove MOVE_FLY, BattleScript_FirstTurnFly
 	jumpifmove MOVE_DIVE, BattleScript_FirstTurnDive
 	jumpifmove MOVE_BOUNCE, BattleScript_FirstTurnBounce
+	jumpifmove MOVE_SKY_ATTACK, BattleScript_FirstTurnSkyAttack
 	setbyte sTWOTURN_STRINGID, B_MSG_TURN1_DIG
 	goto BattleScript_FirstTurnSemiInvulnerable
 
@@ -2003,6 +2003,10 @@ BattleScript_FirstTurnBounce::
 
 BattleScript_FirstTurnDive::
 	setbyte sTWOTURN_STRINGID, B_MSG_TURN1_DIVE
+	goto BattleScript_FirstTurnSemiInvulnerable
+
+BattleScript_FirstTurnSkyAttack::
+	setbyte sTWOTURN_STRINGID, B_MSG_TURN1_FLY
 	goto BattleScript_FirstTurnSemiInvulnerable
 
 BattleScript_FirstTurnFly::
@@ -2018,8 +2022,11 @@ BattleScript_SecondTurnSemiInvulnerable::
 	setbyte sB_ANIM_TURN, 1
 	clearstatusfromeffect BS_ATTACKER
 	orword gHitMarker, HITMARKER_NO_PPDEDUCT
-	jumpifnotmove MOVE_BOUNCE, BattleScript_SemiInvulnerableTryHit
+	jumpifnotmove MOVE_BOUNCE, BattleScript_SemiInvulnerableCheckSkyAttack
 	setmoveeffect MOVE_EFFECT_PARALYSIS
+BattleScript_SemiInvulnerableCheckSkyAttack::
+	jumpifnotmove MOVE_SKY_ATTACK, BattleScript_SemiInvulnerableTryHit
+	setmoveeffect MOVE_EFFECT_FLINCH
 BattleScript_SemiInvulnerableTryHit::
 	accuracycheck BattleScript_SemiInvulnerableMiss, ACC_CURR_MOVE
 	clearsemiinvulnerablebit
