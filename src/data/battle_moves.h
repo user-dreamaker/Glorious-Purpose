@@ -2004,7 +2004,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 
     [MOVE_SKY_ATTACK] =
     {
-        .effect = EFFECT_SKY_ATTACK,
+        .effect = EFFECT_SEMI_INVULNERABLE,
         .power = 140,
         .type = TYPE_FLYING,
         .accuracy = 90,
