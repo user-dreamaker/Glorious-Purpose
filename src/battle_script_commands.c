@@ -2538,7 +2538,15 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 else
                 {
                     gBattleCommunication[MOVE_EFFECT_BYTE] = Random() % 3 + 3;
-                    SetMoveEffect(FALSE, 0);
+                    if (gBattleCommunication[MOVE_EFFECT_BYTE] == MOVE_EFFECT_PARALYSIS
+                        && IS_BATTLER_OF_TYPE(gEffectBattler, TYPE_ELECTRIC))
+                    {
+                        gBattlescriptCurrInstr++;
+                    }
+                    else
+                    {
+                        SetMoveEffect(FALSE, 0);
+                    }
                 }
                 break;
             case MOVE_EFFECT_CHARGING:
