@@ -8557,29 +8557,90 @@ static void Cmd_recoverbasedonsunlight(void)
 
 static void Cmd_hiddenpowercalc(void)
 {
-    s32 powerBits, typeBits;
+    u8 nature = gBattleMons[gBattlerAttacker].personality % NUM_NATURES;
+    u8 power;
+    u8 category; // 0 = Physical, 1 = Special
 
-    powerBits = ((gBattleMons[gBattlerAttacker].hpIV & 2) >> 1)
-              | ((gBattleMons[gBattlerAttacker].attackIV & 2) << 0)
-              | ((gBattleMons[gBattlerAttacker].defenseIV & 2) << 1)
-              | ((gBattleMons[gBattlerAttacker].speedIV & 2) << 2)
-              | ((gBattleMons[gBattlerAttacker].spAttackIV & 2) << 3)
-              | ((gBattleMons[gBattlerAttacker].spDefenseIV & 2) << 4);
-    typeBits  = ((gBattleMons[gBattlerAttacker].hpIV & 1) << 0)
-              | ((gBattleMons[gBattlerAttacker].attackIV & 1) << 1)
-              | ((gBattleMons[gBattlerAttacker].defenseIV & 1) << 2)
-              | ((gBattleMons[gBattlerAttacker].speedIV & 1) << 3)
-              | ((gBattleMons[gBattlerAttacker].spAttackIV & 1) << 4)
-              | ((gBattleMons[gBattlerAttacker].spDefenseIV & 1) << 5);
+    // Power calculation: check IV ranges
+    if (gBattleMons[gBattlerAttacker].hpIV <= 1
+        || gBattleMons[gBattlerAttacker].attackIV <= 1
+        || gBattleMons[gBattlerAttacker].defenseIV <= 1
+        || gBattleMons[gBattlerAttacker].speedIV <= 1
+        || gBattleMons[gBattlerAttacker].spAttackIV <= 1
+        || gBattleMons[gBattlerAttacker].spDefenseIV <= 1)
+    {
+        power = 60;
+    }
+    else if (gBattleMons[gBattlerAttacker].hpIV >= 30
+             && gBattleMons[gBattlerAttacker].attackIV >= 30
+             && gBattleMons[gBattlerAttacker].defenseIV >= 30
+             && gBattleMons[gBattlerAttacker].speedIV >= 30
+             && gBattleMons[gBattlerAttacker].spAttackIV >= 30
+             && gBattleMons[gBattlerAttacker].spDefenseIV >= 30)
+    {
+        power = 70;
+    }
+    else
+    {
+        power = 60;
+    }
 
-    gDynamicBasePower = (40 * powerBits) / 63 + 30;
+    // Category based on Nature
+    switch (nature)
+    {
+    case NATURE_LONELY:  // ↑Atk, ↓Def
+    case NATURE_ADAMANT: // ↑Atk, ↓SpAtk
+    case NATURE_NAUGHTY: // ↑Atk, ↓SpDef
+    case NATURE_BRAVE:   // ↑Atk, ↓Spd
+    case NATURE_BOLD:    // ↑Def, ↓Atk
+    case NATURE_IMPISH:  // ↑Def, ↓SpAtk
+    case NATURE_LAX:     // ↑Def, ↓SpDef
+    case NATURE_RELAXED: // ↑Def, ↓Spd
+        category = 0; // Physical
+        break;
+    case NATURE_MODEST:  // ↑SpAtk, ↓Atk
+    case NATURE_MILD:    // ↑SpAtk, ↓Def
+    case NATURE_RASH:    // ↑SpAtk, ↓SpDef
+    case NATURE_QUIET:   // ↑SpAtk, ↓Spd
+    case NATURE_CALM:    // ↑SpDef, ↓Atk
+    case NATURE_GENTLE:  // ↑SpDef, ↓Def
+    case NATURE_CAREFUL: // ↑SpDef, ↓SpAtk
+    case NATURE_SASSY:   // ↑SpDef, ↓Spd
+        category = 1; // Special
+        break;
+    case NATURE_TIMID:   // ↑Spd, ↓Atk
+    case NATURE_HASTY:   // ↑Spd, ↓Def
+        category = 1; // Special (decreased Atk or Def)
+        break;
+    case NATURE_JOLLY:   // ↑Spd, ↓SpAtk
+    case NATURE_NAIVE:   // ↑Spd, ↓SpDef
+        category = 0; // Physical (decreased SpAtk or SpDef)
+        break;
+    default: // Neutral natures: Hardy, Docile, Bashful, Quirky, Serious
+        if (gBattleMons[gBattlerAttacker].attack > gBattleMons[gBattlerAttacker].spAttack)
+            category = 0; // Physical
+        else
+            category = 1; // Special
+        break;
+    }
 
-    // Subtract 3 instead of 1 below because 2 types are excluded (TYPE_NORMAL and TYPE_MYSTERY)
-    // The final + 1 skips past Normal, and the following conditional skips TYPE_MYSTERY
-    gBattleStruct->dynamicMoveType = ((NUMBER_OF_MON_TYPES - 3) * typeBits) / 63 + 1;
-    if (gBattleStruct->dynamicMoveType >= TYPE_MYSTERY)
-        gBattleStruct->dynamicMoveType++;
-    gBattleStruct->dynamicMoveType |= F_DYNAMIC_TYPE_1 | F_DYNAMIC_TYPE_2;
+    gDynamicBasePower = power;
+    gBattleStruct->dynamicMoveCategory = category;
+
+    // Type is still determined by IVs
+    {
+        s32 typeBits;
+        typeBits  = ((gBattleMons[gBattlerAttacker].hpIV & 1) << 0)
+                  | ((gBattleMons[gBattlerAttacker].attackIV & 1) << 1)
+                  | ((gBattleMons[gBattlerAttacker].defenseIV & 1) << 2)
+                  | ((gBattleMons[gBattlerAttacker].speedIV & 1) << 3)
+                  | ((gBattleMons[gBattlerAttacker].spAttackIV & 1) << 4)
+                  | ((gBattleMons[gBattlerAttacker].spDefenseIV & 1) << 5);
+        gBattleStruct->dynamicMoveType = ((NUMBER_OF_MON_TYPES - 3) * typeBits) / 63 + 1;
+        if (gBattleStruct->dynamicMoveType >= TYPE_MYSTERY)
+            gBattleStruct->dynamicMoveType++;
+        gBattleStruct->dynamicMoveType |= F_DYNAMIC_TYPE_1 | F_DYNAMIC_TYPE_2;
+    }
 
     gBattlescriptCurrInstr++;
 }
