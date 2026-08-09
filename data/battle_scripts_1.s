@@ -838,6 +838,20 @@ BattleScript_DoWrapEffect::
 	goto BattleScript_EffectHit
 
 BattleScript_EffectDoubleHit::
+	jumpifnotmove MOVE_BONEMERANG, BattleScript_DoubleHitNotBonemerang
+	goto BattleScript_EffectBonemerang
+BattleScript_DoubleHitNotBonemerang::
+	attackcanceler
+	accuracycheck BattleScript_PrintMoveMissed, ACC_CURR_MOVE
+	attackstring
+	ppreduce
+	setmultihitcounter 2
+	initmultihitstring
+	setbyte sMULTIHIT_EFFECT, 0
+	goto BattleScript_MultiHitLoop
+
+BattleScript_EffectBonemerang::
+	orword gHitMarker, HITMARKER_IGNORE_ON_AIR
 	attackcanceler
 	accuracycheck BattleScript_PrintMoveMissed, ACC_CURR_MOVE
 	attackstring
