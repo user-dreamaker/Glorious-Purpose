@@ -3483,6 +3483,12 @@ BattleScript_AllStatsUpRet::
 
 BattleScript_RapidSpinAway::
 	rapidspinfree
+	setstatchanger STAT_SPEED, 1, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_CHANGE_ALLOW_PTR, BattleScript_RapidSpinSpeedDone
+	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, B_MSG_STAT_WONT_INCREASE, BattleScript_RapidSpinSpeedDone
+	printfromtable gStatUpStringIds
+	waitmessage B_WAIT_TIME_LONG
+BattleScript_RapidSpinSpeedDone::
 	return
 
 BattleScript_WrapFree::
