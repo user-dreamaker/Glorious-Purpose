@@ -479,7 +479,48 @@ BattleScript_EffectMirrorMove::
 
 BattleScript_EffectAttackUp::
 	setstatchanger STAT_ATK, 1, FALSE
+	jumpifnotbattletype BATTLE_TYPE_DOUBLE, BattleScript_EffectStatUp
+	jumpifmove MOVE_HOWL, BattleScript_EffectHowl
 	goto BattleScript_EffectStatUp
+
+BattleScript_EffectHowl::
+	attackcanceler
+	attackstring
+	ppreduce
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_CHANGE_ALLOW_PTR, BattleScript_HowlTryPartner
+	jumpifbyte CMP_NOT_EQUAL, cMULTISTRING_CHOOSER, B_MSG_STAT_WONT_INCREASE, BattleScript_HowlAttackAnim
+	pause B_WAIT_TIME_SHORT
+	goto BattleScript_HowlPrintAttackerString
+BattleScript_HowlAttackAnim::
+	attackanimation
+	waitanimation
+BattleScript_HowlDoAnim::
+	setgraphicalstatchangevalues
+	playanimation BS_ATTACKER, B_ANIM_STATS_CHANGE, sB_ANIM_ARG1
+BattleScript_HowlPrintAttackerString::
+	printfromtable gStatUpStringIds
+	waitmessage B_WAIT_TIME_LONG
+
+BattleScript_HowlTryPartner::
+	various BS_ATTACKER, VARIOUS_SET_TARGET_PARTNER
+	jumpifhasnohp BS_TARGET, BattleScript_MoveEnd
+	jumpifstatus2 BS_TARGET, STATUS2_SUBSTITUTE, BattleScript_MoveEnd
+	jumpifability BS_TARGET, ABILITY_SOUNDPROOF, BattleScript_SoundproofProtected
+	setstatchanger STAT_ATK, 1, FALSE
+	statbuffchange STAT_CHANGE_ALLOW_PTR, BattleScript_MoveEnd
+	jumpifbyte CMP_NOT_EQUAL, cMULTISTRING_CHOOSER, B_MSG_STAT_WONT_INCREASE, BattleScript_HowlPartnerAttackAnim
+	pause B_WAIT_TIME_SHORT
+	swapattackerwithtarget
+	goto BattleScript_HowlPrintPartnerString
+BattleScript_HowlPartnerAttackAnim::
+	bicbyte gMoveResultFlags, MOVE_RESULT_NO_EFFECT
+	setgraphicalstatchangevalues
+	playanimation BS_TARGET, B_ANIM_STATS_CHANGE, sB_ANIM_ARG1
+BattleScript_HowlPrintPartnerString::
+	printfromtable gStatUpStringIds
+	waitmessage B_WAIT_TIME_LONG
+	swapattackerwithtarget
+	goto BattleScript_MoveEnd
 
 BattleScript_EffectDefenseUp::
 	setstatchanger STAT_DEF, 1, FALSE
