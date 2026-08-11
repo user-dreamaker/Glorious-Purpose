@@ -6302,6 +6302,9 @@ static void Cmd_various(void)
         if (!IsFanfareTaskInactive())
             return;
         break;
+    case VARIOUS_SET_TARGET_PARTNER:
+        gBattlerTarget = GetBattlerAtPosition(GetBattlerPosition(gBattlerAttacker) ^ BIT_FLANK);
+        break;
     }
 
     gBattlescriptCurrInstr += 3;
