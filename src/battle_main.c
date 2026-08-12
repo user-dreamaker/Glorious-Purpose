@@ -3014,6 +3014,7 @@ u8 IsRunningFromBattleImpossible(void)
     for (i = 0; i < gBattlersCount; i++)
     {
         if (side != GetBattlerSide(i)
+         && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST)
          && gBattleMons[i].ability == ABILITY_SHADOW_TAG)
         {
             gBattleScripting.battler = i;
@@ -3194,7 +3195,7 @@ static void HandleTurnActionSelectionState(void)
                     {
                         BtlController_EmitChoosePokemon(BUFFER_A, PARTY_ACTION_CANT_SWITCH, 6, ABILITY_NONE, gBattleStruct->battlerPartyOrders[gActiveBattler]);
                     }
-                    else if ((i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_SHADOW_TAG))
+                    else if ((!IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST) && (i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_SHADOW_TAG)))
                           || ((i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_ARENA_TRAP))
                               && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_FLYING)
                               && gBattleMons[gActiveBattler].ability != ABILITY_LEVITATE)
@@ -4244,7 +4245,7 @@ bool8 TryRunFromBattle(u8 battler)
         gProtectStructs[battler].fleeType = FLEE_ABILITY;
         effect++;
     }
-    else if (IS_BATTLE_TYPE_GHOST_WITHOUT_SCOPE(gBattleTypeFlags))
+    else if (IS_BATTLER_OF_TYPE(battler, TYPE_GHOST))
     {
         if (GetBattlerSide(battler) == B_SIDE_PLAYER)
             effect++;
