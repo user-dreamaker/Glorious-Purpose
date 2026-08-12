@@ -188,7 +188,7 @@ struct PokemonSummaryScreenData
         u8 ALIGNED(4) expPointsStrBuf[9];
         u8 ALIGNED(4) expToNextLevelStrBuf[9];
 
-        u8 ALIGNED(4) abilityNameStrBuf[13];
+        u8 ALIGNED(4) abilityNameStrBuf[15];
         u8 ALIGNED(4) abilityDescStrBuf[52];
     } summary;
 
@@ -3117,10 +3117,10 @@ static void PokeSum_PrintAbilityNameAndDesc(void)
 {
     FillWindowPixelBuffer(sMonSummaryScreen->windowIds[5], 0);
 
-    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[5], FONT_NORMAL,
+    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[5], FONT_SMALL,
                                  66, 1, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.abilityNameStrBuf);
 
-    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[5], FONT_NORMAL,
+    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[5], FONT_SMALL,
                                  2, 15, sLevelNickTextColors[0], TEXT_SKIP_DRAW,
                                  sMonSummaryScreen->summary.abilityDescStrBuf);
 
