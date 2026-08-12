@@ -2405,6 +2405,7 @@ BattleScript_EffectCharge::
 	waitanimation
 	printstring STRINGID_PKMNCHARGINGPOWER
 	waitmessage B_WAIT_TIME_LONG
+	call BattleScript_ChargeTryVoltAbsorb
 	setstatchanger STAT_SPDEF, 1, FALSE
 	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_CHANGE_ALLOW_PTR, BattleScript_ChargeEnd
 	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, B_MSG_STAT_WONT_INCREASE, BattleScript_ChargeEnd
@@ -2412,6 +2413,23 @@ BattleScript_EffectCharge::
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_ChargeEnd::
 	goto BattleScript_MoveEnd
+	
+BattleScript_ChargeTryVoltAbsorb:
+    tryhealhalfhealth BattleScript_ChargeVoltAbsorbEnd, BS_ATTACKER
+    jumpifability BS_ATTACKER, ABILITY_VOLT_ABSORB, BattleScript_ChargeVoltAbsorb
+BattleScript_ChargeVoltAbsorbEnd:
+    return
+
+BattleScript_ChargeVoltAbsorb:
+    jumpifword CMP_EQUAL, gBattleMoveDamage, 0xFFFF, BattleScript_ChargeVoltAbsorbHeal
+	manipulatedamage DMG_RECOIL_FROM_MISS
+BattleScript_ChargeVoltAbsorbHeal:
+    orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE
+    healthbarupdate BS_ATTACKER
+    datahpupdate BS_ATTACKER
+    printstring STRINGID_PKMNRESTOREDHPUSING
+    waitmessage B_WAIT_TIME_LONG
+    return
 
 BattleScript_EffectTaunt::
 	attackcanceler
