@@ -3006,41 +3006,59 @@ u8 ItemBattleEffects(u8 caseID, u8 battlerId, bool8 moveTurn)
     case ITEMEFFECT_KINGSROCK_SHELLBELL:
         if (gBattleMoveDamage)
         {
-            switch (atkHoldEffect)
+            bool8 flinched = FALSE;
+            if (gBattleMons[gBattlerAttacker].ability == ABILITY_STENCH
+                && !(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
+                && TARGET_TURN_DAMAGED
+                && (Random() % 100) < 10
+                && (gBattleMoves[gCurrentMove].flags & FLAG_KINGS_ROCK_AFFECTED)
+                && gBattleMons[gBattlerTarget].hp)
             {
-            case HOLD_EFFECT_FLINCH:
-                if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
-                    && TARGET_TURN_DAMAGED
-                    && (Random() % 100) < battlerHoldEffectParam
-                    && gBattleMoves[gCurrentMove].flags & FLAG_KINGS_ROCK_AFFECTED
-                    && gBattleMons[gBattlerTarget].hp)
+                gBattleCommunication[MOVE_EFFECT_BYTE] = MOVE_EFFECT_FLINCH;
+                BattleScriptPushCursor();
+                SetMoveEffect(FALSE, 0);
+                BattleScriptPop();
+                flinched = TRUE;
+            }
+
+            if (!flinched)
+            {
+                switch (atkHoldEffect)
                 {
-                    gBattleCommunication[MOVE_EFFECT_BYTE] = MOVE_EFFECT_FLINCH;
-                    BattleScriptPushCursor();
-                    SetMoveEffect(FALSE, 0);
-                    BattleScriptPop();
+                case HOLD_EFFECT_FLINCH:
+                    if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
+                        && TARGET_TURN_DAMAGED
+                        && (Random() % 100) < battlerHoldEffectParam
+                        && gBattleMoves[gCurrentMove].flags & FLAG_KINGS_ROCK_AFFECTED
+                        && gBattleMons[gBattlerTarget].hp)
+                    {
+                        gBattleCommunication[MOVE_EFFECT_BYTE] = MOVE_EFFECT_FLINCH;
+                        BattleScriptPushCursor();
+                        SetMoveEffect(FALSE, 0);
+                        BattleScriptPop();
+                    }
+                    break;
+                case HOLD_EFFECT_SHELL_BELL:
+                    if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
+                        && gSpecialStatuses[gBattlerTarget].dmg != 0
+                        && gSpecialStatuses[gBattlerTarget].dmg != 0xFFFF
+                        && gBattlerAttacker != gBattlerTarget
+                        && gBattleMons[gBattlerAttacker].hp != gBattleMons[gBattlerAttacker].maxHP
+                        && gBattleMons[gBattlerAttacker].hp != 0)
+                    {
+                        gLastUsedItem = atkItem;
+                        gPotentialItemEffectBattler = gBattlerAttacker;
+                        gBattleScripting.battler = gBattlerAttacker;
+                        gBattleMoveDamage = (gSpecialStatuses[gBattlerTarget].dmg / atkHoldEffectParam) * -1;
+                        if (gBattleMoveDamage == 0)
+                            gBattleMoveDamage = -1;
+                        gSpecialStatuses[gBattlerTarget].dmg = 0;
+                        BattleScriptPushCursor();
+                        gBattlescriptCurrInstr = BattleScript_ItemHealHP_Ret;
+                        effect++;
+                    }
+                    break;
                 }
-                break;
-            case HOLD_EFFECT_SHELL_BELL:
-                if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
-                    && gSpecialStatuses[gBattlerTarget].dmg != 0
-                    && gSpecialStatuses[gBattlerTarget].dmg != 0xFFFF
-                    && gBattlerAttacker != gBattlerTarget
-                    && gBattleMons[gBattlerAttacker].hp != gBattleMons[gBattlerAttacker].maxHP
-                    && gBattleMons[gBattlerAttacker].hp != 0)
-                {
-                    gLastUsedItem = atkItem;
-                    gPotentialItemEffectBattler = gBattlerAttacker;
-                    gBattleScripting.battler = gBattlerAttacker;
-                    gBattleMoveDamage = (gSpecialStatuses[gBattlerTarget].dmg / atkHoldEffectParam) * -1;
-                    if (gBattleMoveDamage == 0)
-                        gBattleMoveDamage = -1;
-                    gSpecialStatuses[gBattlerTarget].dmg = 0;
-                    BattleScriptPushCursor();
-                    gBattlescriptCurrInstr = BattleScript_ItemHealHP_Ret;
-                    effect++;
-                }
-                break;
             }
         }
         break;
