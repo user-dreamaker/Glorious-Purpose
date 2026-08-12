@@ -969,6 +969,20 @@ static bool8 AccuracyCalcHelper(u16 move)
         return TRUE;
     }
 
+    if ((move == MOVE_SLEEP_POWDER || move == MOVE_POISON_POWDER || move == MOVE_SPORE) && IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_GRASS))
+    {
+        gMoveResultFlags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
+        JumpIfMoveFailed(7, move);
+        return TRUE;
+    }
+
+    if (move == MOVE_STUN_SPORE && (IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_GRASS) || IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_ELECTRIC)))
+    {
+        gMoveResultFlags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
+        JumpIfMoveFailed(7, move);
+        return TRUE;
+    }
+
     if (!(gHitMarker & HITMARKER_IGNORE_ON_AIR) && gStatuses3[gBattlerTarget] & STATUS3_ON_AIR)
     {
         gMoveResultFlags |= MOVE_RESULT_MISSED;
@@ -2361,6 +2375,18 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 else
                     break;
             }
+            if (IS_BATTLER_OF_TYPE(gEffectBattler, TYPE_ELECTRIC)
+                && (gHitMarker & HITMARKER_STATUS_ABILITY_EFFECT)
+                && (primary == TRUE || certain == MOVE_EFFECT_CERTAIN))
+            {
+                BattleScriptPush(gBattlescriptCurrInstr + 1);
+                gBattlescriptCurrInstr = BattleScript_PRLZPrevention;
+
+                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_STATUS_HAD_NO_EFFECT;
+                return;
+            }
+            if (IS_BATTLER_OF_TYPE(gEffectBattler, TYPE_ELECTRIC))
+                break;
             if (gBattleMons[gEffectBattler].status1)
                 break;
 
