@@ -3033,7 +3033,7 @@ u8 ItemBattleEffects(u8 caseID, u8 battlerId, bool8 moveTurn)
                 case HOLD_EFFECT_FLINCH:
                     if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
                         && TARGET_TURN_DAMAGED
-                        && (Random() % 100) < battlerHoldEffectParam
+                        && (Random() % 100) < (gBattleMons[gBattlerAttacker].ability == ABILITY_SERENE_GRACE ? battlerHoldEffectParam * 2 : battlerHoldEffectParam)
                         && gBattleMoves[gCurrentMove].flags & FLAG_KINGS_ROCK_AFFECTED
                         && gBattleMons[gBattlerTarget].hp)
                     {
