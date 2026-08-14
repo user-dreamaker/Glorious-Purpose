@@ -4587,3 +4587,18 @@ BattleScript_GrowthSpAtk:
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_GrowthEnd:
 	goto BattleScript_MoveEnd
+
+BattleScript_LightningRodActivates::
+	attackstring
+	pause B_WAIT_TIME_SHORT
+	printstring STRINGID_PKMNSXMADEYUSELESS
+	waitmessage B_WAIT_TIME_LONG
+	orbyte gMoveResultFlags, MOVE_RESULT_DOESNT_AFFECT_FOE
+	setstatchanger STAT_SPATK, 1, FALSE
+	statbuffchange STAT_CHANGE_ALLOW_PTR, BattleScript_LightningRodEnd
+	setgraphicalstatchangevalues
+	playanimation BS_TARGET, B_ANIM_STATS_CHANGE, sB_ANIM_ARG1
+	printfromtable gStatUpStringIds
+	waitmessage B_WAIT_TIME_LONG
+BattleScript_LightningRodEnd:
+	goto BattleScript_MoveEnd
