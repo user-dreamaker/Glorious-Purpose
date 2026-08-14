@@ -2010,7 +2010,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                  && TARGET_TURN_DAMAGED
                  && (gBattleMoves[move].flags & FLAG_MAKES_CONTACT)
                  && !IS_BATTLER_OF_TYPE(gBattlerAttacker, TYPE_GRASS)
-                 && (Random() % 10) == 0)
+                 && (Random() % 3) == 0)
                 {
                     do
                     {
