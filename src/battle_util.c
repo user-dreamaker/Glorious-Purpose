@@ -82,6 +82,9 @@ void PressurePPLose(u8 target, u8 attacker, u16 move)
     if (gBattleMons[target].ability != ABILITY_PRESSURE)
         return;
 
+    if (GetBattlerSide(target) == GetBattlerSide(attacker))
+        return;
+
     for (moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
     {
         if (gBattleMons[attacker].moves[moveIndex] == move)
@@ -138,10 +141,11 @@ void PressurePPLoseOnUsingPerishSong(u8 attacker)
 {
     int i, j;
     int perishSongPos = MAX_MON_MOVES;
+    u8 atkSide = GetBattlerSide(attacker);
 
     for (i = 0; i < gBattlersCount; i++)
     {
-        if (gBattleMons[i].ability == ABILITY_PRESSURE && i != attacker)
+        if (atkSide != GetBattlerSide(i) && gBattleMons[i].ability == ABILITY_PRESSURE)
         {
             for (j = 0; j < MAX_MON_MOVES; j++)
             {
