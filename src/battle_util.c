@@ -1896,6 +1896,13 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                     effect = 1;
                 }
             }
+            else if (gLastUsedAbility == ABILITY_LIGHTNING_ROD && moveType == TYPE_ELECTRIC)
+            {
+                if (gBattleMons[gBattlerAttacker].status2 & STATUS2_MULTIPLETURNS)
+                    gHitMarker |= HITMARKER_NO_PPDEDUCT;
+                gBattlescriptCurrInstr = BattleScript_LightningRodActivates;
+                effect = 1;
+            }
             break;
         case ABILITYEFFECT_ABSORBING: // 3
             if (move)
