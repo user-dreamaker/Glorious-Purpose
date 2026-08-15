@@ -3910,6 +3910,22 @@ static void WaitForEvoSceneToFinish(void)
 
 static void ReturnFromBattleToOverworld(void)
 {
+    s32 i;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL) != SPECIES_NONE
+         && GetMonAbility(&gPlayerParty[i]) == ABILITY_NATURAL_CURE)
+        {
+            u32 status = GetMonData(&gPlayerParty[i], MON_DATA_STATUS, NULL);
+            if (status != 0)
+            {
+                status = 0;
+                SetMonData(&gPlayerParty[i], MON_DATA_STATUS, &status);
+            }
+        }
+    }
+
     if (!(gBattleTypeFlags & BATTLE_TYPE_LINK))
     {
         RandomlyGivePartyPokerus(gPlayerParty);
