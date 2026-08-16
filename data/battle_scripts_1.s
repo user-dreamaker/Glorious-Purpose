@@ -4631,3 +4631,15 @@ BattleScript_MotorDriveActivates::
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_MotorDriveEnd:
 	goto BattleScript_MoveEnd
+
+BattleScript_AngerPointActivates::
+	attackstring
+	pause B_WAIT_TIME_SHORT
+	setstatchanger STAT_ATK, 6, FALSE
+	statbuffchange STAT_CHANGE_ALLOW_PTR, BattleScript_AngerPointEnd
+	setgraphicalstatchangevalues
+	playanimation BS_TARGET, B_ANIM_STATS_CHANGE, sB_ANIM_ARG1
+	printstring STRINGID_PKMNMAXEDATTACK
+	waitmessage B_WAIT_TIME_LONG
+BattleScript_AngerPointEnd:
+	goto BattleScript_MoveEnd
