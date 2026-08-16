@@ -1133,6 +1133,8 @@ static void Cmd_accuracycheck(void)
             calc = (calc * 80) / 100; // 1.2 sand veil loss
         if (gBattleMons[gBattlerAttacker].ability == ABILITY_HUSTLE && IS_TYPE_PHYSICAL(gBattleMoves[move]))
             calc = (calc * 80) / 100; // 1.2 hustle loss
+        if (gBattleMons[gBattlerTarget].ability == ABILITY_TANGLED_FEET && (gBattleMons[gBattlerTarget].status2 & STATUS2_CONFUSION))
+            calc = calc / 2; // 0.5 tangled feet loss
 
         if (gBattleMons[gBattlerTarget].item == ITEM_ENIGMA_BERRY)
         {
