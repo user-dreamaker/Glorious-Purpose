@@ -2324,7 +2324,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             {
                 if (GetBattlerSide(i) != side && gBattleMons[i].ability == ability)
                 {
-                    if (ability == ABILITY_SHADOW_TAG && IS_BATTLER_OF_TYPE(battler, TYPE_GHOST))
+                    if ((ability == ABILITY_SHADOW_TAG || ability == ABILITY_ARENA_TRAP) && IS_BATTLER_OF_TYPE(battler, TYPE_GHOST))
                         continue;
                     gLastUsedAbility = ability;
                     effect = i + 1;
