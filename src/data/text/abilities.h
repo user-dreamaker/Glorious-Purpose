@@ -80,6 +80,7 @@ static const u8 sTangledFeetDescription[] = _("Ups evasion if confused.");
 static const u8 sMotorDriveDescription[] = _("Turns electricity into Speed.");
 static const u8 sRivalryDescription[] = _("Boosts moves against rivals.");
 static const u8 sSteadfastDescription[] = _("Flinching raises Speed.");
+static const u8 sSnowCloakDescription[] = _("Ups evasion in a hailstorm.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -165,6 +166,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_MOTOR_DRIVE] = sMotorDriveDescription,
     [ABILITY_RIVALRY] = sRivalryDescription,
     [ABILITY_STEADFAST] = sSteadfastDescription,
+    [ABILITY_SNOW_CLOAK] = sSnowCloakDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -251,4 +253,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_MOTOR_DRIVE] = _("MOTOR DRIVE"),
     [ABILITY_RIVALRY] = _("RIVALRY"),
     [ABILITY_STEADFAST] = _("STEADFAST"),
+    [ABILITY_SNOW_CLOAK] = _("SNOW CLOAK"),
 };
