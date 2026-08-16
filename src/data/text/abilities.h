@@ -77,6 +77,7 @@ static const u8 sShellArmorDescription[] = _("Blocks critical hits.");
 static const u8 sCacophonyDescription[] = _("Avoids sound-based moves.");
 static const u8 sAirLockDescription[] = _("Negates weather effects.");
 static const u8 sTangledFeetDescription[] = _("Ups evasion if confused.");
+static const u8 sMotorDriveDescription[] = _("Turns electricity into Speed.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -159,6 +160,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_CACOPHONY] = sCacophonyDescription,
     [ABILITY_AIR_LOCK] = sAirLockDescription,
     [ABILITY_TANGLED_FEET] = sTangledFeetDescription,
+    [ABILITY_MOTOR_DRIVE] = sMotorDriveDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -242,4 +244,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_CACOPHONY] = _("CACOPHONY"),
     [ABILITY_AIR_LOCK] = _("AIR LOCK"),
     [ABILITY_TANGLED_FEET] = _("TANGLED FEET"),
+    [ABILITY_MOTOR_DRIVE] = _("MOTOR DRIVE"),
 };
