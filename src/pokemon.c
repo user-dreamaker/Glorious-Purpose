@@ -2749,6 +2749,20 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         if ((gBattleResources->flags->flags[battlerIdAtk] & RESOURCE_FLAG_FLASH_FIRE) && type == TYPE_FIRE)
             damage = (15 * damage) / 10;
 
+        // Rivalry
+        if (gBattleMons[battlerIdAtk].ability == ABILITY_RIVALRY)
+        {
+            u8 genderAtk = GetGenderFromSpeciesAndPersonality(gBattleMons[battlerIdAtk].species, gBattleMons[battlerIdAtk].personality);
+            u8 genderDef = GetGenderFromSpeciesAndPersonality(gBattleMons[battlerIdDef].species, gBattleMons[battlerIdDef].personality);
+            if (genderAtk != MON_GENDERLESS && genderDef != MON_GENDERLESS)
+            {
+                if (genderAtk == genderDef)
+                    damage = (150 * damage) / 100; // 1.50x for same gender
+                else
+                    damage = (50 * damage) / 100;  // 0.50x for opposite gender
+            }
+        }
+
     return damage + 2;
 }
 
