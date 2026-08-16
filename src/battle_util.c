@@ -2111,6 +2111,16 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                     effect++;
                 }
                 break;
+            case ABILITY_ANGER_POINT:
+                if (TARGET_TURN_DAMAGED && gCritMultiplier == 2
+                 && gBattleMons[battler].statStages[STAT_ATK] < MAX_STAT_STAGE)
+                {
+                    gBattlerAttacker = battler;
+                    BattleScriptPushCursor();
+                    gBattlescriptCurrInstr = BattleScript_AngerPointActivates;
+                    effect++;
+                }
+                break;
             }
             break;
         case ABILITYEFFECT_IMMUNITY: // 5
