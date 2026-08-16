@@ -3034,7 +3034,7 @@ u8 IsRunningFromBattleImpossible(void)
         }
     }
     i = AbilityBattleEffects(ABILITYEFFECT_CHECK_FIELD_EXCEPT_BATTLER, gActiveBattler, ABILITY_MAGNET_PULL, 0, 0);
-    if (i != 0 && IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL))
+    if (i != 0 && IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL) && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST))
     {
         gBattleScripting.battler = i - 1;
         gLastUsedAbility = gBattleMons[i - 1].ability;
@@ -3200,7 +3200,7 @@ static void HandleTurnActionSelectionState(void)
                               && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_FLYING)
                               && gBattleMons[gActiveBattler].ability != ABILITY_LEVITATE)
                           || ((i = AbilityBattleEffects(ABILITYEFFECT_CHECK_FIELD_EXCEPT_BATTLER, gActiveBattler, ABILITY_MAGNET_PULL, 0, 0))
-                              && IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL)))
+                              && IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL) && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST)))
                     {
                         BtlController_EmitChoosePokemon(BUFFER_A, ((i - 1) << 4) | PARTY_ACTION_ABILITY_PREVENTS, 6, gLastUsedAbility, gBattleStruct->battlerPartyOrders[gActiveBattler]);
                     }
