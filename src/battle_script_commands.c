@@ -771,23 +771,57 @@ struct PickupItem
 
 static const struct PickupItem sPickupItems[] =
 {
-    { ITEM_ORAN_BERRY, 15 },
-    { ITEM_CHERI_BERRY, 25 },
-    { ITEM_CHESTO_BERRY, 35 },
-    { ITEM_PECHA_BERRY, 45 },
-    { ITEM_RAWST_BERRY, 55 },
-    { ITEM_ASPEAR_BERRY, 65 },
-    { ITEM_PERSIM_BERRY, 75 },
-    { ITEM_TM10, 80 },
-    { ITEM_PP_UP, 85 },
-    { ITEM_RARE_CANDY, 90 },
-    { ITEM_NUGGET, 95 },
-    { ITEM_SPELON_BERRY, 96 },
-    { ITEM_PAMTRE_BERRY, 97 },
-    { ITEM_WATMEL_BERRY, 98 },
-    { ITEM_DURIN_BERRY, 99 },
-    { ITEM_BELUE_BERRY, 1 },
-
+    { ITEM_ENERGY_POWDER, 2 },
+    { ITEM_ENERGY_ROOT, 4 },
+    { ITEM_HEAL_POWDER, 6 },
+    { ITEM_REVIVAL_HERB, 8 },
+    { ITEM_RARE_CANDY, 9 },
+    { ITEM_CHERI_BERRY, 11 },
+    { ITEM_CHESTO_BERRY, 13 },
+    { ITEM_PECHA_BERRY, 15 },
+    { ITEM_RAWST_BERRY, 17 },
+    { ITEM_ASPEAR_BERRY, 19 },
+    { ITEM_LEPPA_BERRY, 21 },
+    { ITEM_ORAN_BERRY, 23 },
+    { ITEM_PERSIM_BERRY, 25 },
+    { ITEM_LUM_BERRY, 27 },
+    { ITEM_SITRUS_BERRY, 29 },
+    { ITEM_FIGY_BERRY, 31 },
+    { ITEM_WIKI_BERRY, 33 },
+    { ITEM_MAGO_BERRY, 35 },
+    { ITEM_AGUAV_BERRY, 37 },
+    { ITEM_IAPAPA_BERRY, 39 },
+    { ITEM_RAZZ_BERRY, 41 },
+    { ITEM_BLUK_BERRY, 43 },
+    { ITEM_NANAB_BERRY, 45 },
+    { ITEM_WEPEAR_BERRY, 47 },
+    { ITEM_PINAP_BERRY, 49 },
+    { ITEM_POMEG_BERRY, 51 },
+    { ITEM_KELPSY_BERRY, 53 },
+    { ITEM_QUALOT_BERRY, 55 },
+    { ITEM_HONDEW_BERRY, 57 },
+    { ITEM_GREPA_BERRY, 59 },
+    { ITEM_TAMATO_BERRY, 61 },
+    { ITEM_CORNN_BERRY, 63 },
+    { ITEM_MAGOST_BERRY, 65 },
+    { ITEM_RABUTA_BERRY, 67 },
+    { ITEM_NOMEL_BERRY, 69 },
+    { ITEM_SPELON_BERRY, 71 },
+    { ITEM_PAMTRE_BERRY, 73 },
+    { ITEM_WATMEL_BERRY, 75 },
+    { ITEM_DURIN_BERRY, 77 },
+    { ITEM_BELUE_BERRY, 79 },
+    { ITEM_LIECHI_BERRY, 81 },
+    { ITEM_GANLON_BERRY, 83 },
+    { ITEM_SALAC_BERRY, 85 },
+    { ITEM_PETAYA_BERRY, 87 },
+    { ITEM_APICOT_BERRY, 89 },
+    { ITEM_LANSAT_BERRY, 91 },
+    { ITEM_STARF_BERRY, 93 },
+    { ITEM_ENIGMA_BERRY, 95 },
+    { ITEM_WHITE_HERB, 97 },
+    { ITEM_MENTAL_HERB, 99 },
+    { ITEM_LEFTOVERS, 100 },
 };
 
 static const u8 sTerrainToType[] =
@@ -9446,7 +9480,7 @@ static void Cmd_pickup(void)
         {
             s32 random = Random() % 100;
 
-            for (j = 0; j < 15; ++j)
+            for (j = 0; j < 51; ++j)
                 if (sPickupItems[j].chance > random)
                     break;
             SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupItems[j]);
