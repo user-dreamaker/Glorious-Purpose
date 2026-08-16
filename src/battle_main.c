@@ -3025,6 +3025,7 @@ u8 IsRunningFromBattleImpossible(void)
         if (side != GetBattlerSide(i)
          && gBattleMons[gActiveBattler].ability != ABILITY_LEVITATE
          && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_FLYING)
+         && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST)
          && gBattleMons[i].ability == ABILITY_ARENA_TRAP)
         {
             gBattleScripting.battler = i;
@@ -3196,7 +3197,7 @@ static void HandleTurnActionSelectionState(void)
                         BtlController_EmitChoosePokemon(BUFFER_A, PARTY_ACTION_CANT_SWITCH, 6, ABILITY_NONE, gBattleStruct->battlerPartyOrders[gActiveBattler]);
                     }
                     else if ((!IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST) && (i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_SHADOW_TAG)))
-                          || ((i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_ARENA_TRAP))
+                          || ((!IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST) && (i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_ARENA_TRAP)))
                               && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_FLYING)
                               && gBattleMons[gActiveBattler].ability != ABILITY_LEVITATE)
                           || ((i = AbilityBattleEffects(ABILITYEFFECT_CHECK_FIELD_EXCEPT_BATTLER, gActiveBattler, ABILITY_MAGNET_PULL, 0, 0))
