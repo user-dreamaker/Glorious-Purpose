@@ -82,6 +82,7 @@ static const u8 sRivalryDescription[] = _("Boosts moves against rivals.");
 static const u8 sSteadfastDescription[] = _("Flinching raises Speed.");
 static const u8 sSnowCloakDescription[] = _("Ups evasion in a hailstorm.");
 static const u8 sGluttonyDescription[] = _("Eats Berries early.");
+static const u8 sAngerPointDescription[] = _("Maxes Attack after a critical hit.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -169,6 +170,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_STEADFAST] = sSteadfastDescription,
     [ABILITY_SNOW_CLOAK] = sSnowCloakDescription,
     [ABILITY_GLUTTONY] = sGluttonyDescription,
+    [ABILITY_ANGER_POINT] = sAngerPointDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -257,4 +259,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_STEADFAST] = _("STEADFAST"),
     [ABILITY_SNOW_CLOAK] = _("SNOW CLOAK"),
     [ABILITY_GLUTTONY] = _("GLUTTONY"),
+    [ABILITY_ANGER_POINT] = _("ANGER POINT"),
 };
