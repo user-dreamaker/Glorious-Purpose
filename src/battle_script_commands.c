@@ -1627,6 +1627,10 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
     {
         flags = MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE;
     }
+    else if (targetAbility == ABILITY_MOTOR_DRIVE && moveType == TYPE_ELECTRIC)
+    {
+        flags = MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE;
+    }
     else
     {
         while (TYPE_EFFECT_ATK_TYPE(i) != TYPE_ENDTABLE)
