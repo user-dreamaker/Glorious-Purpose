@@ -87,6 +87,7 @@ static const u8 sDrySkinDescription[] = _("Prefers the rain to heat.");
 static const u8 sDownloadDescription[] = _("Adjusts power from foe's stats.");
 static const u8 sIronFistDescription[] = _("Boosts punching moves.");
 static const u8 sAdaptabilityDescription[] = _("Boosts same type attacks.");
+static const u8 sSkillLinkDescription[] = _("Multi-hit moves hit five times.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -179,6 +180,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_DOWNLOAD] = sDownloadDescription,
     [ABILITY_IRON_FIST] = sIronFistDescription,
     [ABILITY_ADAPTABILITY] = sAdaptabilityDescription,
+    [ABILITY_SKILL_LINK] = sSkillLinkDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -272,4 +274,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_DOWNLOAD] = _("DOWNLOAD"),
     [ABILITY_IRON_FIST] = _("IRON FIST"),
     [ABILITY_ADAPTABILITY] = _("ADAPTABILITY"),
+    [ABILITY_SKILL_LINK] = _("SKILL LINK"),
 };
