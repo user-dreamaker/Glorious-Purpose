@@ -1212,6 +1212,7 @@ bool8 HandleFaintedMonActions(void)
         case 6:
             if (AbilityBattleEffects(ABILITYEFFECT_INTIMIDATE1, 0, 0, 0, 0)
              || AbilityBattleEffects(ABILITYEFFECT_TRACE, 0, 0, 0, 0)
+             || AbilityBattleEffects(ABILITYEFFECT_DOWNLOAD, 0, 0, 0, 0)
              || ItemBattleEffects(ITEMEFFECT_NORMAL, 0, TRUE)
              || AbilityBattleEffects(ABILITYEFFECT_FORECAST, 0, 0, 0, 0))
                 return TRUE;
@@ -1822,6 +1823,12 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                             break;
                         }
                     }
+                }
+                break;
+            case ABILITY_DOWNLOAD:
+                if (gBattleMons[battler].hp != 0)
+                {
+                    gStatuses3[battler] |= STATUS3_DOWNLOAD;
                 }
                 break;
             }
@@ -2477,6 +2484,60 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                 {
                     gLastUsedAbility = ability;
                     effect++;
+                }
+            }
+            break;
+        case ABILITYEFFECT_DOWNLOAD: // 20
+            for (i = 0; i < gBattlersCount; i++)
+            {
+                if (gBattleMons[i].ability == ABILITY_DOWNLOAD && (gStatuses3[i] & STATUS3_DOWNLOAD))
+                {
+                    u32 opposingBattler = BATTLE_OPPOSITE(i);
+                    u32 count = 0, def = 0, spDef = 0, var, statId;
+
+                    gStatuses3[i] &= ~STATUS3_DOWNLOAD;
+
+                    for (target1 = 0; target1 < 2; target1++, opposingBattler = BATTLE_PARTNER(opposingBattler))
+                    {
+                        if (gBattleMons[opposingBattler].hp != 0)
+                        {
+                            var = gBattleMons[opposingBattler].defense;
+                            var = var * gStatStageRatios[gBattleMons[opposingBattler].statStages[STAT_DEF]][0]
+                                / gStatStageRatios[gBattleMons[opposingBattler].statStages[STAT_DEF]][1];
+                            def += var;
+
+                            var = gBattleMons[opposingBattler].spDefense;
+                            var = var * gStatStageRatios[gBattleMons[opposingBattler].statStages[STAT_SPDEF]][0]
+                                / gStatStageRatios[gBattleMons[opposingBattler].statStages[STAT_SPDEF]][1];
+                            spDef += var;
+
+                            count++;
+                        }
+                    }
+
+                    if (count != 0)
+                    {
+                        def /= count;
+                        spDef /= count;
+
+                        if (def < spDef)
+                            statId = STAT_ATK;
+                        else
+                            statId = STAT_SPATK;
+
+                        if (gBattleMons[i].statStages[statId] < MAX_STAT_STAGE)
+                        {
+                            gBattlerAttacker = i;
+                            gLastUsedAbility = ABILITY_DOWNLOAD;
+                            gBattleScripting.battler = i;
+                            SET_STATCHANGER(statId, 1, FALSE);
+                            gBattleScripting.animArg1 = 14 + statId;
+                            gBattleScripting.animArg2 = 0;
+                            BattleScriptPushCursorAndCallback(BattleScript_DownloadActivates);
+                            effect++;
+                            break;
+                        }
+                    }
                 }
             }
             break;
