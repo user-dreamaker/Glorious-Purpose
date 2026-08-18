@@ -85,6 +85,7 @@ static const u8 sGluttonyDescription[] = _("Eats Berries early.");
 static const u8 sAngerPointDescription[] = _("Maxes Attack after a critical hit.");
 static const u8 sDrySkinDescription[] = _("Prefers the rain to heat.");
 static const u8 sDownloadDescription[] = _("Adjusts power from foe's stats.");
+static const u8 sIronFistDescription[] = _("Boosts punching moves.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -175,6 +176,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_ANGER_POINT] = sAngerPointDescription,
     [ABILITY_DRY_SKIN] = sDrySkinDescription,
     [ABILITY_DOWNLOAD] = sDownloadDescription,
+    [ABILITY_IRON_FIST] = sIronFistDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -266,4 +268,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_ANGER_POINT] = _("ANGER POINT"),
     [ABILITY_DRY_SKIN] = _("DRY SKIN"),
     [ABILITY_DOWNLOAD] = _("DOWNLOAD"),
+    [ABILITY_IRON_FIST] = _("IRON FIST"),
 };
