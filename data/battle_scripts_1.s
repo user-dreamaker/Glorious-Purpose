@@ -4653,6 +4653,15 @@ BattleScript_DrySkinSunActivates::
 	tryfaintmon BS_ATTACKER
 	end3
 
+BattleScript_SolarPowerActivates::
+	printstring STRINGID_PKMNHURTBYHARSHSUNLIGHT
+	waitmessage B_WAIT_TIME_LONG
+	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE
+	healthbarupdate BS_ATTACKER
+	datahpupdate BS_ATTACKER
+	tryfaintmon BS_ATTACKER
+	end3
+
 BattleScript_DownloadActivates::
 	pause B_WAIT_TIME_SHORT
 	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_CHANGE_ALLOW_PTR, BattleScript_DownloadEnd
