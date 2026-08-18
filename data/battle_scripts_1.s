@@ -4652,3 +4652,13 @@ BattleScript_DrySkinSunActivates::
 	datahpupdate BS_ATTACKER
 	tryfaintmon BS_ATTACKER
 	end3
+
+BattleScript_DownloadActivates::
+	pause B_WAIT_TIME_SHORT
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_CHANGE_ALLOW_PTR, BattleScript_DownloadEnd
+	setgraphicalstatchangevalues
+	playanimation BS_ATTACKER, B_ANIM_STATS_CHANGE, sB_ANIM_ARG1
+	printfromtable gStatUpStringIds
+	waitmessage B_WAIT_TIME_LONG
+BattleScript_DownloadEnd:
+	end3
