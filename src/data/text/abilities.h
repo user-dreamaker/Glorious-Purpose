@@ -90,6 +90,7 @@ static const u8 sAdaptabilityDescription[] = _("Boosts same type attacks.");
 static const u8 sSkillLinkDescription[] = _("Multi-hit moves hit five times.");
 static const u8 sHydrationDescription[] = _("Heals status problems in rain.");
 static const u8 sSolarPowerDescription[] = _("Trades HP for power in sunshine.");
+static const u8 sQuickFeetDescription[] = _("Ups SPEED if suffering.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -185,6 +186,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_SKILL_LINK] = sSkillLinkDescription,
     [ABILITY_HYDRATION] = sHydrationDescription,
     [ABILITY_SOLAR_POWER] = sSolarPowerDescription,
+    [ABILITY_QUICK_FEET] = sQuickFeetDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -281,4 +283,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_SKILL_LINK] = _("SKILL LINK"),
     [ABILITY_HYDRATION] = _("HYDRATION"),
     [ABILITY_SOLAR_POWER] = _("SOLAR POWER"),
+    [ABILITY_QUICK_FEET] = _("QUICK FEET"),
 };
