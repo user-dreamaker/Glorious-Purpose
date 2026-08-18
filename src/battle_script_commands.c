@@ -1279,6 +1279,9 @@ static void Cmd_damagecalc(void)
                                             gBattleStruct->dynamicMoveType, gBattlerAttacker, gBattlerTarget);
     gBattleMoveDamage = gBattleMoveDamage * gCritMultiplier * gBattleScripting.dmgMultiplier;
 
+    if (gCritMultiplier > 1 && gBattleMons[gBattlerAttacker].ability == ABILITY_SNIPER)
+        gBattleMoveDamage = gBattleMoveDamage * 150 / 100;
+
     if (gStatuses3[gBattlerAttacker] & STATUS3_CHARGED_UP && gBattleMoves[gCurrentMove].type == TYPE_ELECTRIC)
         gBattleMoveDamage *= 2;
     if (gProtectStructs[gBattlerAttacker].helpingHand)
@@ -1295,6 +1298,9 @@ void AI_CalcDmg(u8 attacker, u8 defender)
                                             gBattleStruct->dynamicMoveType, attacker, defender);
     gDynamicBasePower = 0;
     gBattleMoveDamage = gBattleMoveDamage * gCritMultiplier * gBattleScripting.dmgMultiplier;
+
+    if (gCritMultiplier > 1 && gBattleMons[attacker].ability == ABILITY_SNIPER)
+        gBattleMoveDamage = gBattleMoveDamage * 150 / 100;
 
     if (gStatuses3[attacker] & STATUS3_CHARGED_UP && gBattleMoves[gCurrentMove].type == TYPE_ELECTRIC)
         gBattleMoveDamage *= 2;
