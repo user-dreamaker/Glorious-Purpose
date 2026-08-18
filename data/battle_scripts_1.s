@@ -4643,3 +4643,12 @@ BattleScript_AngerPointActivates::
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_AngerPointEnd:
 	goto BattleScript_MoveEnd
+
+BattleScript_DrySkinSunActivates::
+	printstring STRINGID_PKMNHURTBYHARSHSUNLIGHT
+	waitmessage B_WAIT_TIME_LONG
+	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE
+	healthbarupdate BS_ATTACKER
+	datahpupdate BS_ATTACKER
+	tryfaintmon BS_ATTACKER
+	end3
