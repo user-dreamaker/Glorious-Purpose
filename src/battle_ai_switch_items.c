@@ -132,7 +132,7 @@ static bool8 FindMonThatAbsorbsOpponentsMove(void)
             monAbility = gSpeciesInfo[species].abilities[1];
         else
             monAbility = gSpeciesInfo[species].abilities[0];
-        if (absorbingTypeAbility == monAbility && Random() & 1)
+        if ((absorbingTypeAbility == monAbility || (absorbingTypeAbility == ABILITY_WATER_ABSORB && monAbility == ABILITY_DRY_SKIN)) && Random() & 1)
         {
             // we found a mon
             *(gBattleStruct->AI_monToSwitchIntoId + (GetBattlerPosition(gActiveBattler) >> 1)) = i;
