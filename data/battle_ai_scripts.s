@@ -63,6 +63,7 @@ AI_CBM_CheckIfNegatesType::
 	if_equal ABILITY_DRY_SKIN, CheckIfWaterAbsorbCancelsWater
 	if_equal ABILITY_FLASH_FIRE, CheckIfFlashFireCancelsFire
 	if_equal ABILITY_WONDER_GUARD, CheckIfWonderGuardCancelsMove
+	if_equal ABILITY_MAGIC_GUARD, CheckIfMagicGuardCancelsMove
 	if_equal ABILITY_LEVITATE, CheckIfLevitateCancelsGroundMove
 	goto AI_CheckBadMove_CheckSoundproof
 
@@ -84,6 +85,18 @@ CheckIfFlashFireCancelsFire::
 CheckIfWonderGuardCancelsMove::
 	if_type_effectiveness AI_EFFECTIVENESS_x2, AI_CheckBadMove_CheckSoundproof
 	goto Score_Minus10
+
+CheckIfMagicGuardCancelsMove::
+	if_effect EFFECT_TOXIC, Score_Minus10
+	if_effect EFFECT_POISON, Score_Minus10
+	if_effect EFFECT_WILL_O_WISP, Score_Minus10
+	if_effect EFFECT_LEECH_SEED, Score_Minus10
+	if_effect EFFECT_CURSE, Score_Minus10
+	if_effect EFFECT_NIGHTMARE, Score_Minus10
+	if_effect EFFECT_SPIKES, Score_Minus10
+	if_effect EFFECT_SANDSTORM, Score_Minus10
+	if_effect EFFECT_HAIL, Score_Minus10
+	goto AI_CheckBadMove_CheckSoundproof
 
 CheckIfLevitateCancelsGroundMove::
 	get_curr_move_type
@@ -218,6 +231,7 @@ AI_CBM_Sleep::
 	get_ability AI_TARGET
 	if_equal ABILITY_INSOMNIA, Score_Minus10
 	if_equal ABILITY_VITAL_SPIRIT, Score_Minus10
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_move MOVE_SLEEP_POWDER, AI_CBM_CheckGrassTarget
 	if_move MOVE_SPORE, AI_CBM_CheckGrassTarget
@@ -247,6 +261,8 @@ AI_CBM_Explosion_End::
 AI_CBM_Nightmare::
 	if_status2 AI_TARGET, STATUS2_NIGHTMARE, Score_Minus10
 	if_not_status AI_TARGET, STATUS1_SLEEP, Score_Minus8
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	end
 
 AI_CBM_DreamEater::
@@ -362,6 +378,7 @@ AI_CBM_Poison::
 	if_move MOVE_POISON_POWDER, AI_CBM_CheckGrassTarget
 	get_ability AI_TARGET
 	if_equal ABILITY_IMMUNITY, Score_Minus10
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 @	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10  @ Improvement in Emerald
 	end
@@ -403,6 +420,7 @@ AI_CBM_Confuse::
 	if_status2 AI_TARGET, STATUS2_CONFUSION, Score_Minus5
 	get_ability AI_TARGET
 	if_equal ABILITY_OWN_TEMPO, Score_Minus10
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 @	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10  @ Improvement in Emerald
 	end
 
@@ -418,6 +436,7 @@ AI_CBM_Paralyze::
 	if_equal TYPE_ELECTRIC, Score_Minus10
 	get_ability AI_TARGET
 	if_equal ABILITY_LIMBER, Score_Minus10
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_move MOVE_STUN_SPORE, AI_CBM_CheckGrassTarget
 @	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10  @ Improvement in Emerald
@@ -434,6 +453,8 @@ AI_CBM_LeechSeed::
 	if_equal TYPE_GRASS, Score_Minus10
 	get_target_type2
 	if_equal TYPE_GRASS, Score_Minus10
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	end
 
 AI_CBM_Disable::
@@ -453,12 +474,16 @@ AI_CBM_CantEscape::
 	end
 
 AI_CBM_Curse::
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_stat_level_equal AI_USER, STAT_ATK, 12, Score_Minus10
 	if_stat_level_equal AI_USER, STAT_DEF, 12, Score_Minus8
 	end
 
 AI_CBM_Spikes::
 	if_side_affecting AI_TARGET, SIDE_STATUS_SPIKES, Score_Minus10
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	end
 
 AI_CBM_Foresight::
@@ -472,12 +497,15 @@ AI_CBM_PerishSong::
 AI_CBM_Sandstorm::
 	get_weather
 	if_equal AI_WEATHER_SANDSTORM, Score_Minus8
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	end
 
 AI_CBM_Attract::
 	if_status2 AI_TARGET, STATUS2_INFATUATION, Score_Minus10
 	get_ability AI_TARGET
 	if_equal ABILITY_OBLIVIOUS, Score_Minus10
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	get_gender AI_USER
 	if_equal MON_MALE, AI_CBM_Attract_CheckIfTargetIsFemale
 	if_equal MON_FEMALE, AI_CBM_Attract_CheckIfTargetIsMale
@@ -543,6 +571,8 @@ AI_CBM_SpitUpAndSwallow::
 AI_CBM_Hail::
 	get_weather
 	if_equal AI_WEATHER_HAIL, Score_Minus8
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	end
 
 AI_CBM_Torment::
@@ -552,6 +582,7 @@ AI_CBM_Torment::
 AI_CBM_WillOWisp::
 	get_ability AI_TARGET
 	if_equal ABILITY_WATER_VEIL, Score_Minus10
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	if_type_effectiveness AI_EFFECTIVENESS_x0_5, Score_Minus10
@@ -793,6 +824,8 @@ AI_CheckViability::
 	end
 
 AI_CV_Sleep::
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_has_move_with_effect AI_TARGET, EFFECT_DREAM_EATER, AI_CV_SleepEncourageSlpDamage
 	if_has_move_with_effect AI_TARGET, EFFECT_NIGHTMARE, AI_CV_SleepEncourageSlpDamage
 	goto AI_CV_Sleep_End
@@ -1443,6 +1476,8 @@ AI_CV_Heal_End::
 	end
 
 AI_CV_Toxic::
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_user_has_no_attacking_moves AI_CV_Toxic3
 	if_hp_more_than AI_USER, 50, AI_CV_Toxic2
 	if_random_less_than 50, AI_CV_Toxic2
@@ -1572,6 +1607,8 @@ AI_CV_Flatter::
 	score +1
 
 AI_CV_Confuse::
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_hp_more_than AI_TARGET, 70, AI_CV_Confuse_End
 	if_random_less_than 128, AI_CV_Confuse2
 	score -1
@@ -1627,6 +1664,8 @@ AI_CV_Reflect_PhysicalTypeList::
 	.byte -1
 
 AI_CV_Poison::
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_hp_less_than AI_USER, 50, AI_CV_Poison_ScoreDown1
 	if_hp_more_than AI_TARGET, 50, AI_CV_Poison_End
 
@@ -1637,6 +1676,8 @@ AI_CV_Poison_End::
 	end
 
 AI_CV_Paralyze::
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	if_target_faster AI_CV_Paralyze2
 	if_hp_more_than AI_USER, 70, AI_CV_Paralyze_End
 	score -1
@@ -2002,6 +2043,8 @@ AI_CV_Thief_EncourageItemsToSteal::
 	.byte -1
 
 AI_CV_Curse::
+	get_ability AI_TARGET
+	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
 	get_user_type1
 	if_equal TYPE_GHOST, AI_CV_Curse4
 	get_user_type2

@@ -92,6 +92,7 @@ static const u8 sHydrationDescription[] = _("Heals status problems in rain.");
 static const u8 sSolarPowerDescription[] = _("Trades HP for power in sunshine.");
 static const u8 sQuickFeetDescription[] = _("Ups SPEED if suffering.");
 static const u8 sSniperDescription[] = _("Boosts critical hits.");
+static const u8 sMagicGuardDescription[] = _("Prevents indirect damage.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -189,6 +190,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_SOLAR_POWER] = sSolarPowerDescription,
     [ABILITY_QUICK_FEET] = sQuickFeetDescription,
     [ABILITY_SNIPER] = sSniperDescription,
+    [ABILITY_MAGIC_GUARD] = sMagicGuardDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -287,4 +289,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_SOLAR_POWER] = _("SOLAR POWER"),
     [ABILITY_QUICK_FEET] = _("QUICK FEET"),
     [ABILITY_SNIPER] = _("SNIPER"),
+    [ABILITY_MAGIC_GUARD] = _("MAGIC GUARD"),
 };
