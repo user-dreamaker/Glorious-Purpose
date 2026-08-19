@@ -919,6 +919,7 @@ BattleScript_MoveMissedDoDamage::
 	resultmessage
 	waitmessage B_WAIT_TIME_LONG
 	jumpifbyte CMP_COMMON_BITS, gMoveResultFlags, MOVE_RESULT_DOESNT_AFFECT_FOE, BattleScript_MoveEnd
+	jumpifability BS_ATTACKER, ABILITY_MAGIC_GUARD, BattleScript_MoveEnd
 	printstring STRINGID_PKMNCRASHED
 	waitmessage B_WAIT_TIME_LONG
 	damagecalc
@@ -3950,6 +3951,12 @@ BattleScript_WrapTurnDmg::
 	waitmessage B_WAIT_TIME_LONG
 	goto BattleScript_DoTurnDmg
 
+BattleScript_WrapTurnNoDmg::
+	playanimation BS_ATTACKER, B_ANIM_TURN_TRAP, sB_ANIM_ARG1
+	printstring STRINGID_PKMNHURTBY
+	waitmessage B_WAIT_TIME_LONG
+	end2
+
 BattleScript_WrapEnds::
 	printstring STRINGID_PKMNFREEDFROM
 	waitmessage B_WAIT_TIME_LONG
@@ -4077,6 +4084,7 @@ BattleScript_MoveEffectConfusion::
 BattleScript_MoveEffectRecoil::
 	jumpifmove MOVE_STRUGGLE, BattleScript_DoRecoil
 	jumpifability BS_ATTACKER, ABILITY_ROCK_HEAD, BattleScript_RecoilEnd
+	jumpifability BS_ATTACKER, ABILITY_MAGIC_GUARD, BattleScript_RecoilEnd
 BattleScript_DoRecoil::
 	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE | HITMARKER_PASSIVE_DAMAGE
 	healthbarupdate BS_ATTACKER
