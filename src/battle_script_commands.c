@@ -1017,7 +1017,7 @@ static bool8 AccuracyCalcHelper(u16 move)
         return TRUE;
     }
 
-    if (!(gHitMarker & HITMARKER_IGNORE_ON_AIR) && gStatuses3[gBattlerTarget] & STATUS3_ON_AIR)
+    if (!(gHitMarker & HITMARKER_IGNORE_ON_AIR) && gStatuses3[gBattlerTarget] & STATUS3_ON_AIR && gBattleMons[gBattlerAttacker].ability != ABILITY_NO_GUARD && gBattleMons[gBattlerTarget].ability != ABILITY_NO_GUARD)
     {
         gMoveResultFlags |= MOVE_RESULT_MISSED;
         JumpIfMoveFailed(7, move);
@@ -1026,7 +1026,7 @@ static bool8 AccuracyCalcHelper(u16 move)
 
     gHitMarker &= ~HITMARKER_IGNORE_ON_AIR;
 
-    if (!(gHitMarker & HITMARKER_IGNORE_UNDERGROUND) && gStatuses3[gBattlerTarget] & STATUS3_UNDERGROUND)
+    if (!(gHitMarker & HITMARKER_IGNORE_UNDERGROUND) && gStatuses3[gBattlerTarget] & STATUS3_UNDERGROUND && gBattleMons[gBattlerAttacker].ability != ABILITY_NO_GUARD && gBattleMons[gBattlerTarget].ability != ABILITY_NO_GUARD)
     {
         gMoveResultFlags |= MOVE_RESULT_MISSED;
         JumpIfMoveFailed(7, move);
@@ -1035,7 +1035,7 @@ static bool8 AccuracyCalcHelper(u16 move)
 
     gHitMarker &= ~HITMARKER_IGNORE_UNDERGROUND;
 
-    if (!(gHitMarker & HITMARKER_IGNORE_UNDERWATER) && gStatuses3[gBattlerTarget] & STATUS3_UNDERWATER)
+    if (!(gHitMarker & HITMARKER_IGNORE_UNDERWATER) && gStatuses3[gBattlerTarget] & STATUS3_UNDERWATER && gBattleMons[gBattlerAttacker].ability != ABILITY_NO_GUARD && gBattleMons[gBattlerTarget].ability != ABILITY_NO_GUARD)
     {
         gMoveResultFlags |= MOVE_RESULT_MISSED;
         JumpIfMoveFailed(7, move);
@@ -1102,6 +1102,12 @@ static void Cmd_accuracycheck(void)
             return;
         if (AccuracyCalcHelper(move))
             return;
+
+        if (gBattleMons[gBattlerAttacker].ability == ABILITY_NO_GUARD || gBattleMons[gBattlerTarget].ability == ABILITY_NO_GUARD)
+        {
+            gBattlescriptCurrInstr += 7;
+            return;
+        }
 
         if (gBattleMons[gBattlerTarget].status2 & STATUS2_FORESIGHT || gBattleMons[gBattlerAttacker].ability == ABILITY_ILLUMINATE || gBattleMons[gBattlerAttacker].ability == ABILITY_KEEN_EYE)
         {
