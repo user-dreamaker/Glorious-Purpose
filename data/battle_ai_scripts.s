@@ -232,6 +232,11 @@ AI_CBM_Sleep::
 	if_equal ABILITY_INSOMNIA, Score_Minus10
 	if_equal ABILITY_VITAL_SPIRIT, Score_Minus10
 	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
+	get_weather
+	if_not_equal AI_WEATHER_SUN, AI_CBM_Sleep_CheckStatus
+	get_ability AI_TARGET
+	if_equal ABILITY_LEAF_GUARD, Score_Minus10
+AI_CBM_Sleep_CheckStatus::
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_move MOVE_SLEEP_POWDER, AI_CBM_CheckGrassTarget
 	if_move MOVE_SPORE, AI_CBM_CheckGrassTarget
@@ -379,6 +384,11 @@ AI_CBM_Poison::
 	get_ability AI_TARGET
 	if_equal ABILITY_IMMUNITY, Score_Minus10
 	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
+	get_weather
+	if_not_equal AI_WEATHER_SUN, AI_CBM_Poison_CheckStatus
+	get_ability AI_TARGET
+	if_equal ABILITY_LEAF_GUARD, Score_Minus10
+AI_CBM_Poison_CheckStatus::
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 @	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10  @ Improvement in Emerald
 	end
@@ -437,6 +447,11 @@ AI_CBM_Paralyze::
 	get_ability AI_TARGET
 	if_equal ABILITY_LIMBER, Score_Minus10
 	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
+	get_weather
+	if_not_equal AI_WEATHER_SUN, AI_CBM_Paralyze_CheckStatus
+	get_ability AI_TARGET
+	if_equal ABILITY_LEAF_GUARD, Score_Minus10
+AI_CBM_Paralyze_CheckStatus::
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_move MOVE_STUN_SPORE, AI_CBM_CheckGrassTarget
 @	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10  @ Improvement in Emerald
@@ -583,6 +598,11 @@ AI_CBM_WillOWisp::
 	get_ability AI_TARGET
 	if_equal ABILITY_WATER_VEIL, Score_Minus10
 	if_equal ABILITY_MAGIC_GUARD, Score_Minus10
+	get_weather
+	if_not_equal AI_WEATHER_SUN, AI_CBM_WillOWisp_CheckStatus
+	get_ability AI_TARGET
+	if_equal ABILITY_LEAF_GUARD, Score_Minus10
+AI_CBM_WillOWisp_CheckStatus::
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	if_type_effectiveness AI_EFFECTIVENESS_x0_5, Score_Minus10
