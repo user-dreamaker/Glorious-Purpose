@@ -2331,6 +2331,14 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 break;
             if (gBattleMons[gEffectBattler].ability == ABILITY_INSOMNIA)
                 break;
+            if (gBattleMons[gEffectBattler].ability == ABILITY_LEAF_GUARD && (gBattleWeather & B_WEATHER_SUN))
+            {
+                gLastUsedAbility = ABILITY_LEAF_GUARD;
+                RecordAbilityBattle(gEffectBattler, ABILITY_LEAF_GUARD);
+                BattleScriptPush(gBattlescriptCurrInstr + 1);
+                gBattlescriptCurrInstr = BattleScript_LeafGuardPrevents;
+                return;
+            }
 
             CancelMultiTurnMoves(gEffectBattler);
             statusChanged = TRUE;
@@ -2374,6 +2382,14 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 break;
             if (gBattleMons[gEffectBattler].ability == ABILITY_IMMUNITY)
                 break;
+            if (gBattleMons[gEffectBattler].ability == ABILITY_LEAF_GUARD && (gBattleWeather & B_WEATHER_SUN))
+            {
+                gLastUsedAbility = ABILITY_LEAF_GUARD;
+                RecordAbilityBattle(gEffectBattler, ABILITY_LEAF_GUARD);
+                BattleScriptPush(gBattlescriptCurrInstr + 1);
+                gBattlescriptCurrInstr = BattleScript_LeafGuardPrevents;
+                return;
+            }
 
             statusChanged = TRUE;
             break;
@@ -2411,6 +2427,14 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 break;
             if (gBattleMons[gEffectBattler].ability == ABILITY_WATER_VEIL)
                 break;
+            if (gBattleMons[gEffectBattler].ability == ABILITY_LEAF_GUARD && (gBattleWeather & B_WEATHER_SUN))
+            {
+                gLastUsedAbility = ABILITY_LEAF_GUARD;
+                RecordAbilityBattle(gEffectBattler, ABILITY_LEAF_GUARD);
+                BattleScriptPush(gBattlescriptCurrInstr + 1);
+                gBattlescriptCurrInstr = BattleScript_LeafGuardPrevents;
+                return;
+            }
             if (gBattleMons[gEffectBattler].status1)
                 break;
 
@@ -2427,6 +2451,14 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 break;
             if (gBattleMons[gEffectBattler].ability == ABILITY_MAGMA_ARMOR)
                 break;
+            if (gBattleMons[gEffectBattler].ability == ABILITY_LEAF_GUARD && (gBattleWeather & B_WEATHER_SUN))
+            {
+                gLastUsedAbility = ABILITY_LEAF_GUARD;
+                RecordAbilityBattle(gEffectBattler, ABILITY_LEAF_GUARD);
+                BattleScriptPush(gBattlescriptCurrInstr + 1);
+                gBattlescriptCurrInstr = BattleScript_LeafGuardPrevents;
+                return;
+            }
 
             CancelMultiTurnMoves(gEffectBattler);
             statusChanged = TRUE;
@@ -2470,6 +2502,14 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 break;
             if (gBattleMons[gEffectBattler].status1)
                 break;
+            if (gBattleMons[gEffectBattler].ability == ABILITY_LEAF_GUARD && (gBattleWeather & B_WEATHER_SUN))
+            {
+                gLastUsedAbility = ABILITY_LEAF_GUARD;
+                RecordAbilityBattle(gEffectBattler, ABILITY_LEAF_GUARD);
+                BattleScriptPush(gBattlescriptCurrInstr + 1);
+                gBattlescriptCurrInstr = BattleScript_LeafGuardPrevents;
+                return;
+            }
 
             statusChanged = TRUE;
             break;
@@ -2493,6 +2533,14 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 }
                 return;
             }
+            if (gBattleMons[gEffectBattler].ability == ABILITY_LEAF_GUARD && (gBattleWeather & B_WEATHER_SUN))
+            {
+                gLastUsedAbility = ABILITY_LEAF_GUARD;
+                RecordAbilityBattle(gEffectBattler, ABILITY_LEAF_GUARD);
+                BattleScriptPush(gBattlescriptCurrInstr + 1);
+                gBattlescriptCurrInstr = BattleScript_LeafGuardPrevents;
+                return;
+            }
             if ((IS_BATTLER_OF_TYPE(gEffectBattler, TYPE_POISON) || IS_BATTLER_OF_TYPE(gEffectBattler, TYPE_STEEL))
                 && (gHitMarker & HITMARKER_STATUS_ABILITY_EFFECT)
                 && (primary == TRUE || certain == MOVE_EFFECT_CERTAIN))
@@ -2509,8 +2557,8 @@ void SetMoveEffect(bool8 primary, u8 certain)
             {
                 if (gBattleMons[gEffectBattler].ability == ABILITY_IMMUNITY)
                     break;
-
-                // It's redundant, because at this point we know the status1 value is 0.
+                if (gBattleMons[gEffectBattler].ability == ABILITY_LEAF_GUARD && (gBattleWeather & B_WEATHER_SUN))
+                    break;
                 gBattleMons[gEffectBattler].status1 &= ~STATUS1_TOXIC_POISON;
                 gBattleMons[gEffectBattler].status1 &= ~STATUS1_POISON;
                 statusChanged = TRUE;

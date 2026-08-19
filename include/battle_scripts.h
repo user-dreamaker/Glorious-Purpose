@@ -163,6 +163,7 @@ extern const u8 BattleScript_PRLZPrevention[];
 extern const u8 BattleScript_PSNPrevention[];
 extern const u8 BattleScript_ObliviousPreventsAttraction[];
 extern const u8 BattleScript_FlinchPrevention[];
+extern const u8 BattleScript_LeafGuardPrevents[];
 extern const u8 BattleScript_OwnTempoPrevents[];
 extern const u8 BattleScript_SoundproofProtected[];
 extern const u8 BattleScript_LightningRodActivates[];
