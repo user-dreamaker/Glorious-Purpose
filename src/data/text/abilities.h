@@ -94,6 +94,7 @@ static const u8 sQuickFeetDescription[] = _("Ups SPEED if suffering.");
 static const u8 sSniperDescription[] = _("Boosts critical hits.");
 static const u8 sMagicGuardDescription[] = _("Prevents indirect damage.");
 static const u8 sNoGuardDescription[] = _("Ensures that all moves land.");
+static const u8 sTechnicianDescription[] = _("Boosts weaker moves.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -193,6 +194,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_SNIPER] = sSniperDescription,
     [ABILITY_MAGIC_GUARD] = sMagicGuardDescription,
     [ABILITY_NO_GUARD] = sNoGuardDescription,
+    [ABILITY_TECHNICIAN] = sTechnicianDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -293,4 +295,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_SNIPER] = _("SNIPER"),
     [ABILITY_MAGIC_GUARD] = _("MAGIC GUARD"),
     [ABILITY_NO_GUARD] = _("NO GUARD"),
+    [ABILITY_TECHNICIAN] = _("TECHNICIAN"),
 };
