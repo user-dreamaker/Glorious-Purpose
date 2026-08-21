@@ -1223,6 +1223,7 @@ bool8 HandleFaintedMonActions(void)
              || AbilityBattleEffects(ABILITYEFFECT_TRACE, 0, 0, 0, 0)
              || AbilityBattleEffects(ABILITYEFFECT_DOWNLOAD, 0, 0, 0, 0)
              || ItemBattleEffects(ITEMEFFECT_NORMAL, 0, TRUE)
+             || AbilityBattleEffects(ABILITYEFFECT_FOREWARN, 0, 0, 0, 0)
              || AbilityBattleEffects(ABILITYEFFECT_FORECAST, 0, 0, 0, 0))
                 return TRUE;
             gBattleStruct->faintedActionsState++;
@@ -1839,6 +1840,10 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                 {
                     gStatuses3[battler] |= STATUS3_DOWNLOAD;
                 }
+                break;
+            case ABILITY_FOREWARN:
+                if (gBattleMons[battler].hp != 0 && GetBattlerSide(battler) == B_SIDE_PLAYER)
+                    gStatuses3[battler] |= STATUS3_FOREWARN;
                 break;
             }
             break;
@@ -2586,6 +2591,48 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                             break;
                         }
                     }
+                }
+            }
+            break;
+        case ABILITYEFFECT_FOREWARN: // 21
+            for (i = 0; i < gBattlersCount; i++)
+            {
+                if (gBattleMons[i].ability == ABILITY_FOREWARN && (gStatuses3[i] & STATUS3_FOREWARN))
+                {
+                    u32 opposingBattler = BATTLE_OPPOSITE(i);
+                    u32 j, announced = 0;
+
+                    for (target1 = 0; target1 < 2 && effect == 0; target1++, opposingBattler = BATTLE_PARTNER(opposingBattler))
+                    {
+                        if (gBattleMons[opposingBattler].hp != 0)
+                        {
+                            for (j = 0; j < MAX_MON_MOVES; j++)
+                            {
+                                u16 move = gBattleMons[opposingBattler].moves[j];
+                                if (move != MOVE_NONE)
+                                {
+                                    if (announced == gBattleStruct->forewarnAnnounced[i])
+                                    {
+                                        gBattlerAttacker = i;
+                                        gBattlerTarget = opposingBattler;
+                                        PREPARE_MOVE_BUFFER(gBattleTextBuff1, move)
+                                        BattleScriptPushCursorAndCallback(BattleScript_ForewarnActivates);
+                                        gBattleStruct->forewarnAnnounced[i]++;
+                                        effect++;
+                                        break;
+                                    }
+                                    announced++;
+                                }
+                            }
+                        }
+                    }
+
+                    if (effect == 0)
+                    {
+                        gStatuses3[i] &= ~STATUS3_FOREWARN;
+                        gBattleStruct->forewarnAnnounced[i] = 0;
+                    }
+                    break;
                 }
             }
             break;
