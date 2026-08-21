@@ -237,6 +237,7 @@ extern const u8 BattleScript_BattleTowerTrainerBattleWon[];
 extern const u8 BattleScript_AngerPointActivates[];
 extern const u8 BattleScript_DrySkinSunActivates[];
 extern const u8 BattleScript_DownloadActivates[];
+extern const u8 BattleScript_ForewarnActivates[];
 
 extern const u8 *const gBattleScriptsForMoveEffects[];
 extern const u8 *const gBattlescriptsForBallThrow[];
