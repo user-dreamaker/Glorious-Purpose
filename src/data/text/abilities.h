@@ -96,6 +96,7 @@ static const u8 sMagicGuardDescription[] = _("Prevents indirect damage.");
 static const u8 sNoGuardDescription[] = _("Ensures that all moves land.");
 static const u8 sTechnicianDescription[] = _("Boosts weaker moves.");
 static const u8 sLeafGuardDescription[] = _("Protects from status when sunny.");
+static const u8 sMoldBreakerDescription[] = _("Moves ignore Abilities.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -197,6 +198,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_NO_GUARD] = sNoGuardDescription,
     [ABILITY_TECHNICIAN] = sTechnicianDescription,
     [ABILITY_LEAF_GUARD] = sLeafGuardDescription,
+    [ABILITY_MOLD_BREAKER] = sMoldBreakerDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -299,4 +301,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_NO_GUARD] = _("NO GUARD"),
     [ABILITY_TECHNICIAN] = _("TECHNICIAN"),
     [ABILITY_LEAF_GUARD] = _("LEAF GUARD"),
+    [ABILITY_MOLD_BREAKER] = _("MOLD BREAKER"),
 };
