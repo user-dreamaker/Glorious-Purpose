@@ -1186,6 +1186,15 @@ static void Cmd_attackstring(void)
         PrepareStringBattle(STRINGID_USEDMOVE, gBattlerAttacker);
         gHitMarker |= HITMARKER_ATTACKSTRING_PRINTED;
     }
+    if (gBattleMons[gBattlerAttacker].ability == ABILITY_MOLD_BREAKER
+     && GetBattlerSide(gBattlerTarget) != GetBattlerSide(gBattlerAttacker)
+     && !gDisableStructs[gBattlerTarget].substituteHP
+     && IsIgnorableAbility(gBattleMons[gBattlerTarget].ability))
+    {
+        gLastUsedAbility = gBattleMons[gBattlerTarget].ability;
+        RecordAbilityBattle(gBattlerTarget, gLastUsedAbility);
+        gBattleMons[gBattlerTarget].ability = ABILITY_NONE;
+    }
     gBattlescriptCurrInstr++;
     gBattleCommunication[MSG_DISPLAY] = 0;
 }
