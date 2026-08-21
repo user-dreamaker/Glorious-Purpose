@@ -2598,6 +2598,53 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
     return effect;
 }
 
+bool8 IsIgnorableAbility(u16 ability)
+{
+    switch (ability)
+    {
+	case ABILITY_BATTLE_ARMOR:
+	case ABILITY_CLEAR_BODY:
+	case ABILITY_DAMP:
+	case ABILITY_DRY_SKIN:
+//	case ABILITY_FILTER:
+	case ABILITY_FLASH_FIRE:
+	case ABILITY_HYPER_CUTTER:
+	case ABILITY_IMMUNITY:
+	case ABILITY_INNER_FOCUS:
+	case ABILITY_INSOMNIA:
+	case ABILITY_KEEN_EYE:
+	case ABILITY_LEAF_GUARD:
+	case ABILITY_LEVITATE:
+	case ABILITY_LIGHTNING_ROD:
+	case ABILITY_LIMBER:
+	case ABILITY_MAGMA_ARMOR:
+	case ABILITY_MARVEL_SCALE:
+	case ABILITY_MOTOR_DRIVE:
+	case ABILITY_OBLIVIOUS:
+	case ABILITY_OWN_TEMPO:
+	case ABILITY_SAND_VEIL:
+	case ABILITY_SHELL_ARMOR:
+	case ABILITY_SHIELD_DUST:
+	case ABILITY_SNOW_CLOAK:
+//	case ABILITY_SOLID_ROCK:
+	case ABILITY_SOUNDPROOF:
+	case ABILITY_STICKY_HOLD:
+	case ABILITY_STURDY:
+	case ABILITY_SUCTION_CUPS:
+	case ABILITY_TANGLED_FEET:
+	case ABILITY_THICK_FAT:
+	case ABILITY_VITAL_SPIRIT:
+	case ABILITY_VOLT_ABSORB:
+	case ABILITY_WATER_ABSORB:
+	case ABILITY_WATER_VEIL:
+    case ABILITY_WHITE_SMOKE:
+    case ABILITY_WONDER_GUARD:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
 void BattleScriptExecute(const u8 *BS_ptr)
 {
     gBattlescriptCurrInstr = BS_ptr;
