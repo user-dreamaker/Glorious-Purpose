@@ -4685,3 +4685,9 @@ BattleScript_DownloadActivates::
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_DownloadEnd:
 	end3
+
+BattleScript_ForewarnActivates::
+	pause B_WAIT_TIME_SHORT
+	printstring STRINGID_FOREWARNMADEAWARE
+	waitmessage B_WAIT_TIME_LONG
+	end3

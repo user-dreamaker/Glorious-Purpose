@@ -2887,6 +2887,8 @@ static void TryDoEventsBeforeFirstTurn(void)
         return;
     if (AbilityBattleEffects(ABILITYEFFECT_DOWNLOAD, 0, 0, 0, 0) != 0)
         return;
+    if (AbilityBattleEffects(ABILITYEFFECT_FOREWARN, 0, 0, 0, 0) != 0)
+        return;
     // Check all switch in items having effect from the fastest mon to slowest.
     while (gBattleStruct->switchInItemsCounter < gBattlersCount)
     {
