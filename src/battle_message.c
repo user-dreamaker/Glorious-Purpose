@@ -285,6 +285,7 @@ static const u8 sText_PkmnsXRestoredHPALittle2[] = _("{B_ATK_NAME_WITH_PREFIX}'s
 static const u8 sText_PkmnHurtByHarshSunlight[] = _("{B_ATK_NAME_WITH_PREFIX} is hurt\nby the harsh sunlight!");
 static const u8 sText_ForewarnMadeAware[] = _("{B_ATK_NAME_WITH_PREFIX} FOREWARN:\n{B_DEF_NAME_WITH_PREFIX} was {B_BUFF1}.");
 static const u8 sText_PkmnsXWhippedUpSandstorm[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nwhipped up a sandstorm!");
+static const u8 sText_PkmnsXWhippedUpHail[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nwhipped up a hailstorm!");
 static const u8 sText_PkmnsXIntensifiedSun[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nintensified the sun's rays!");
 static const u8 sText_PkmnsXPreventsYLoss[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nprevents {B_BUFF1} loss!");
 static const u8 sText_PkmnsXInfatuatedY[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\ninfatuated {B_ATK_NAME_WITH_PREFIX}!");
@@ -895,6 +896,7 @@ const u8 *const gBattleStringsTable[BATTLESTRINGS_COUNT - BATTLESTRINGS_TABLE_ST
     [STRINGID_TRAINER1MON1AND2COMEBACK - BATTLESTRINGS_TABLE_START]      = sText_Trainer1RecallBoth,
     [STRINGID_PKMNHURTBYHARSHSUNLIGHT - BATTLESTRINGS_TABLE_START]       = sText_PkmnHurtByHarshSunlight,
     [STRINGID_FOREWARNMADEAWARE - BATTLESTRINGS_TABLE_START]             = sText_ForewarnMadeAware,
+    [STRINGID_PKMNSXWHIPPEDUPHAIL - BATTLESTRINGS_TABLE_START]           = sText_PkmnsXWhippedUpHail,
 };
 
 const u16 gMissStringIds[] =
