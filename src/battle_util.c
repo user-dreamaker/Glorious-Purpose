@@ -1224,6 +1224,7 @@ bool8 HandleFaintedMonActions(void)
              || AbilityBattleEffects(ABILITYEFFECT_DOWNLOAD, 0, 0, 0, 0)
              || ItemBattleEffects(ITEMEFFECT_NORMAL, 0, TRUE)
              || AbilityBattleEffects(ABILITYEFFECT_FOREWARN, 0, 0, 0, 0)
+             || AbilityBattleEffects(ABILITYEFFECT_FRISK, 0, 0, 0, 0)
              || AbilityBattleEffects(ABILITYEFFECT_FORECAST, 0, 0, 0, 0))
                 return TRUE;
             gBattleStruct->faintedActionsState++;
@@ -1853,6 +1854,10 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             case ABILITY_FOREWARN:
                 if (gBattleMons[battler].hp != 0 && GetBattlerSide(battler) == B_SIDE_PLAYER)
                     gStatuses3[battler] |= STATUS3_FOREWARN;
+                break;
+            case ABILITY_FRISK:
+                if (gBattleMons[battler].hp != 0)
+                    gStatuses3[battler] |= STATUS3_FRISK;
                 break;
             }
             break;
@@ -2640,6 +2645,44 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                     {
                         gStatuses3[i] &= ~STATUS3_FOREWARN;
                         gBattleStruct->forewarnAnnounced[i] = 0;
+                    }
+                    break;
+                }
+            }
+            break;
+        case ABILITYEFFECT_FRISK: // 22
+            for (i = 0; i < gBattlersCount; i++)
+            {
+                if (gBattleMons[i].ability == ABILITY_FRISK && (gStatuses3[i] & STATUS3_FRISK))
+                {
+                    u32 opposingBattler = BATTLE_OPPOSITE(i);
+                    u32 found = 0;
+                    for (target1 = 0; target1 < 2 && effect == 0; target1++, opposingBattler = BATTLE_PARTNER(opposingBattler))
+                    {
+                        if (gBattleMons[opposingBattler].hp != 0)
+                        {
+                            u16 item = gBattleMons[opposingBattler].item;
+                            if (item != ITEM_NONE)
+                            {
+                                if (found == gBattleStruct->friskAnnounced[i])
+                                {
+                                    gBattlerAttacker = i;
+                                    gBattlerTarget = opposingBattler;
+                                    gLastUsedItem = item;
+                                    gBattleScripting.battler = i;
+                                    BattleScriptPushCursorAndCallback(BattleScript_FriskActivates);
+                                    gBattleStruct->friskAnnounced[i]++;
+                                    effect++;
+                                    break;
+                                }
+                                found++;
+                            }
+                        }
+                    }
+                    if (effect == 0)
+                    {
+                        gStatuses3[i] &= ~STATUS3_FRISK;
+                        gBattleStruct->friskAnnounced[i] = 0;
                     }
                     break;
                 }
