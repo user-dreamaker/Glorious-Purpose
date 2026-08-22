@@ -102,6 +102,7 @@ static const u8 sForewarnDescription[] = _("Warns of the foe's moves.");
 static const u8 sTintedLensDescription[] = _("Boosts not very effective moves.");
 static const u8 sFilterDescription[] = _("Weakens super-effective moves.");
 static const u8 sScrappyDescription[] = _("Moves hit Ghost-type Pokémon.");
+static const u8 sSolidRockDescription[] = _("Weakens super-effective moves.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -209,6 +210,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_TINTED_LENS] = sTintedLensDescription,
     [ABILITY_FILTER] = sFilterDescription,
     [ABILITY_SCRAPPY] = sScrappyDescription,
+    [ABILITY_SOLID_ROCK] = sSolidRockDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -317,4 +319,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_TINTED_LENS] = _("TINTED LENS"),
     [ABILITY_FILTER] = _("FILTER"),
     [ABILITY_SCRAPPY] = _("SCRAPPY"),
+    [ABILITY_SOLID_ROCK] = _("SOLID ROCK"),
 };
