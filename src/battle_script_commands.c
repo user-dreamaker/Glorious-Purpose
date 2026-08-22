@@ -1409,6 +1409,8 @@ static void Cmd_typecalc(void)
             {
                 if (gBattleMons[gBattlerTarget].status2 & STATUS2_FORESIGHT)
                     break;
+                if (gBattleMons[gBattlerAttacker].ability == ABILITY_SCRAPPY && (moveType == TYPE_NORMAL || moveType == TYPE_FIGHTING))
+                    break;
                 i += 3;
                 continue;
             }
@@ -1489,6 +1491,8 @@ static void CheckWonderGuardAndLevitate(void)
         if (TYPE_EFFECT_ATK_TYPE(i) == TYPE_FORESIGHT)
         {
             if (gBattleMons[gBattlerTarget].status2 & STATUS2_FORESIGHT)
+                break;
+            if (gBattleMons[gBattlerAttacker].ability == ABILITY_SCRAPPY && (moveType == TYPE_NORMAL || moveType == TYPE_FIGHTING))
                 break;
             i += 3;
             continue;
@@ -1620,6 +1624,8 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
             if (TYPE_EFFECT_ATK_TYPE(i) == TYPE_FORESIGHT)
             {
                 if (gBattleMons[defender].status2 & STATUS2_FORESIGHT)
+                    break;
+                if (gBattleMons[attacker].ability == ABILITY_SCRAPPY && (moveType == TYPE_NORMAL || moveType == TYPE_FIGHTING))
                     break;
                 i += 3;
                 continue;
