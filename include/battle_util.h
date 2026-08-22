@@ -98,5 +98,9 @@ u8 GetMoveTarget(u16 move, u8 setTarget);
 u8 IsMonDisobedient(void);
 bool8 GhostUnTrap(u8 battler);
 bool8 IsIgnorableAbility(u16 ability);
+bool8 IsNeutralizableAbility(u16 ability);
+bool8 IsNeutralizingGasOnField(void);
+bool8 IsNeutralizingGasOnBattler(u8 battler);
+bool8 TryNeutralizingGasRestore(u8 battler);
 
 #endif // GUARD_BATTLE_UTIL_H

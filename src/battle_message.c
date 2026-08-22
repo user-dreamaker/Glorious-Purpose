@@ -285,6 +285,8 @@ static const u8 sText_PkmnsXRestoredHPALittle2[] = _("{B_ATK_NAME_WITH_PREFIX}'s
 static const u8 sText_PkmnHurtByHarshSunlight[] = _("{B_ATK_NAME_WITH_PREFIX} is hurt\nby the harsh sunlight!");
 static const u8 sText_ForewarnMadeAware[] = _("{B_ATK_NAME_WITH_PREFIX} FOREWARN:\n{B_DEF_NAME_WITH_PREFIX} was {B_BUFF1}.");
 static const u8 sText_Frisk[] = _("{B_ATK_NAME_WITH_PREFIX} FRISK:\n{B_DEF_NAME_WITH_PREFIX} was {B_LAST_ITEM}.");
+static const u8 sText_NeutralizingGasOn[] = _("Neutralizing Gas filled the area!");
+static const u8 sText_NeutralizingGasOff[] = _("Neutralizing Gas wore off!");
 static const u8 sText_PkmnsXWhippedUpSandstorm[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nwhipped up a sandstorm!");
 static const u8 sText_PkmnsXWhippedUpHail[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nwhipped up a hailstorm!");
 static const u8 sText_PkmnsXIntensifiedSun[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nintensified the sun's rays!");
@@ -899,6 +901,8 @@ const u8 *const gBattleStringsTable[BATTLESTRINGS_COUNT - BATTLESTRINGS_TABLE_ST
     [STRINGID_FOREWARNMADEAWARE - BATTLESTRINGS_TABLE_START]             = sText_ForewarnMadeAware,
     [STRINGID_FRISK - BATTLESTRINGS_TABLE_START]                         = sText_Frisk,
     [STRINGID_PKMNSXWHIPPEDUPHAIL - BATTLESTRINGS_TABLE_START]           = sText_PkmnsXWhippedUpHail,
+    [STRINGID_NEUTRALIZING_GAS_ON - BATTLESTRINGS_TABLE_START]           = sText_NeutralizingGasOn,
+    [STRINGID_NEUTRALIZING_GAS_OFF - BATTLESTRINGS_TABLE_START]          = sText_NeutralizingGasOff,
 };
 
 const u16 gMissStringIds[] =
