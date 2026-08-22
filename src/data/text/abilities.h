@@ -100,6 +100,7 @@ static const u8 sMoldBreakerDescription[] = _("Moves ignore Abilities.");
 static const u8 sSuperLuckDescription[] = _("Critical hits land more often.");
 static const u8 sForewarnDescription[] = _("Warns of the foe's moves.");
 static const u8 sTintedLensDescription[] = _("Boosts not very effective moves.");
+static const u8 sFilterDescription[] = _("Weakens super-effective moves.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -205,6 +206,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_SUPER_LUCK] = sSuperLuckDescription,
     [ABILITY_FOREWARN] = sForewarnDescription,
     [ABILITY_TINTED_LENS] = sTintedLensDescription,
+    [ABILITY_FILTER] = sFilterDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -311,4 +313,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_SUPER_LUCK] = _("SUPER LUCK"),
     [ABILITY_FOREWARN] = _("FOREWARN"),
     [ABILITY_TINTED_LENS] = _("TINTED LENS"),
+    [ABILITY_FILTER] = _("FILTER"),
 };
