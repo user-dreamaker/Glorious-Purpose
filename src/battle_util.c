@@ -2216,6 +2216,47 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                     effect++;
                 }
                 break;
+            case ABILITY_CURSED_BODY:
+                if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
+                 && TARGET_TURN_DAMAGED
+                 && gBattleMoves[move].power != 0
+                 && move != MOVE_STRUGGLE
+                 && gDisableStructs[gBattlerAttacker].disabledMove == MOVE_NONE
+                 && (Random() % 1) == 0)
+                {
+                    s32 i;
+                    u16 moveToDisable = move;
+                    for (i = 0; i < MAX_MON_MOVES; i++)
+                    {
+                        if (gBattleMons[gBattlerAttacker].moves[i] == moveToDisable)
+                            break;
+                    }
+                    if (i == MAX_MON_MOVES && moveToDisable != gChosenMove)
+                    {
+                        moveToDisable = gChosenMove;
+                        if (moveToDisable != MOVE_STRUGGLE && moveToDisable != MOVE_NONE)
+                        {
+                            for (i = 0; i < MAX_MON_MOVES; i++)
+                            {
+                                if (gBattleMons[gBattlerAttacker].moves[i] == moveToDisable)
+                                    break;
+                            }
+                        }
+                    }
+                    if (i != MAX_MON_MOVES && gBattleMons[gBattlerAttacker].pp[i] != 0)
+                    {
+                        PREPARE_MOVE_BUFFER(gBattleTextBuff1, moveToDisable);
+                        gDisableStructs[gBattlerAttacker].disabledMove = moveToDisable;
+                        gDisableStructs[gBattlerAttacker].disableTimer = 4;
+                        gDisableStructs[gBattlerAttacker].disableTimerStartValue = 4;
+                        gBattleScripting.battler = battler;
+                        gBattlerTarget = gBattlerAttacker;
+                        BattleScriptPushCursor();
+                        gBattlescriptCurrInstr = BattleScript_CursedBodyActivates;
+                        effect++;
+                    }
+                }
+                break;
             }
             break;
         case ABILITYEFFECT_IMMUNITY: // 5
