@@ -457,7 +457,8 @@ struct BattleStruct
         struct MultiBattlePokemonTx multiBattleMons[3];
     } multiBuffer;
     u8 forewarnAnnounced[MAX_BATTLERS_COUNT];
-    u8 padding_1E8[0x18];
+    u8 friskAnnounced[MAX_BATTLERS_COUNT];
+    u8 padding_1E8[0x14];
 }; // size == 0x200 bytes
 
 extern struct BattleStruct *gBattleStruct;

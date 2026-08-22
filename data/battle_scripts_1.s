@@ -4699,3 +4699,9 @@ BattleScript_ForewarnActivates::
 	printstring STRINGID_FOREWARNMADEAWARE
 	waitmessage B_WAIT_TIME_LONG
 	end3
+
+BattleScript_FriskActivates::
+	pause B_WAIT_TIME_SHORT
+	printstring STRINGID_FRISK
+	waitmessage B_WAIT_TIME_LONG
+	end3
