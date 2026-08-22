@@ -4216,6 +4216,17 @@ BattleScript_DroughtActivates::
 	call BattleScript_WeatherFormChanges
 	end3
 
+BattleScript_NeutralizingGasOn::
+	pause B_WAIT_TIME_SHORT
+	printstring STRINGID_NEUTRALIZING_GAS_ON
+	waitmessage B_WAIT_TIME_LONG
+	end3
+
+BattleScript_NeutralizingGasOff::
+	printstring STRINGID_NEUTRALIZING_GAS_OFF
+	waitmessage B_WAIT_TIME_LONG
+	return
+
 BattleScript_TookAttack::
 	attackstring
 	pause B_WAIT_TIME_SHORT

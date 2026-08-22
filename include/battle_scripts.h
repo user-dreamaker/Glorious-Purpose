@@ -241,6 +241,8 @@ extern const u8 BattleScript_DownloadActivates[];
 extern const u8 BattleScript_ForewarnActivates[];
 extern const u8 BattleScript_FriskActivates[];
 extern const u8 BattleScript_CursedBodyActivates[];
+extern const u8 BattleScript_NeutralizingGasOn[];
+extern const u8 BattleScript_NeutralizingGasOff[];
 
 extern const u8 *const gBattleScriptsForMoveEffects[];
 extern const u8 *const gBattlescriptsForBallThrow[];
