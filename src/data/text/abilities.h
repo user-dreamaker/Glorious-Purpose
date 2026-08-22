@@ -99,6 +99,7 @@ static const u8 sLeafGuardDescription[] = _("Protects from status when sunny.");
 static const u8 sMoldBreakerDescription[] = _("Moves ignore Abilities.");
 static const u8 sSuperLuckDescription[] = _("Critical hits land more often.");
 static const u8 sForewarnDescription[] = _("Warns of the foe's moves.");
+static const u8 sTintedLensDescription[] = _("Boosts not very effective moves.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -203,6 +204,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_MOLD_BREAKER] = sMoldBreakerDescription,
     [ABILITY_SUPER_LUCK] = sSuperLuckDescription,
     [ABILITY_FOREWARN] = sForewarnDescription,
+    [ABILITY_TINTED_LENS] = sTintedLensDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -308,4 +310,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_MOLD_BREAKER] = _("MOLD BREAKER"),
     [ABILITY_SUPER_LUCK] = _("SUPER LUCK"),
     [ABILITY_FOREWARN] = _("FOREWARN"),
+    [ABILITY_TINTED_LENS] = _("TINTED LENS"),
 };
