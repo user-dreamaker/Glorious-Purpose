@@ -106,6 +106,7 @@ static const u8 sSolidRockDescription[] = _("Weakens super-effective moves.");
 static const u8 sSnowWarningDescription[] = _("Summons a hailstorm.");
 static const u8 sFriskDescription[] = _("Reveals the foe's held item.");
 static const u8 sRecklessDescription[] = _("Boosts moves with recoil.");
+static const u8 sCursedBodyDescription[] = _("May disable a foe's move.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -217,6 +218,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_SNOW_WARNING] = sSnowWarningDescription,
     [ABILITY_FRISK] = sFriskDescription,
     [ABILITY_RECKLESS] = sRecklessDescription,
+    [ABILITY_CURSED_BODY] = sCursedBodyDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -329,4 +331,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_SNOW_WARNING] = _("SNOW WARNING"),
     [ABILITY_FRISK] = _("FRISK"),
     [ABILITY_RECKLESS] = _("RECKLESS"),
+    [ABILITY_CURSED_BODY] = _("CURSED BODY"),
 };
