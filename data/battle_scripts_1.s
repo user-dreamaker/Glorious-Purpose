@@ -4705,3 +4705,11 @@ BattleScript_FriskActivates::
 	printstring STRINGID_FRISK
 	waitmessage B_WAIT_TIME_LONG
 	end3
+
+BattleScript_CursedBodyActivates::
+	pause B_WAIT_TIME_SHORT
+	swapattackerwithtarget
+	printstring STRINGID_PKMNMOVEWASDISABLED
+	waitmessage B_WAIT_TIME_LONG
+	swapattackerwithtarget
+	return

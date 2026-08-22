@@ -2186,6 +2186,35 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                     effect++;
                 }
                 break;
+            case ABILITY_CURSED_BODY:
+                if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
+                 && gBattleMons[gBattlerAttacker].hp != 0
+                 && !gProtectStructs[gBattlerAttacker].confusionSelfDmg
+                 && TARGET_TURN_DAMAGED
+                 && (gBattleMoves[move].flags & FLAG_MAKES_CONTACT)
+                 && move != MOVE_STRUGGLE
+                 && gDisableStructs[gBattlerAttacker].disabledMove == MOVE_NONE
+                 && (Random() % 3) == 0)
+                {
+                    s32 i;
+                    for (i = 0; i < MAX_MON_MOVES; i++)
+                    {
+                        if (gBattleMons[gBattlerAttacker].moves[i] == move)
+                            break;
+                    }
+                    if (i != MAX_MON_MOVES && gBattleMons[gBattlerAttacker].pp[i] != 0)
+                    {
+                        gLastMoves[gBattlerAttacker] = move;
+                        gDisableStructs[gBattlerAttacker].disabledMove = move;
+                        gDisableStructs[gBattlerAttacker].disableTimer = 4;
+                        gDisableStructs[gBattlerAttacker].disableTimerStartValue = gDisableStructs[gBattlerAttacker].disableTimer;
+                        PREPARE_MOVE_BUFFER(gBattleTextBuff1, move);
+                        BattleScriptPushCursor();
+                        gBattlescriptCurrInstr = BattleScript_CursedBodyActivates;
+                        effect++;
+                    }
+                }
+                break;
             case ABILITY_CUTE_CHARM:
                 if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
                  && gBattleMons[gBattlerAttacker].hp != 0
