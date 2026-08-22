@@ -1457,7 +1457,7 @@ static void Cmd_typecalc(void)
         gMoveResultFlags &= ~MOVE_RESULT_NOT_VERY_EFFECTIVE;
     }
 
-    if (gBattleMons[gBattlerTarget].ability == ABILITY_FILTER
+    if ((gBattleMons[gBattlerTarget].ability == ABILITY_FILTER || gBattleMons[gBattlerTarget].ability == ABILITY_SOLID_ROCK)
      && (gMoveResultFlags & MOVE_RESULT_SUPER_EFFECTIVE))
     {
         gBattleMoveDamage = gBattleMoveDamage * 3 / 4;
@@ -1676,7 +1676,7 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
         flags &= ~MOVE_RESULT_NOT_VERY_EFFECTIVE;
     }
 
-    if (gBattleMons[defender].ability == ABILITY_FILTER
+    if ((gBattleMons[defender].ability == ABILITY_FILTER || gBattleMons[defender].ability == ABILITY_SOLID_ROCK)
      && (flags & MOVE_RESULT_SUPER_EFFECTIVE))
     {
         gBattleMoveDamage = gBattleMoveDamage * 3 / 4;
