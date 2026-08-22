@@ -105,6 +105,7 @@ static const u8 sScrappyDescription[] = _("Moves hit Ghost-type Pokémon.");
 static const u8 sSolidRockDescription[] = _("Weakens super-effective moves.");
 static const u8 sSnowWarningDescription[] = _("Summons a hailstorm.");
 static const u8 sFriskDescription[] = _("Reveals the foe's held item.");
+static const u8 sRecklessDescription[] = _("Boosts moves with recoil.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -215,6 +216,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_SOLID_ROCK] = sSolidRockDescription,
     [ABILITY_SNOW_WARNING] = sSnowWarningDescription,
     [ABILITY_FRISK] = sFriskDescription,
+    [ABILITY_RECKLESS] = sRecklessDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -326,4 +328,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_SOLID_ROCK] = _("SOLID ROCK"),
     [ABILITY_SNOW_WARNING] = _("SNOW WARNING"),
     [ABILITY_FRISK] = _("FRISK"),
+    [ABILITY_RECKLESS] = _("RECKLESS"),
 };
