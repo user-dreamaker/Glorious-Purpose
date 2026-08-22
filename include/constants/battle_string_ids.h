@@ -389,8 +389,10 @@
 #define STRINGID_FOREWARNMADEAWARE 388
 #define STRINGID_PKMNSXWHIPPEDUPHAIL 389
 #define STRINGID_FRISK 390
+#define STRINGID_NEUTRALIZING_GAS_ON 391
+#define STRINGID_NEUTRALIZING_GAS_OFF 392
 
-#define BATTLESTRINGS_COUNT     391
+#define BATTLESTRINGS_COUNT     393
 
 // This is the string id that gBattleStringsTable starts with.
 // String ids before this (e.g. STRINGID_INTROMSG) are not in the table,

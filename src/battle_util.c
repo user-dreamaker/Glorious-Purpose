@@ -1859,6 +1859,24 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                 if (gBattleMons[battler].hp != 0)
                     gStatuses3[battler] |= STATUS3_FRISK;
                 break;
+            case ABILITY_NEUTRALIZING_GAS:
+                for (target1 = 0; target1 < gBattlersCount; target1++)
+                {
+                    if (target1 != battler
+                     && gBattleMons[target1].hp != 0
+                     && IsNeutralizableAbility(gBattleMons[target1].ability))
+                    {
+                        RecordAbilityBattle(target1, gBattleMons[target1].ability);
+                        gBattleMons[target1].ability = ABILITY_NONE;
+                        effect++;
+                    }
+                }
+                if (effect != 0)
+                {
+                    BattleScriptPushCursorAndCallback(BattleScript_NeutralizingGasOn);
+                    gBattleScripting.battler = battler;
+                }
+                break;
             }
             break;
         case ABILITYEFFECT_ENDTURN: // 1
@@ -2771,6 +2789,54 @@ bool8 IsIgnorableAbility(u16 ability)
     default:
         return FALSE;
     }
+}
+
+bool8 IsNeutralizableAbility(u16 ability)
+{
+    return ability != ABILITY_NONE && ability != ABILITY_NEUTRALIZING_GAS;
+}
+
+bool8 IsNeutralizingGasOnField(void)
+{
+    u32 i;
+
+    for (i = 0; i < gBattlersCount; i++)
+    {
+        if (gBattleMons[i].ability == ABILITY_NEUTRALIZING_GAS && gBattleMons[i].hp != 0)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+bool8 IsNeutralizingGasOnBattler(u8 battler)
+{
+    return gBattleMons[battler].ability == ABILITY_NEUTRALIZING_GAS;
+}
+
+bool8 TryNeutralizingGasRestore(u8 battler)
+{
+    u32 i;
+
+    if (gBattleMons[battler].ability != ABILITY_NEUTRALIZING_GAS)
+        return FALSE;
+
+    for (i = 0; i < gBattlersCount; i++)
+    {
+        if (i != battler && gBattleMons[i].hp != 0 && gBattleMons[i].ability == ABILITY_NEUTRALIZING_GAS)
+            return FALSE;
+    }
+
+    for (i = 0; i < gBattlersCount; i++)
+    {
+        if (i != battler
+         && gBattleMons[i].hp != 0
+         && gBattleMons[i].ability == ABILITY_NONE
+         && GetAbilityBySpecies(gBattleMons[i].species, gBattleMons[i].abilityNum) != ABILITY_NONE)
+        {
+            gBattleMons[i].ability = GetAbilityBySpecies(gBattleMons[i].species, gBattleMons[i].abilityNum);
+        }
+    }
+    return TRUE;
 }
 
 void BattleScriptExecute(const u8 *BS_ptr)

@@ -1195,6 +1195,14 @@ static void Cmd_attackstring(void)
         RecordAbilityBattle(gBattlerTarget, gLastUsedAbility);
         gBattleMons[gBattlerTarget].ability = ABILITY_NONE;
     }
+    if (IsNeutralizingGasOnField()
+     && !IsNeutralizingGasOnBattler(gBattlerTarget)
+     && IsNeutralizableAbility(gBattleMons[gBattlerTarget].ability))
+    {
+        gLastUsedAbility = gBattleMons[gBattlerTarget].ability;
+        RecordAbilityBattle(gBattlerTarget, gLastUsedAbility);
+        gBattleMons[gBattlerTarget].ability = ABILITY_NONE;
+    }
     gBattlescriptCurrInstr++;
     gBattleCommunication[MSG_DISPLAY] = 0;
 }
@@ -3199,13 +3207,25 @@ static void Cmd_cleareffectsonfaint(void)
 {
     if (gBattleControllerExecFlags == 0)
     {
+        bool8 gasWoreOff;
+
         gActiveBattler = GetBattlerForBattleScript(gBattlescriptCurrInstr[1]);
+
+        gasWoreOff = TryNeutralizingGasRestore(gActiveBattler);
 
         gBattleMons[gActiveBattler].status1 = 0;
         BtlController_EmitSetMonData(BUFFER_A, REQUEST_STATUS_BATTLE, 0, sizeof(gBattleMons[gActiveBattler].status1), &gBattleMons[gActiveBattler].status1);
         MarkBattlerForControllerExec(gActiveBattler);
 
         FaintClearSetData(); // Effects like attractions, trapping, etc.
+
+        if (gasWoreOff)
+        {
+            BattleScriptPush(gBattlescriptCurrInstr + 2);
+            gBattlescriptCurrInstr = BattleScript_NeutralizingGasOff;
+            return;
+        }
+
         gBattlescriptCurrInstr += 2;
     }
 }
@@ -5247,6 +5267,14 @@ static void Cmd_switchineffects(void)
 
     gHitMarker &= ~HITMARKER_FAINTED(gActiveBattler);
     gSpecialStatuses[gActiveBattler].faintedHasReplacement = FALSE;
+
+    if (!IsNeutralizingGasOnBattler(gActiveBattler)
+     && IsNeutralizingGasOnField()
+     && IsNeutralizableAbility(gBattleMons[gActiveBattler].ability))
+    {
+        RecordAbilityBattle(gActiveBattler, gBattleMons[gActiveBattler].ability);
+        gBattleMons[gActiveBattler].ability = ABILITY_NONE;
+    }
 
     if (!(gSideStatuses[GetBattlerSide(gActiveBattler)] & SIDE_STATUS_SPIKES_DAMAGED)
         && (gSideStatuses[GetBattlerSide(gActiveBattler)] & SIDE_STATUS_SPIKES)
@@ -9544,6 +9572,14 @@ static void Cmd_switchoutabilities(void)
                                      sizeof(gBattleMons[gActiveBattler].status1),
                                      &gBattleMons[gActiveBattler].status1);
         MarkBattlerForControllerExec(gActiveBattler);
+        break;
+    case ABILITY_NEUTRALIZING_GAS:
+        if (TryNeutralizingGasRestore(gActiveBattler))
+        {
+            BattleScriptPush(gBattlescriptCurrInstr + 2);
+            gBattlescriptCurrInstr = BattleScript_NeutralizingGasOff;
+            return;
+        }
         break;
     }
 
