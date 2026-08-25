@@ -20,6 +20,8 @@
 #include "constants/sound.h"
 #include "pokedex_area_markers.h"
 #include "field_specials.h"
+#include "constants/abilities.h"
+#include "battle_main.h"
 
 #define TAG_AREA_MARKERS 2001
 
@@ -650,7 +652,7 @@ const struct WindowTemplate sWindowTemplate_AreaMap_Size = {
     .tilemapLeft = 2,
     .tilemapTop = 7,
     .width = 10,
-    .height = 2,
+    .height = 10,
     .paletteNum = 0,
     .baseBlock = 0x01d0
 };
@@ -811,6 +813,60 @@ static const u8 *const sDexCategoryNamePtrs[] = {
     gText_DexCategory_UrbanPkmn,
     gText_DexCategory_RarePkmn,
 };
+
+enum
+{
+    STAT_PRINT_HP,
+    STAT_PRINT_ATK,
+    STAT_PRINT_DEF,
+    STAT_PRINT_SPEED,
+    STAT_PRINT_SPATK,
+    STAT_PRINT_SPDEF,
+};
+
+static const u8 sText_HP[] = _("HP  {STR_VAR_1}");
+static const u8 sText_Atk[] = _("Atk {STR_VAR_1}");
+static const u8 sText_Def[] = _("Def {STR_VAR_1}");
+static const u8 sText_Spe[] = _("Spe {STR_VAR_1}");
+static const u8 sText_Spa[] = _("Spa {STR_VAR_1}");
+static const u8 sText_Spd[] = _("Spd {STR_VAR_1}");
+static const u8 sText_CaptureToMoreInfo[] = _("Capture for\nmore information!");
+
+static const u8 *const sStatsTextPointers[] =
+{
+    [STAT_PRINT_HP]    = sText_HP,
+    [STAT_PRINT_ATK]   = sText_Atk,
+    [STAT_PRINT_DEF]   = sText_Def,
+    [STAT_PRINT_SPEED] = sText_Spe,
+    [STAT_PRINT_SPATK] = sText_Spa,
+    [STAT_PRINT_SPDEF] = sText_Spd,
+};
+
+static void PrepareStatToPrint(u16 species, u8 statId)
+{
+    switch (statId)
+    {
+    case STAT_PRINT_HP:
+        ConvertIntToDecimalStringN(gStringVar1, gSpeciesInfo[species].baseHP, STR_CONV_MODE_LEADING_ZEROS, 3);
+        break;
+    case STAT_PRINT_ATK:
+        ConvertIntToDecimalStringN(gStringVar1, gSpeciesInfo[species].baseAttack, STR_CONV_MODE_LEADING_ZEROS, 3);
+        break;
+    case STAT_PRINT_DEF:
+        ConvertIntToDecimalStringN(gStringVar1, gSpeciesInfo[species].baseDefense, STR_CONV_MODE_LEADING_ZEROS, 3);
+        break;
+    case STAT_PRINT_SPEED:
+        ConvertIntToDecimalStringN(gStringVar1, gSpeciesInfo[species].baseSpeed, STR_CONV_MODE_LEADING_ZEROS, 3);
+        break;
+    case STAT_PRINT_SPATK:
+        ConvertIntToDecimalStringN(gStringVar1, gSpeciesInfo[species].baseSpAttack, STR_CONV_MODE_LEADING_ZEROS, 3);
+        break;
+    case STAT_PRINT_SPDEF:
+        ConvertIntToDecimalStringN(gStringVar1, gSpeciesInfo[species].baseSpDefense, STR_CONV_MODE_LEADING_ZEROS, 3);
+        break;
+    }
+    StringExpandPlaceholders(gStringVar4, sStatsTextPointers[statId]);
+}
 
 const u16 sPalette_Silhouette[] = INCBIN_U16("graphics/pokedex/silhouette_sprite_pal.gbapal");
 
@@ -2996,20 +3052,6 @@ u8 DexScreen_DrawMonAreaPage(void)
     FillBgTilemapBufferRect_Palette0(3, BG_TILE_H_FLIP(6), left + 1 + width, top + 1, 1, height);
     FillBgTilemapBufferRect_Palette0(3, 1, left + 1, top + 1, width, height);
     FillBgTilemapBufferRect_Palette0(0, 0, 0, 2, 30, 16);
-
-    width = 10;
-    height = 6;
-    left = 1;
-    top = 9;
-
-    FillBgTilemapBufferRect_Palette0(0, 29, left, top, 1, 1);
-    FillBgTilemapBufferRect_Palette0(0, BG_TILE_H_FLIP(29), left + 1 + width, top, 1, 1);
-    FillBgTilemapBufferRect_Palette0(0, BG_TILE_V_FLIP(29), left, top + 1 + height, 1, 1);
-    FillBgTilemapBufferRect_Palette0(0, BG_TILE_H_V_FLIP(29), left + 1 + width, top + 1 + height, 1, 1);
-    FillBgTilemapBufferRect_Palette0(0, 30, left + 1, top, width, 1);
-    FillBgTilemapBufferRect_Palette0(0, BG_TILE_V_FLIP(30), left + 1, top + 1 + height, width, 1);
-    FillBgTilemapBufferRect_Palette0(0, 31, left, top + 1, 1, height);
-    FillBgTilemapBufferRect_Palette0(0, BG_TILE_H_FLIP(31), left + 1 + width, top + 1, 1, height);
     FillBgTilemapBufferRect_Palette0(2, 0, 0, 0, 30, 20);
     FillBgTilemapBufferRect_Palette0(1, 0, 0, 0, 30, 20);
 
@@ -3050,9 +3092,34 @@ u8 DexScreen_DrawMonAreaPage(void)
 
     // Print "Size"
     FillWindowPixelBuffer(sPokedexScreenData->windowIds[9], PIXEL_FILL(0));
+    if (monIsCaught)
     {
-        s32 strWidth = GetStringWidth(FONT_SMALL, gText_Size, 0);
-        DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gText_Size, (sWindowTemplate_AreaMap_Size.width * 8 - strWidth) / 2, 4, 0);
+        PrepareStatToPrint(species, STAT_PRINT_HP);
+        DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gStringVar4, 0, 4, 0);
+        PrepareStatToPrint(species, STAT_PRINT_ATK);
+        DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gStringVar4, 44, 4, 0);
+        PrepareStatToPrint(species, STAT_PRINT_DEF);
+        DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gStringVar4, 0, 17, 0);
+        PrepareStatToPrint(species, STAT_PRINT_SPATK);
+        DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gStringVar4, 44, 17, 0);
+        PrepareStatToPrint(species, STAT_PRINT_SPDEF);
+        DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gStringVar4, 0, 30, 0);
+        PrepareStatToPrint(species, STAT_PRINT_SPEED);
+        DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gStringVar4, 44, 30, 0);
+        DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gAbilityNames[gSpeciesInfo[species].abilities[0]], 0, 46, 0);
+        if (gSpeciesInfo[species].abilities[0] != gSpeciesInfo[species].abilities[1] && gSpeciesInfo[species].abilities[1] != ABILITY_NONE)
+            DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gAbilityNames[gSpeciesInfo[species].abilities[1]], 0, 57, 0);
+        else if (gSpeciesInfo[species].hiddenAbilities[0] != ABILITY_NONE && gSpeciesInfo[species].hiddenAbilities[0] != gSpeciesInfo[species].abilities[0] && gSpeciesInfo[species].hiddenAbilities[0] != gSpeciesInfo[species].abilities[1])
+            DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gAbilityNames[gSpeciesInfo[species].hiddenAbilities[0]], 0, 57, 0);
+        if (gSpeciesInfo[species].hiddenAbilities[0] != ABILITY_NONE && gSpeciesInfo[species].hiddenAbilities[0] != gSpeciesInfo[species].abilities[0] && gSpeciesInfo[species].hiddenAbilities[0] != gSpeciesInfo[species].abilities[1])
+        {
+            if (gSpeciesInfo[species].abilities[0] != gSpeciesInfo[species].abilities[1] && gSpeciesInfo[species].abilities[1] != ABILITY_NONE)
+                DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, gAbilityNames[gSpeciesInfo[species].hiddenAbilities[0]], 0, 68, 0);
+        }
+    }
+    else
+    {
+        DexScreen_AddTextPrinterParameterized(sPokedexScreenData->windowIds[9], FONT_SMALL, sText_CaptureToMoreInfo, 0, 4, 0);
     }
     PutWindowTilemap(sPokedexScreenData->windowIds[9]);
     CopyWindowToVram(sPokedexScreenData->windowIds[9], COPYWIN_GFX);
@@ -3089,30 +3156,8 @@ u8 DexScreen_DrawMonAreaPage(void)
 
     // Show size comparison
     ResetAllPicSprites();
-    LoadPalette(sPalette_Silhouette, OBJ_PLTT_ID(2), PLTT_SIZE_4BPP);
-
-    if (monIsCaught)
-    {
-        sPokedexScreenData->windowIds[14] = CreateMonPicSprite_HandleDeoxys(species, SHINY_ODDS, DexScreen_GetDefaultPersonality(species), TRUE, 40, 104, 0, 0xFFFF);
-        gSprites[sPokedexScreenData->windowIds[14]].oam.paletteNum = 2;
-        gSprites[sPokedexScreenData->windowIds[14]].oam.affineMode = ST_OAM_AFFINE_NORMAL;
-        gSprites[sPokedexScreenData->windowIds[14]].oam.matrixNum = 2;
-        gSprites[sPokedexScreenData->windowIds[14]].oam.priority = 1;
-        gSprites[sPokedexScreenData->windowIds[14]].y2 = gPokedexEntries[speciesId].pokemonOffset;
-        SetOamMatrix(2, gPokedexEntries[speciesId].pokemonScale, 0, 0, gPokedexEntries[speciesId].pokemonScale);
-        sPokedexScreenData->windowIds[15] = CreateTrainerPicSprite(PlayerGenderToFrontTrainerPicId(gSaveBlock2Ptr->playerGender, TRUE), 1, 80, 104, 0, 0xFFFF);
-        gSprites[sPokedexScreenData->windowIds[15]].oam.paletteNum = 2;
-        gSprites[sPokedexScreenData->windowIds[15]].oam.affineMode = ST_OAM_AFFINE_NORMAL;
-        gSprites[sPokedexScreenData->windowIds[15]].oam.matrixNum = 1;
-        gSprites[sPokedexScreenData->windowIds[15]].oam.priority = 1;
-        gSprites[sPokedexScreenData->windowIds[15]].y2 = gPokedexEntries[speciesId].trainerOffset;
-        SetOamMatrix(1, gPokedexEntries[speciesId].trainerScale, 0, 0, gPokedexEntries[speciesId].trainerScale);
-    }
-    else
-    {
-        sPokedexScreenData->windowIds[14] = 0xff;
-        sPokedexScreenData->windowIds[15] = 0xff;
-    }
+    sPokedexScreenData->windowIds[14] = 0xff;
+    sPokedexScreenData->windowIds[15] = 0xff;
 
     // Create the area markers
     sPokedexScreenData->areaMarkersTaskId = CreatePokedexAreaMarkers(species, TAG_AREA_MARKERS, 3, kantoMapVoff * 8);
