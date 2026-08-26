@@ -976,14 +976,28 @@ static void Cmd_get_considered_move_power(void)
 {
     if(AI_THINKING_STRUCT->funcResult == MOVE_HIDDEN_POWER)
     {
-        s32 powerBits  = ((gBattleMons[gBattlerAttacker].hpIV & 2) >> 1)
-              | ((gBattleMons[gBattlerAttacker].attackIV & 2) << 0)
-              | ((gBattleMons[gBattlerAttacker].defenseIV & 2) << 1)
-              | ((gBattleMons[gBattlerAttacker].speedIV & 2) << 2)
-              | ((gBattleMons[gBattlerAttacker].spAttackIV & 2) << 3)
-              | ((gBattleMons[gBattlerAttacker].spDefenseIV & 2) << 4);
-
-        AI_THINKING_STRUCT->funcResult = (40 * powerBits) / 63 + 30;
+        if (gBattleMons[gBattlerAttacker].hpIV <= 1
+            || gBattleMons[gBattlerAttacker].attackIV <= 1
+            || gBattleMons[gBattlerAttacker].defenseIV <= 1
+            || gBattleMons[gBattlerAttacker].speedIV <= 1
+            || gBattleMons[gBattlerAttacker].spAttackIV <= 1
+            || gBattleMons[gBattlerAttacker].spDefenseIV <= 1)
+        {
+            AI_THINKING_STRUCT->funcResult = 60;
+        }
+        else if (gBattleMons[gBattlerAttacker].hpIV >= 30
+                 && gBattleMons[gBattlerAttacker].attackIV >= 30
+                 && gBattleMons[gBattlerAttacker].defenseIV >= 30
+                 && gBattleMons[gBattlerAttacker].speedIV >= 30
+                 && gBattleMons[gBattlerAttacker].spAttackIV >= 30
+                 && gBattleMons[gBattlerAttacker].spDefenseIV >= 30)
+        {
+            AI_THINKING_STRUCT->funcResult = 70;
+        }
+        else
+        {
+            AI_THINKING_STRUCT->funcResult = 60;
+        }
     }
     else
         AI_THINKING_STRUCT->funcResult = gBattleMoves[AI_THINKING_STRUCT->moveConsidered].power;	
@@ -1888,14 +1902,28 @@ static void Cmd_get_move_power_from_result(void)
 {
     if(AI_THINKING_STRUCT->funcResult == MOVE_HIDDEN_POWER)
     {
-        s32 powerBits  = ((gBattleMons[gBattlerAttacker].hpIV & 2) >> 1)
-              | ((gBattleMons[gBattlerAttacker].attackIV & 2) << 0)
-              | ((gBattleMons[gBattlerAttacker].defenseIV & 2) << 1)
-              | ((gBattleMons[gBattlerAttacker].speedIV & 2) << 2)
-              | ((gBattleMons[gBattlerAttacker].spAttackIV & 2) << 3)
-              | ((gBattleMons[gBattlerAttacker].spDefenseIV & 2) << 4);
-
-        AI_THINKING_STRUCT->funcResult = (40 * powerBits) / 63 + 30;
+        if (gBattleMons[gBattlerAttacker].hpIV <= 1
+            || gBattleMons[gBattlerAttacker].attackIV <= 1
+            || gBattleMons[gBattlerAttacker].defenseIV <= 1
+            || gBattleMons[gBattlerAttacker].speedIV <= 1
+            || gBattleMons[gBattlerAttacker].spAttackIV <= 1
+            || gBattleMons[gBattlerAttacker].spDefenseIV <= 1)
+        {
+            AI_THINKING_STRUCT->funcResult = 60;
+        }
+        else if (gBattleMons[gBattlerAttacker].hpIV >= 30
+                 && gBattleMons[gBattlerAttacker].attackIV >= 30
+                 && gBattleMons[gBattlerAttacker].defenseIV >= 30
+                 && gBattleMons[gBattlerAttacker].speedIV >= 30
+                 && gBattleMons[gBattlerAttacker].spAttackIV >= 30
+                 && gBattleMons[gBattlerAttacker].spDefenseIV >= 30)
+        {
+            AI_THINKING_STRUCT->funcResult = 70;
+        }
+        else
+        {
+            AI_THINKING_STRUCT->funcResult = 60;
+        }
     }
     else
         AI_THINKING_STRUCT->funcResult = gBattleMoves[AI_THINKING_STRUCT->funcResult].power;

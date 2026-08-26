@@ -2552,7 +2552,65 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     if (WEATHER_HAS_EFFECT && (gBattleWeather & B_WEATHER_HAIL) && IS_BATTLER_OF_TYPE(battlerIdDef, TYPE_ICE))
         defense = (15 * defense) / 10;
 
-    if (IS_TYPE_PHYSICAL(gBattleMoves[move]))
+    // Hidden Power uses dynamic category based on Nature
+    if (move == MOVE_HIDDEN_POWER)
+    {
+        if (gBattleStruct->dynamicMoveCategory == 0) // Physical
+        {
+            if (gCritMultiplier == 2)
+            {
+                if (attacker->statStages[STAT_ATK] > DEFAULT_STAT_STAGE)
+                    APPLY_STAT_MOD(damage, attacker, attack, STAT_ATK)
+                else
+                    damage = attack;
+            }
+            else
+                APPLY_STAT_MOD(damage, attacker, attack, STAT_ATK)
+
+            damage = damage * gBattleMovePower;
+            damage *= (2 * attacker->level / 5 + 2);
+
+            if (gCritMultiplier == 2)
+            {
+                if (defender->statStages[STAT_DEF] < DEFAULT_STAT_STAGE)
+                    APPLY_STAT_MOD(damage, defender, defense, STAT_DEF)
+                else
+                    damage = damage * defense;
+            }
+            else
+                APPLY_STAT_MOD(damage, defender, defense, STAT_DEF)
+
+            damage = damage / (50 * 1);
+        }
+        else // Special
+        {
+            if (gCritMultiplier == 2)
+            {
+                if (attacker->statStages[STAT_SPATK] > DEFAULT_STAT_STAGE)
+                    APPLY_STAT_MOD(damage, attacker, spAttack, STAT_SPATK)
+                else
+                    damage = spAttack;
+            }
+            else
+                APPLY_STAT_MOD(damage, attacker, spAttack, STAT_SPATK)
+
+            damage = damage * gBattleMovePower;
+            damage *= (2 * attacker->level / 5 + 2);
+
+            if (gCritMultiplier == 2)
+            {
+                if (defender->statStages[STAT_SPDEF] < DEFAULT_STAT_STAGE)
+                    APPLY_STAT_MOD(damage, defender, spDefense, STAT_SPDEF)
+                else
+                    damage = damage * spDefense;
+            }
+            else
+                APPLY_STAT_MOD(damage, defender, spDefense, STAT_SPDEF)
+
+            damage = damage / (50 * 1);
+        }
+    }
+    else if (IS_TYPE_PHYSICAL(gBattleMoves[move]))
     {
         if (gCritMultiplier == 2)
         {

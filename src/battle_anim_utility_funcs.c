@@ -6,6 +6,7 @@
 #include "task.h"
 #include "util.h"
 #include "constants/songs.h"
+#include "constants/pokemon.h"
 
 struct AnimStatsChangeData
 {
@@ -838,6 +839,21 @@ static void UpdateMonScrollingBgMask(u8 taskId)
 void AnimTask_GetBattleTerrain(u8 taskId)
 {
     gBattleAnimArgs[0] = gBattleTerrain;
+    DestroyAnimVisualTask(taskId);
+}
+
+void AnimTask_GetHiddenPowerType(u8 taskId)
+{
+    u8 typeBits = ((gBattleMons[gBattleAnimAttacker].hpIV & 1) << 0)
+                | ((gBattleMons[gBattleAnimAttacker].attackIV & 1) << 1)
+                | ((gBattleMons[gBattleAnimAttacker].defenseIV & 1) << 2)
+                | ((gBattleMons[gBattleAnimAttacker].speedIV & 1) << 3)
+                | ((gBattleMons[gBattleAnimAttacker].spAttackIV & 1) << 4)
+                | ((gBattleMons[gBattleAnimAttacker].spDefenseIV & 1) << 5);
+    u8 type = ((NUMBER_OF_MON_TYPES - 3) * typeBits) / 63 + 1;
+    if (type >= TYPE_MYSTERY)
+        type++;
+    gBattleAnimArgs[0] = type;
     DestroyAnimVisualTask(taskId);
 }
 
