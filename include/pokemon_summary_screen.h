@@ -14,6 +14,8 @@ u8 GetLastViewedMonIndex(void);
 void ShowPokemonSummaryScreen(struct Pokemon * party, u8 cursorPos, u8 lastIdx, void (*callback)(void), u8 a4);
 void SetPokemonSummaryScreenMode(u8);
 u8 GetHiddenPowerType(struct Pokemon * mon);
+u8 GetHiddenPowerCategory(struct Pokemon * mon);
+u8 GetHiddenPowerPower(struct Pokemon * mon);
 u8 GetWeatherBallType(void);
 
 // The Pokemon Summary Screen can operate in different modes. Certain features,

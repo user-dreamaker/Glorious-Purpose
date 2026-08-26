@@ -111,6 +111,8 @@ static void EndDrawPartyStatusSummary(void);
 
 extern u8 GetWeatherBallType(void);
 extern u8 GetHiddenPowerType(struct Pokemon * mon);
+extern u8 GetHiddenPowerCategory(struct Pokemon * mon);
+extern u8 GetHiddenPowerPower(struct Pokemon * mon);
 extern const u16 gNaturePowerMoves[];
 
 static void MoveSelectionDisplaySplitIcon(void);
@@ -1472,6 +1474,8 @@ static void MoveSelectionDisplayMovePower(void)
 	// Print power
 	if (gBattleMoves[move].power <= 1)
 		StringCopy(gDisplayedStringBattle, gText_ThreeHyphens);
+	else if (move == MOVE_HIDDEN_POWER)
+		ConvertIntToDecimalStringN(gDisplayedStringBattle, GetHiddenPowerPower(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]]), STR_CONV_MODE_RIGHT_ALIGN, 3);
 	else
 		ConvertIntToDecimalStringN(gDisplayedStringBattle, gBattleMoves[move].power, STR_CONV_MODE_RIGHT_ALIGN, 3);
 	
@@ -3079,7 +3083,12 @@ static void MoveSelectionDisplaySplitIcon(void)
 	ListMenuLoadStdPalAt(BG_PLTT_ID(10), 1);
 	
 	FillWindowPixelBuffer(B_WIN_PSS_ICON, PIXEL_FILL(15));
-	BlitMenuInfoIcon(B_WIN_PSS_ICON, gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].category + MENU_INFO_ICON_PHYSICAL, 0, 0);
+	{
+		u8 category = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].category;
+		if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_HIDDEN_POWER)
+			category = GetHiddenPowerCategory(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]]);
+		BlitMenuInfoIcon(B_WIN_PSS_ICON, category + MENU_INFO_ICON_PHYSICAL, 0, 0);
+	}
 	
 	PutWindowTilemap(B_WIN_PSS_ICON);
 	CopyWindowToVram(B_WIN_PSS_ICON, COPYWIN_FULL);
