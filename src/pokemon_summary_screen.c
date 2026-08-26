@@ -2425,6 +2425,7 @@ static void BufferMonMoveI(u32 i)
     {
         case MOVE_HIDDEN_POWER:
             type = GetHiddenPowerType(&sMonSummaryScreen->currentMon);
+            power = GetHiddenPowerPower(&sMonSummaryScreen->currentMon);
             break;
         case MOVE_RETURN:
             power = (10 * monFriendship / 25);
@@ -3137,12 +3138,22 @@ static void PokeSum_DrawMoveTypeIcons(void)
             continue;
 
         BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], sMonSummaryScreen->moveTypes[i] + 1, 3, GetMoveNamePrinterYpos(i) - 1);
-        BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], gBattleMoves[sMonSummaryScreen->moveIds[i]].category + MENU_INFO_ICON_PHYSICAL, 3, GetMoveNamePrinterYpos(i) + 11);
+        {
+            u8 category = gBattleMoves[sMonSummaryScreen->moveIds[i]].category;
+            if (sMonSummaryScreen->moveIds[i] == MOVE_HIDDEN_POWER)
+                category = GetHiddenPowerCategory(&sMonSummaryScreen->currentMon);
+            BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], category + MENU_INFO_ICON_PHYSICAL, 3, GetMoveNamePrinterYpos(i) + 11);
+        }
     }
 
     if (sMonSummaryScreen->mode == PSS_MODE_SELECT_MOVE)  {
         BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], sMonSummaryScreen->moveTypes[4] + 1, 3, GetMoveNamePrinterYpos(4) - 1);
-        BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], gBattleMoves[sMonSummaryScreen->moveIds[4]].category + MENU_INFO_ICON_PHYSICAL, 3, GetMoveNamePrinterYpos(4) + 11);
+        {
+            u8 category = gBattleMoves[sMonSummaryScreen->moveIds[4]].category;
+            if (sMonSummaryScreen->moveIds[4] == MOVE_HIDDEN_POWER)
+                category = GetHiddenPowerCategory(&sMonSummaryScreen->currentMon);
+            BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], category + MENU_INFO_ICON_PHYSICAL, 3, GetMoveNamePrinterYpos(4) + 11);
+        }
 }
 }
 
@@ -5457,6 +5468,72 @@ u8 GetHiddenPowerType(struct Pokemon * mon)
         type++;
     type |= 0xC0;
     return(type & 0x3F);
+}
+
+u8 GetHiddenPowerCategory(struct Pokemon * mon)
+{
+    u8 nature = GetNature(mon);
+    switch (nature)
+    {
+    case NATURE_HARDY:   // ↑Atk, ↓Atk
+    case NATURE_LONELY:  // ↑Atk, ↓Def
+    case NATURE_BRAVE:   // ↑Atk, ↓Spd
+    case NATURE_ADAMANT: // ↑Atk, ↓SpAtk
+    case NATURE_NAUGHTY: // ↑Atk, ↓SpDef
+    case NATURE_DOCILE:  // ↑Def, ↓Def
+    case NATURE_RELAXED: // ↑Def, ↓Spd
+    case NATURE_IMPISH:  // ↑Def, ↓SpAtk
+    case NATURE_LAX:     // ↑Def, ↓SpDef
+    case NATURE_JOLLY:   // ↑Spd, ↓SpAtk
+    case NATURE_NAIVE:   // ↑Spd, ↓SpDef
+    case NATURE_CAREFUL: // ↑Sp.Def, ↓SpAtk
+        return 0; // Physical
+    case NATURE_BOLD:    // ↑Def, ↓Atk
+    case NATURE_TIMID:   // ↑Spd, ↓Atk
+    case NATURE_HASTY:   // ↑Spd, ↓Def
+    case NATURE_SERIOUS: // ↑Spd, ↓Spd
+    case NATURE_MODEST:  // ↑Sp.Atk, ↓Atk
+    case NATURE_MILD:    // ↑Sp.Atk, ↓Def
+    case NATURE_QUIET:   // ↑Sp.Atk, ↓Spd
+    case NATURE_BASHFUL: // ↑Sp.Atk, ↓Sp.Atk
+    case NATURE_RASH:    // ↑Sp.Atk, ↓SpDef
+    case NATURE_CALM:    // ↑Sp.Def, ↓Atk
+    case NATURE_GENTLE:  // ↑Sp.Def, ↓Def
+    case NATURE_SASSY:   // ↑Sp.Def, ↓Spd
+    case NATURE_QUIRKY:  // ↑Sp.Def, ↓SpDef
+        return 1; // Special
+    default:
+        if (GetMonData(mon, MON_DATA_ATK) > GetMonData(mon, MON_DATA_SPATK))
+            return 0;
+        else
+            return 1;
+    }
+}
+
+u8 GetHiddenPowerPower(struct Pokemon * mon)
+{
+    if (GetMonData(mon, MON_DATA_HP_IV) <= 1
+        || GetMonData(mon, MON_DATA_ATK_IV) <= 1
+        || GetMonData(mon, MON_DATA_DEF_IV) <= 1
+        || GetMonData(mon, MON_DATA_SPEED_IV) <= 1
+        || GetMonData(mon, MON_DATA_SPATK_IV) <= 1
+        || GetMonData(mon, MON_DATA_SPDEF_IV) <= 1)
+    {
+        return 60;
+    }
+    else if (GetMonData(mon, MON_DATA_HP_IV) >= 30
+             && GetMonData(mon, MON_DATA_ATK_IV) >= 30
+             && GetMonData(mon, MON_DATA_DEF_IV) >= 30
+             && GetMonData(mon, MON_DATA_SPEED_IV) >= 30
+             && GetMonData(mon, MON_DATA_SPATK_IV) >= 30
+             && GetMonData(mon, MON_DATA_SPDEF_IV) >= 30)
+    {
+        return 70;
+    }
+    else
+    {
+        return 60;
+    }
 }
 
 u8 GetWeatherBallType(void)
