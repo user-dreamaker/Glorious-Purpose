@@ -1800,7 +1800,6 @@ static bool8 SetMenuTextsForMon(void)
             SetMenuText(MENU_TEXT_STORE);
     }
 
-    SetMenuText(MENU_TEXT_MARK);
     SetMenuText(MENU_TEXT_RELEASE);
     SetMenuText(MENU_TEXT_CANCEL);
     return TRUE;
