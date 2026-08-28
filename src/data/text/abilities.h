@@ -108,6 +108,7 @@ static const u8 sFriskDescription[] = _("Reveals the foe's held item.");
 static const u8 sRecklessDescription[] = _("Boosts moves with recoil.");
 static const u8 sCursedBodyDescription[] = _("May disable a foe's move.");
 static const u8 sNeutralizingGasDescription[] = _("All Abilities are nullified.");
+static const u8 sUngroundedDescription[] = _("Not hit by GROUND attacks.");
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
 {
@@ -221,6 +222,7 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_RECKLESS] = sRecklessDescription,
     [ABILITY_CURSED_BODY] = sCursedBodyDescription,
     [ABILITY_NEUTRALIZING_GAS] = sNeutralizingGasDescription,
+    [ABILITY_UNGROUNDED] = sUngroundedDescription,
 };
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
@@ -335,4 +337,5 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_RECKLESS] = _("RECKLESS"),
     [ABILITY_CURSED_BODY] = _("CURSED BODY"),
     [ABILITY_NEUTRALIZING_GAS] = _("NEUTRALIZE GAS"),
+    [ABILITY_UNGROUNDED] = _("UNGROUNDED"),
 };

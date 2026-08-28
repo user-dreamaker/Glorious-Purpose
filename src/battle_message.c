@@ -911,7 +911,8 @@ const u16 gMissStringIds[] =
     [B_MSG_PROTECTED]   = STRINGID_PKMNPROTECTEDITSELF,
     [B_MSG_AVOIDED_ATK] = STRINGID_PKMNAVOIDEDATTACK,
     [B_MSG_AVOIDED_DMG] = STRINGID_AVOIDEDDAMAGE,
-    [B_MSG_GROUND_MISS] = STRINGID_PKMNMAKESGROUNDMISS
+    [B_MSG_GROUND_MISS] = STRINGID_PKMNMAKESGROUNDMISS,
+    [B_MSG_GROUND_MISS_UNGROUNDED] = STRINGID_ITDOESNTAFFECT
 };
 
 const u16 gNoEscapeStringIds[] =
@@ -1534,6 +1535,13 @@ static const u16 sGrammarMoveUsedTable[] =
     MOVE_NONE
 };
 
+static const u8 *GetBattlerAbilityName(u32 battlerId, u32 ability)
+{
+    if (ability != gLastUsedAbility && HasHiddenAbility(battlerId, gLastUsedAbility))
+        ability = gLastUsedAbility;
+    return gAbilityNames[ability];
+}
+
 void BufferStringBattle(u16 stringId)
 {
     s32 i;
@@ -2042,16 +2050,16 @@ u32 BattleStringExpandPlaceholders(const u8 *src, u8 *dst)
                 toCpy = gAbilityNames[gLastUsedAbility];
                 break;
             case B_TXT_ATK_ABILITY: // attacker ability
-                toCpy = gAbilityNames[sBattlerAbilities[gBattlerAttacker]];
+                toCpy = GetBattlerAbilityName(gBattlerAttacker, sBattlerAbilities[gBattlerAttacker]);
                 break;
             case B_TXT_DEF_ABILITY: // target ability
-                toCpy = gAbilityNames[sBattlerAbilities[gBattlerTarget]];
+                toCpy = GetBattlerAbilityName(gBattlerTarget, sBattlerAbilities[gBattlerTarget]);
                 break;
             case B_TXT_SCR_ACTIVE_ABILITY: // scripting active ability
-                toCpy = gAbilityNames[sBattlerAbilities[gBattleScripting.battler]];
+                toCpy = GetBattlerAbilityName(gBattleScripting.battler, sBattlerAbilities[gBattleScripting.battler]);
                 break;
             case B_TXT_EFF_ABILITY: // effect battlerId ability
-                toCpy = gAbilityNames[sBattlerAbilities[gEffectBattler]];
+                toCpy = GetBattlerAbilityName(gEffectBattler, sBattlerAbilities[gEffectBattler]);
                 break;
             case B_TXT_TRAINER1_CLASS: // trainer class name
                 if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
