@@ -126,6 +126,7 @@ static void PokeSum_PrintTrainerMemo_Mon_NotHeldByOT(void);
 static bool32 CurrentMonIsFromGBA(void);
 static u8 PokeSum_BufferOtName_IsEqualToCurrentOwner(struct Pokemon * mon);
 static void PokeSum_PrintAbilityNameAndDesc(void);
+static void PokeSum_ToggleHiddenAbility(void);
 static void PokeSum_DrawMoveTypeIcons(void);
 static void PokeSum_DestroySprites(void);
 static void PokeSum_FlipPages_HandleBgHofs(void);
@@ -328,6 +329,7 @@ static EWRAM_DATA struct PokerusIconObj * sPokerusIconObj = NULL;
 static EWRAM_DATA struct ShinyStarObjData * sShinyStarObjData = NULL;
 static EWRAM_DATA u8 sLastViewedMonIndex = 0;
 static EWRAM_DATA u8 sMoveSelectionCursorPos = 0;
+static EWRAM_DATA u8 sAbilityDisplayState = 0;
 static EWRAM_DATA u8 sMoveSwapCursorPos = 0;
 static EWRAM_DATA struct MonPicBounceState * sMonPicBounceState = NULL;
 
@@ -1199,6 +1201,11 @@ static void Task_InputHandler_Info(u8 taskId)
             else if (JOY_NEW(B_BUTTON))
             {
                 sMonSummaryScreen->state3270 = PSS_STATE3270_ATEXIT_FADEOUT;
+            }
+            else if (sMonSummaryScreen->curPageIndex == PSS_PAGE_SKILLS && JOY_NEW(SELECT_BUTTON))
+            {
+                PlaySE(SE_SELECT);
+                PokeSum_ToggleHiddenAbility();
             }
         }
         break;
@@ -3102,6 +3109,7 @@ static void PokeSum_PrintAbilityDataOrMoveTypes(void)
     case PSS_PAGE_INFO:
         break;
     case PSS_PAGE_SKILLS:
+        sAbilityDisplayState = 0;
         PokeSum_PrintAbilityNameAndDesc();
         break;
     case PSS_PAGE_MOVES:
@@ -3124,6 +3132,30 @@ static void PokeSum_PrintAbilityNameAndDesc(void)
                                  2, 15, sLevelNickTextColors[0], TEXT_SKIP_DRAW,
                                  sMonSummaryScreen->summary.abilityDescStrBuf);
 
+}
+
+static void PokeSum_ToggleHiddenAbility(void)
+{
+    u16 species = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPECIES);
+    u8 ability;
+    u32 i;
+
+    for (i = 0; i < 3; i++)
+    {
+        sAbilityDisplayState = (sAbilityDisplayState + 1) % 3;
+        if (sAbilityDisplayState == 0 || gSpeciesInfo[species].hiddenAbilities[sAbilityDisplayState - 1] != ABILITY_NONE)
+            break;
+    }
+
+    if (sAbilityDisplayState == 0)
+        ability = GetAbilityBySpecies(species, GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ABILITY_NUM));
+    else
+        ability = gSpeciesInfo[species].hiddenAbilities[sAbilityDisplayState - 1];
+
+    StringCopy(sMonSummaryScreen->summary.abilityNameStrBuf, gAbilityNames[ability]);
+    StringCopy(sMonSummaryScreen->summary.abilityDescStrBuf, gAbilityDescriptionPointers[ability]);
+    PokeSum_PrintAbilityNameAndDesc();
+    CopyWindowToVram(sMonSummaryScreen->windowIds[5], 2);
 }
 
 static void PokeSum_DrawMoveTypeIcons(void)

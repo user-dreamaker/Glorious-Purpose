@@ -1659,6 +1659,19 @@ u8 CastformDataTypeChange(u8 battler)
     return formChange;
 }
 
+static const struct
+{
+    u16 ability;
+    u32 weatherCheck;
+    u32 weatherSet;
+    const u8 *script;
+} sWeatherHiddenAbilities[] =
+{
+    {ABILITY_DRIZZLE, B_WEATHER_RAIN_PERMANENT, B_WEATHER_RAIN_PERMANENT | B_WEATHER_RAIN_TEMPORARY, BattleScript_DrizzleActivates},
+    {ABILITY_DROUGHT, B_WEATHER_SUN_PERMANENT, B_WEATHER_SUN, BattleScript_DroughtActivates},
+    {ABILITY_SNOW_WARNING, B_WEATHER_HAIL_PERMANENT, B_WEATHER_HAIL, BattleScript_SnowWarningActivates},
+};
+
 u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveArg)
 {
     u8 effect = 0;
@@ -1878,6 +1891,24 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                 }
                 break;
             }
+            if (effect == 0)
+            {
+                u32 h;
+
+                for (h = 0; h < ARRAY_COUNT(sWeatherHiddenAbilities); h++)
+                {
+                    if (HasHiddenAbility(battler, sWeatherHiddenAbilities[h].ability)
+                     && !(gBattleWeather & sWeatherHiddenAbilities[h].weatherCheck))
+                    {
+                        gLastUsedAbility = sWeatherHiddenAbilities[h].ability;
+                        gBattleWeather = sWeatherHiddenAbilities[h].weatherSet;
+                        BattleScriptPushCursorAndCallback(sWeatherHiddenAbilities[h].script);
+                        gBattleScripting.battler = battler;
+                        effect++;
+                        break;
+                    }
+                }
+            }
             break;
         case ABILITYEFFECT_ENDTURN: // 1
             if (gBattleMons[battler].hp != 0)
@@ -2026,10 +2057,30 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                 gBattlescriptCurrInstr = BattleScript_MotorDriveActivates;
                 effect = 1;
             }
+            else if (moveType == TYPE_ELECTRIC && HasHiddenAbility(battler, ABILITY_LIGHTNING_ROD))
+            {
+                if (gBattleMons[gBattlerAttacker].status2 & STATUS2_MULTIPLETURNS)
+                    gHitMarker |= HITMARKER_NO_PPDEDUCT;
+                gLastUsedAbility = ABILITY_LIGHTNING_ROD;
+                gBattlescriptCurrInstr = BattleScript_LightningRodActivates;
+                effect = 1;
+            }
             break;
         case ABILITYEFFECT_ABSORBING: // 3
             if (move)
             {
+                if (gLastUsedAbility != ABILITY_VOLT_ABSORB
+                 && gLastUsedAbility != ABILITY_WATER_ABSORB
+                 && gLastUsedAbility != ABILITY_DRY_SKIN
+                 && gLastUsedAbility != ABILITY_FLASH_FIRE)
+                {
+                    if (HasHiddenAbility(battler, ABILITY_FLASH_FIRE))
+                        gLastUsedAbility = ABILITY_FLASH_FIRE;
+                    else if (HasHiddenAbility(battler, ABILITY_WATER_ABSORB))
+                        gLastUsedAbility = ABILITY_WATER_ABSORB;
+                    else if (HasHiddenAbility(battler, ABILITY_VOLT_ABSORB))
+                        gLastUsedAbility = ABILITY_VOLT_ABSORB;
+                }
                 switch (gLastUsedAbility)
                 {
                 case ABILITY_VOLT_ABSORB:
@@ -2264,6 +2315,21 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                 }
                 break;
             }
+            if (effect == 0 && HasHiddenAbility(battler, ABILITY_FLAME_BODY)
+             && !(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
+             && gBattleMons[gBattlerAttacker].hp != 0
+             && !gProtectStructs[gBattlerAttacker].confusionSelfDmg
+             && TARGET_TURN_DAMAGED
+             && (gBattleMoves[move].flags & FLAG_MAKES_CONTACT)
+             && (Random() % 3) == 0)
+            {
+                gLastUsedAbility = ABILITY_FLAME_BODY;
+                gBattleCommunication[MOVE_EFFECT_BYTE] = MOVE_EFFECT_AFFECTS_USER | MOVE_EFFECT_BURN;
+                BattleScriptPushCursor();
+                gBattlescriptCurrInstr = BattleScript_ApplySecondaryEffect;
+                gHitMarker |= HITMARKER_STATUS_ABILITY_EFFECT;
+                effect++;
+            }
             break;
         case ABILITYEFFECT_IMMUNITY: // 5
             for (battler = 0; battler < gBattlersCount; battler++)
@@ -2487,7 +2553,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             side = GetBattlerSide(battler);
             for (i = 0; i < gBattlersCount; i++)
             {
-                if (GetBattlerSide(i) != side && gBattleMons[i].ability == ability)
+                if (GetBattlerSide(i) != side && BattlerHasAbility(i, ability))
                 {
                     if ((ability == ABILITY_SHADOW_TAG || ability == ABILITY_ARENA_TRAP) && IS_BATTLER_OF_TYPE(battler, TYPE_GHOST))
                         continue;
@@ -2500,7 +2566,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             side = GetBattlerSide(battler);
             for (i = 0; i < gBattlersCount; i++)
             {
-                if (GetBattlerSide(i) == side && gBattleMons[i].ability == ability)
+                if (GetBattlerSide(i) == side && BattlerHasAbility(i, ability))
                 {
                     gLastUsedAbility = ability;
                     effect = i + 1;
@@ -2527,7 +2593,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             default:
                 for (i = 0; i < gBattlersCount; i++)
                 {
-                    if (gBattleMons[i].ability == ability)
+                    if (BattlerHasAbility(i, ability))
                     {
                         gLastUsedAbility = ability;
                         effect = i + 1;
@@ -2539,7 +2605,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
         case ABILITYEFFECT_CHECK_ON_FIELD: // 19
             for (i = 0; i < gBattlersCount; i++)
             {
-                if (gBattleMons[i].ability == ability && gBattleMons[i].hp != 0)
+                if (BattlerHasAbility(i, ability) && gBattleMons[i].hp != 0)
                 {
                     gLastUsedAbility = ability;
                     effect = i + 1;
@@ -2550,7 +2616,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             side = GetBattlerSide(battler);
             for (i = 0; i < gBattlersCount; i++)
             {
-                if (GetBattlerSide(i) != side && gBattleMons[i].ability == ability)
+                if (GetBattlerSide(i) != side && BattlerHasAbility(i, ability))
                 {
                     gLastUsedAbility = ability;
                     effect = i + 1;
@@ -2561,7 +2627,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             {
                 for (i = 0; i < gBattlersCount; i++)
                 {
-                    if (gBattleMons[i].ability == ability && GetBattlerSide(i) == side && i != battler)
+                    if (BattlerHasAbility(i, ability) && GetBattlerSide(i) == side && i != battler)
                     {
                         gLastUsedAbility = ability;
                         effect = i + 1;
@@ -2573,7 +2639,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             side = GetBattlerSide(battler);
             for (i = 0; i < gBattlersCount; i++)
             {
-                if (GetBattlerSide(i) != side && gBattleMons[i].ability == ability)
+                if (GetBattlerSide(i) != side && BattlerHasAbility(i, ability))
                 {
                     gLastUsedAbility = ability;
                     effect++;
@@ -2584,7 +2650,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             side = GetBattlerSide(battler);
             for (i = 0; i < gBattlersCount; i++)
             {
-                if (GetBattlerSide(i) == side && gBattleMons[i].ability == ability)
+                if (GetBattlerSide(i) == side && BattlerHasAbility(i, ability))
                 {
                     gLastUsedAbility = ability;
                     effect++;
@@ -2594,7 +2660,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
         case ABILITYEFFECT_COUNT_ON_FIELD: // 18
             for (i = 0; i < gBattlersCount; i++)
             {
-                if (gBattleMons[i].ability == ability && i != battler)
+                if (BattlerHasAbility(i, ability) && i != battler)
                 {
                     gLastUsedAbility = ability;
                     effect++;
@@ -2761,6 +2827,7 @@ bool8 IsIgnorableAbility(u16 ability)
 	case ABILITY_KEEN_EYE:
 	case ABILITY_LEAF_GUARD:
 	case ABILITY_LEVITATE:
+	case ABILITY_UNGROUNDED:
 	case ABILITY_LIGHTNING_ROD:
 	case ABILITY_LIMBER:
 	case ABILITY_MAGMA_ARMOR:
@@ -2794,6 +2861,17 @@ bool8 IsIgnorableAbility(u16 ability)
 bool8 IsNeutralizableAbility(u16 ability)
 {
     return ability != ABILITY_NONE && ability != ABILITY_NEUTRALIZING_GAS;
+}
+
+bool32 HasHiddenAbility(u32 battlerId, u32 ability)
+{
+    const u16 species = gBattleMons[battlerId].species;
+    return gSpeciesInfo[species].hiddenAbilities[0] == ability || gSpeciesInfo[species].hiddenAbilities[1] == ability;
+}
+
+bool32 BattlerHasAbility(u32 battlerId, u32 ability)
+{
+    return gBattleMons[battlerId].ability == ability || HasHiddenAbility(battlerId, ability);
 }
 
 bool8 IsNeutralizingGasOnField(void)
@@ -3512,7 +3590,7 @@ u8 GetMoveTarget(u16 move, u8 setTarget)
             } while (targetBattler == gBattlerAttacker || side == GetBattlerSide(targetBattler) || gAbsentBattlerFlags & gBitTable[targetBattler]);
             if (gBattleMoves[move].type == TYPE_ELECTRIC
                 && AbilityBattleEffects(ABILITYEFFECT_COUNT_OTHER_SIDE, gBattlerAttacker, ABILITY_LIGHTNING_ROD, 0, 0)
-                && gBattleMons[targetBattler].ability != ABILITY_LIGHTNING_ROD)
+                && !BattlerHasAbility(targetBattler, ABILITY_LIGHTNING_ROD))
             {
                 targetBattler ^= BIT_FLANK;
                 RecordAbilityBattle(targetBattler, gBattleMons[targetBattler].ability);
