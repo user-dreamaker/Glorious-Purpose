@@ -191,6 +191,7 @@ struct PokemonSummaryScreenData
 
         u8 ALIGNED(4) abilityNameStrBuf[15];
         u8 ALIGNED(4) abilityDescStrBuf[52];
+        u8 ALIGNED(4) evStrBufs[6][4];
     } summary;
 
     u8 ALIGNED(4) isEgg; /* 0x3200 */
@@ -332,6 +333,7 @@ static EWRAM_DATA u8 sMoveSelectionCursorPos = 0;
 static EWRAM_DATA u8 sAbilityDisplayState = 0;
 static EWRAM_DATA u8 sMoveSwapCursorPos = 0;
 static EWRAM_DATA struct MonPicBounceState * sMonPicBounceState = NULL;
+static EWRAM_DATA bool8 sShowEVsOnSkillsPage = FALSE;
 
 extern const u32 gSummaryScreen_PageSkills_Tilemap[];
 extern const u32 gSummaryScreen_PageMoves_Tilemap[];
@@ -994,6 +996,7 @@ void ShowPokemonSummaryScreen(struct Pokemon * party, u8 cursorPos, u8 lastIdx, 
 
     sMoveSelectionCursorPos = 0;
     sMoveSwapCursorPos = 0;
+    sShowEVsOnSkillsPage = FALSE;
     sMonSummaryScreen->savedCallback = savedCallback;
     sMonSummaryScreen->monList.mons = party;
 
@@ -1206,6 +1209,12 @@ static void Task_InputHandler_Info(u8 taskId)
             {
                 PlaySE(SE_SELECT);
                 PokeSum_ToggleHiddenAbility();
+                if (!sShowEVsOnSkillsPage)
+                {
+                    sShowEVsOnSkillsPage = TRUE;
+                    PokeSum_PrintRightPaneText();
+                    CopyWindowToVram(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], 2);
+                }
             }
         }
         break;
@@ -2379,6 +2388,22 @@ static void BufferMonSkills(void)
     StringCopy(sMonSummaryScreen->summary.abilityNameStrBuf, gAbilityNames[type]);
     StringCopy(sMonSummaryScreen->summary.abilityDescStrBuf, gAbilityDescriptionPointers[type]);
 
+    {
+        u16 ev;
+        ev = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_EV);
+        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.evStrBufs[0], ev, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ev = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK_EV);
+        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.evStrBufs[1], ev, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ev = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF_EV);
+        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.evStrBufs[2], ev, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ev = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK_EV);
+        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.evStrBufs[3], ev, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ev = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF_EV);
+        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.evStrBufs[4], ev, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ev = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED_EV);
+        ConvertIntToDecimalStringN(sMonSummaryScreen->summary.evStrBufs[5], ev, STR_CONV_MODE_RIGHT_ALIGN, 3);
+    }
+
     sMonSummaryScreen->curMonStatusAilment = StatusToAilment(GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_STATUS));
     if (sMonSummaryScreen->curMonStatusAilment == AILMENT_NONE)
         if (CheckPartyPokerus(&sMonSummaryScreen->currentMon, 0))
@@ -2723,6 +2748,22 @@ static void PrintSkillsPage(void)
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->spAStr, 48, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA]);
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->spDStr, 61, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD]);
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->speStr, 74, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE]);
+    if (sShowEVsOnSkillsPage)
+    {
+        u8 evX;
+        evX = 28 - GetStringWidth(FONT_SMALL, sMonSummaryScreen->summary.evStrBufs[0], 0);
+        AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_SMALL, evX, 3, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.evStrBufs[0]);
+        evX = 28 - GetStringWidth(FONT_SMALL, sMonSummaryScreen->summary.evStrBufs[1], 0);
+        AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_SMALL, evX, 21, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.evStrBufs[1]);
+        evX = 28 - GetStringWidth(FONT_SMALL, sMonSummaryScreen->summary.evStrBufs[2], 0);
+        AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_SMALL, evX, 34, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.evStrBufs[2]);
+        evX = 28 - GetStringWidth(FONT_SMALL, sMonSummaryScreen->summary.evStrBufs[3], 0);
+        AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_SMALL, evX, 47, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.evStrBufs[3]);
+        evX = 28 - GetStringWidth(FONT_SMALL, sMonSummaryScreen->summary.evStrBufs[4], 0);
+        AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_SMALL, evX, 60, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.evStrBufs[4]);
+        evX = 28 - GetStringWidth(FONT_SMALL, sMonSummaryScreen->summary.evStrBufs[5], 0);
+        AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_SMALL, evX, 73, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.evStrBufs[5]);
+    }
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 15 + sMonSkillsPrinterXpos->expStr, 87, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.expPointsStrBuf);
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 15 + sMonSkillsPrinterXpos->toNextLevel, 100, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.expToNextLevelStrBuf);
     BlitBitmapRectToWindow(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], sIVMarks_Images[hpIv], 0, 0, 8, 8, 75, 7, 8, 8);
