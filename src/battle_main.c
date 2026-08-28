@@ -3029,7 +3029,8 @@ u8 IsRunningFromBattleImpossible(void)
             return BATTLE_RUN_FAILURE;
         }
         if (side != GetBattlerSide(i)
-         && gBattleMons[gActiveBattler].ability != ABILITY_LEVITATE
+         && !BattlerHasAbility(gActiveBattler, ABILITY_LEVITATE)
+         && !BattlerHasAbility(gActiveBattler, ABILITY_UNGROUNDED)
          && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_FLYING)
          && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST)
          && gBattleMons[i].ability == ABILITY_ARENA_TRAP)
@@ -3205,7 +3206,8 @@ static void HandleTurnActionSelectionState(void)
                     else if ((!IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST) && (i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_SHADOW_TAG)))
                           || ((!IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST) && (i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_ARENA_TRAP)))
                               && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_FLYING)
-                              && gBattleMons[gActiveBattler].ability != ABILITY_LEVITATE)
+                              && !BattlerHasAbility(gActiveBattler, ABILITY_LEVITATE)
+                              && !BattlerHasAbility(gActiveBattler, ABILITY_UNGROUNDED))
                           || ((i = AbilityBattleEffects(ABILITYEFFECT_CHECK_FIELD_EXCEPT_BATTLER, gActiveBattler, ABILITY_MAGNET_PULL, 0, 0))
                               && IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL) && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST)))
                     {
@@ -4076,14 +4078,14 @@ static void HandleAction_UseMove(void)
           && gSideTimers[side].followmeTimer == 0
           && (gBattleMoves[gCurrentMove].power != 0
              || gBattleMoves[gCurrentMove].target != MOVE_TARGET_USER)
-          && gBattleMons[*(gBattleStruct->moveTarget + gBattlerAttacker)].ability != ABILITY_LIGHTNING_ROD
+          && !BattlerHasAbility(*(gBattleStruct->moveTarget + gBattlerAttacker), ABILITY_LIGHTNING_ROD)
           && gBattleMoves[gCurrentMove].type == TYPE_ELECTRIC)
     {
         side = GetBattlerSide(gBattlerAttacker);
         for (gActiveBattler = 0; gActiveBattler < gBattlersCount; gActiveBattler++)
             if (side != GetBattlerSide(gActiveBattler)
              && *(gBattleStruct->moveTarget + gBattlerAttacker) != gActiveBattler
-             && gBattleMons[gActiveBattler].ability == ABILITY_LIGHTNING_ROD
+             && BattlerHasAbility(gActiveBattler, ABILITY_LIGHTNING_ROD)
              && GetBattlerTurnOrderNum(gActiveBattler) < var)
                 var = GetBattlerTurnOrderNum(gActiveBattler);
         if (var == 4)

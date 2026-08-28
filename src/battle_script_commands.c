@@ -1137,7 +1137,7 @@ static void Cmd_accuracycheck(void)
             calc = (calc * 133) / 100; // 1.33 compound eyes boost
         if (WEATHER_HAS_EFFECT && gBattleMons[gBattlerTarget].ability == ABILITY_SAND_VEIL && gBattleWeather & B_WEATHER_SANDSTORM)
             calc = (calc * 80) / 100; // 1.2 sand veil loss
-        if (WEATHER_HAS_EFFECT && gBattleMons[gBattlerTarget].ability == ABILITY_SNOW_CLOAK && gBattleWeather & B_WEATHER_HAIL)
+        if (WEATHER_HAS_EFFECT && BattlerHasAbility(gBattlerTarget, ABILITY_SNOW_CLOAK) && gBattleWeather & B_WEATHER_HAIL)
             calc = (calc * 80) / 100; // 1.2 snow cloak loss
         if (gBattleMons[gBattlerAttacker].ability == ABILITY_HUSTLE && IS_TYPE_PHYSICAL(gBattleMoves[move]))
             calc = (calc * 80) / 100; // 1.2 hustle loss
@@ -1400,13 +1400,22 @@ static void Cmd_typecalc(void)
         }
     }
 
-    if (gBattleMons[gBattlerTarget].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
+    if (BattlerHasAbility(gBattlerTarget, ABILITY_LEVITATE) && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
     {
-        gLastUsedAbility = gBattleMons[gBattlerTarget].ability;
+        gLastUsedAbility = ABILITY_LEVITATE;
         gMoveResultFlags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
         gLastLandedMoves[gBattlerTarget] = 0;
         gLastHitByType[gBattlerTarget] = 0;
         gBattleCommunication[MISS_TYPE] = B_MSG_GROUND_MISS;
+        RecordAbilityBattle(gBattlerTarget, gLastUsedAbility);
+    }
+    else if (BattlerHasAbility(gBattlerTarget, ABILITY_UNGROUNDED) && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
+    {
+        gLastUsedAbility = ABILITY_UNGROUNDED;
+        gMoveResultFlags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
+        gLastLandedMoves[gBattlerTarget] = 0;
+        gLastHitByType[gBattlerTarget] = 0;
+        gBattleCommunication[MISS_TYPE] = B_MSG_GROUND_MISS_UNGROUNDED;
         RecordAbilityBattle(gBattlerTarget, gLastUsedAbility);
     }
     else
@@ -1486,11 +1495,18 @@ static void CheckWonderGuardAndLevitate(void)
 
     GET_MOVE_TYPE(gCurrentMove, moveType);
 
-    if (gBattleMons[gBattlerTarget].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
+    if (BattlerHasAbility(gBattlerTarget, ABILITY_LEVITATE) && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
     {
         gLastUsedAbility = ABILITY_LEVITATE;
         gBattleCommunication[MISS_TYPE] = B_MSG_GROUND_MISS;
         RecordAbilityBattle(gBattlerTarget, ABILITY_LEVITATE);
+        return;
+    }
+    if (BattlerHasAbility(gBattlerTarget, ABILITY_UNGROUNDED) && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
+    {
+        gLastUsedAbility = ABILITY_UNGROUNDED;
+        gBattleCommunication[MISS_TYPE] = B_MSG_GROUND_MISS_UNGROUNDED;
+        RecordAbilityBattle(gBattlerTarget, ABILITY_UNGROUNDED);
         return;
     }
 
@@ -1621,7 +1637,7 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
         }
     }
 
-    if (gBattleMons[defender].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND && move != MOVE_BONEMERANG)
+    if ((BattlerHasAbility(defender, ABILITY_LEVITATE) || BattlerHasAbility(defender, ABILITY_UNGROUNDED)) && moveType == TYPE_GROUND && move != MOVE_BONEMERANG)
     {
         flags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
     }
@@ -1706,7 +1722,7 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
 
     moveType = gBattleMoves[move].type;
 
-    if (targetAbility == ABILITY_LEVITATE && moveType == TYPE_GROUND && move != MOVE_BONEMERANG)
+    if ((targetAbility == ABILITY_LEVITATE || targetAbility == ABILITY_UNGROUNDED) && moveType == TYPE_GROUND && move != MOVE_BONEMERANG)
     {
         flags = MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE;
     }
@@ -2686,7 +2702,7 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 }
                 break;
             case MOVE_EFFECT_FLINCH:
-                if (gBattleMons[gEffectBattler].ability == ABILITY_INNER_FOCUS)
+                if (BattlerHasAbility(gEffectBattler, ABILITY_INNER_FOCUS))
                 {
                     if (primary == TRUE || certain == MOVE_EFFECT_CERTAIN)
                     {
@@ -4641,12 +4657,20 @@ static void Cmd_typecalc2(void)
     s32 i = 0;
     u8 moveType = gBattleMoves[gCurrentMove].type;
 
-    if (gBattleMons[gBattlerTarget].ability == ABILITY_LEVITATE && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
+    if (BattlerHasAbility(gBattlerTarget, ABILITY_LEVITATE) && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
     {
-        gLastUsedAbility = gBattleMons[gBattlerTarget].ability;
+        gLastUsedAbility = ABILITY_LEVITATE;
         gMoveResultFlags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
         gLastLandedMoves[gBattlerTarget] = 0;
         gBattleCommunication[MISS_TYPE] = B_MSG_GROUND_MISS;
+        RecordAbilityBattle(gBattlerTarget, gLastUsedAbility);
+    }
+    else if (BattlerHasAbility(gBattlerTarget, ABILITY_UNGROUNDED) && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
+    {
+        gLastUsedAbility = ABILITY_UNGROUNDED;
+        gMoveResultFlags |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
+        gLastLandedMoves[gBattlerTarget] = 0;
+        gBattleCommunication[MISS_TYPE] = B_MSG_GROUND_MISS_UNGROUNDED;
         RecordAbilityBattle(gBattlerTarget, gLastUsedAbility);
     }
     else
@@ -5279,7 +5303,7 @@ static void Cmd_switchineffects(void)
     if (!(gSideStatuses[GetBattlerSide(gActiveBattler)] & SIDE_STATUS_SPIKES_DAMAGED)
         && (gSideStatuses[GetBattlerSide(gActiveBattler)] & SIDE_STATUS_SPIKES)
         && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_FLYING)
-        && gBattleMons[gActiveBattler].ability != ABILITY_LEVITATE && gBattleMons[gActiveBattler].ability != ABILITY_MAGIC_GUARD)
+        && !BattlerHasAbility(gActiveBattler, ABILITY_LEVITATE) && !BattlerHasAbility(gActiveBattler, ABILITY_UNGROUNDED) && gBattleMons[gActiveBattler].ability != ABILITY_MAGIC_GUARD)
     {
         u8 spikesDmg;
 
@@ -7577,7 +7601,7 @@ static void Cmd_weatherdamage(void)
         if (gBattleWeather & B_WEATHER_HAIL)
         {
             if (!IS_BATTLER_OF_TYPE(gBattlerAttacker, TYPE_ICE)
-                && gBattleMons[gBattlerAttacker].ability != ABILITY_SNOW_CLOAK
+                && !BattlerHasAbility(gBattlerAttacker, ABILITY_SNOW_CLOAK)
                 && gBattleMons[gBattlerAttacker].ability != ABILITY_MAGIC_GUARD
                 && !(gStatuses3[gBattlerAttacker] & STATUS3_UNDERGROUND)
                 && !(gStatuses3[gBattlerAttacker] & STATUS3_UNDERWATER))
