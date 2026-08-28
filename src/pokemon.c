@@ -4083,6 +4083,7 @@ static void CopyPlayerPartyMonToBattleData(u8 battlerId, u8 partyIndex)
     gBattleMons[battlerId].type1 = gSpeciesInfo[gBattleMons[battlerId].species].types[0];
     gBattleMons[battlerId].type2 = gSpeciesInfo[gBattleMons[battlerId].species].types[1];
     gBattleMons[battlerId].ability = GetAbilityBySpecies(gBattleMons[battlerId].species, gBattleMons[battlerId].abilityNum);
+    TryApplySecondaryTypeToBattleMon(battlerId);
     GetMonData(&gPlayerParty[partyIndex], MON_DATA_NICKNAME, nickname);
     StringCopy_Nickname(gBattleMons[battlerId].nickname, nickname);
     GetMonData(&gPlayerParty[partyIndex], MON_DATA_OT_NAME, gBattleMons[battlerId].otName);
@@ -6671,4 +6672,167 @@ u8 *MonSpritesGfxManager_GetSpritePtr(u8 spriteNum)
             spriteNum = 0;
         return sMonSpritesGfxManager->spritePointers[spriteNum];
     }
+}
+
+
+
+static u8 GetTypeForHiddenPowerItem(u16 item)
+{
+    switch (item)
+    {
+    case ITEM_SILVER_POWDER: return TYPE_BUG;
+    case ITEM_BLACK_GLASSES: return TYPE_DARK;
+    case ITEM_DRAGON_FANG: return TYPE_DRAGON;
+    case ITEM_MAGNET: return TYPE_ELECTRIC;
+    case ITEM_BLACK_BELT: return TYPE_FIGHTING;
+    case ITEM_CHARCOAL: return TYPE_FIRE;
+    case ITEM_SHARP_BEAK: return TYPE_FLYING;
+    case ITEM_SPELL_TAG: return TYPE_GHOST;
+    case ITEM_MIRACLE_SEED: return TYPE_GRASS;
+    case ITEM_SOFT_SAND: return TYPE_GROUND;
+    case ITEM_NEVER_MELT_ICE: return TYPE_ICE;
+    case ITEM_POISON_BARB: return TYPE_POISON;
+    case ITEM_TWISTED_SPOON: return TYPE_PSYCHIC;
+    case ITEM_HARD_STONE: return TYPE_ROCK;
+    case ITEM_METAL_COAT: return TYPE_STEEL;
+    case ITEM_MYSTIC_WATER: return TYPE_WATER;
+    default: return TYPE_NONE;
+    }
+}
+
+static bool8 IsMonMonoType(u16 species)
+{
+    if (species == SPECIES_NONE || species >= NUM_SPECIES)
+        return FALSE;
+    return gSpeciesInfo[species].types[0] == gSpeciesInfo[species].types[1];
+}
+
+static u8 CalcHiddenPowerType(u8 typeBits)
+{
+    u8 type = ((NUMBER_OF_MON_TYPES - 3) * typeBits) / 63 + 1;
+    if (type >= TYPE_MYSTERY)
+        type++;
+    return type;
+}
+
+static u8 GetMonHiddenPowerTypeClean(struct Pokemon *mon)
+{
+    u8 bits = ((GetMonData(mon, MON_DATA_HP_IV, NULL) & 1) << 0)
+            | ((GetMonData(mon, MON_DATA_ATK_IV, NULL) & 1) << 1)
+            | ((GetMonData(mon, MON_DATA_DEF_IV, NULL) & 1) << 2)
+            | ((GetMonData(mon, MON_DATA_SPEED_IV, NULL) & 1) << 3)
+            | ((GetMonData(mon, MON_DATA_SPATK_IV, NULL) & 1) << 4)
+            | ((GetMonData(mon, MON_DATA_SPDEF_IV, NULL) & 1) << 5);
+    return CalcHiddenPowerType(bits);
+}
+
+static u8 GetBattleMonHiddenPowerTypeClean(struct BattlePokemon *battleMon)
+{
+    u8 bits = ((battleMon->hpIV & 1) << 0)
+            | ((battleMon->attackIV & 1) << 1)
+            | ((battleMon->defenseIV & 1) << 2)
+            | ((battleMon->speedIV & 1) << 3)
+            | ((battleMon->spAttackIV & 1) << 4)
+            | ((battleMon->spDefenseIV & 1) << 5);
+    return CalcHiddenPowerType(bits);
+}
+
+static bool8 MonHasHiddenPowerOrPowerfulMoveOfType(struct Pokemon *mon, u8 hpType)
+{
+    s32 i;
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        u16 move = GetMonData(mon, MON_DATA_MOVE1 + i, NULL);
+        if (move == MOVE_NONE)
+            continue;
+        if (move == MOVE_HIDDEN_POWER)
+            return TRUE;
+        if (gBattleMoves[move].type == hpType && gBattleMoves[move].power >= 70)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static bool8 BattleMonHasHiddenPowerOrPowerfulMoveOfType(struct BattlePokemon *battleMon, u8 hpType)
+{
+    s32 i;
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        u16 move = battleMon->moves[i];
+        if (move == MOVE_NONE)
+            continue;
+        if (move == MOVE_HIDDEN_POWER)
+            return TRUE;
+        if (gBattleMoves[move].type == hpType && gBattleMoves[move].power >= 70)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+u8 GetMonSecondaryTypeFromHiddenPower(struct Pokemon *mon)
+{
+    u16 species;
+    u16 heldItem;
+    u8 itemType;
+    u8 hpType;
+
+    if (mon == NULL)
+        return TYPE_NONE;
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    if (species == SPECIES_NONE || species == SPECIES_EGG)
+        return TYPE_NONE;
+    if (!IsMonMonoType(species))
+        return TYPE_NONE;
+    heldItem = GetMonData(mon, MON_DATA_HELD_ITEM, NULL);
+    itemType = GetTypeForHiddenPowerItem(heldItem);
+    if (itemType == TYPE_NONE)
+        return TYPE_NONE;
+    if (gSpeciesInfo[species].types[0] == itemType)
+        return TYPE_NONE;
+    hpType = GetMonHiddenPowerTypeClean(mon);
+    if (hpType != itemType)
+        return TYPE_NONE;
+    if (hpType >= NUMBER_OF_MON_TYPES || hpType == TYPE_MYSTERY)
+        return TYPE_NONE;
+    if (!MonHasHiddenPowerOrPowerfulMoveOfType(mon, hpType))
+        return TYPE_NONE;
+    return hpType;
+}
+
+u8 GetBattleMonSecondaryTypeFromHiddenPower(struct BattlePokemon *battleMon)
+{
+    u16 species;
+    u8 itemType;
+    u8 hpType;
+
+    if (battleMon == NULL)
+        return TYPE_NONE;
+    species = battleMon->species;
+    if (species == SPECIES_NONE || species == SPECIES_EGG)
+        return TYPE_NONE;
+    if (!IsMonMonoType(species))
+        return TYPE_NONE;
+    itemType = GetTypeForHiddenPowerItem(battleMon->item);
+    if (itemType == TYPE_NONE)
+        return TYPE_NONE;
+    if (gSpeciesInfo[species].types[0] == itemType)
+        return TYPE_NONE;
+    hpType = GetBattleMonHiddenPowerTypeClean(battleMon);
+    if (hpType != itemType)
+        return TYPE_NONE;
+    if (hpType >= NUMBER_OF_MON_TYPES || hpType == TYPE_MYSTERY)
+        return TYPE_NONE;
+    if (!BattleMonHasHiddenPowerOrPowerfulMoveOfType(battleMon, hpType))
+        return TYPE_NONE;
+    return hpType;
+}
+
+void TryApplySecondaryTypeToBattleMon(u8 battlerId)
+{
+    u8 secType;
+    if (battlerId >= MAX_BATTLERS_COUNT)
+        return;
+    secType = GetBattleMonSecondaryTypeFromHiddenPower(&gBattleMons[battlerId]);
+    if (secType != TYPE_NONE)
+        gBattleMons[battlerId].type2 = secType;
 }

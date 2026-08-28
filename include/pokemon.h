@@ -433,4 +433,8 @@ struct MonSpritesGfxManager *CreateMonSpritesGfxManager(u8 battlePosition, u8 mo
 void DestroyMonSpritesGfxManager(void);
 u8 *MonSpritesGfxManager_GetSpritePtr(u8 bufferId);
 
+u8 GetMonSecondaryTypeFromHiddenPower(struct Pokemon *mon);
+u8 GetBattleMonSecondaryTypeFromHiddenPower(struct BattlePokemon *battleMon);
+void TryApplySecondaryTypeToBattleMon(u8 battlerId);
+
 #endif // GUARD_POKEMON_H
