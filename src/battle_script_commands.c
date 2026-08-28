@@ -1,5 +1,6 @@
 #include "global.h"
 #include "gflib.h"
+#include "pokemon.h"
 #include "item.h"
 #include "util.h"
 #include "random.h"
@@ -4844,6 +4845,7 @@ static void Cmd_switchindataupdate(void)
     {
         gBattleMons[gActiveBattler].item = ITEM_NONE;
     }
+    TryApplySecondaryTypeToBattleMon(gActiveBattler);
 
     if (gBattleMoves[gCurrentMove].effect == EFFECT_BATON_PASS)
     {
