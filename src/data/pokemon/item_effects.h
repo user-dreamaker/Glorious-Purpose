@@ -335,6 +335,49 @@ static const u8 sItemEffect_SitrusBerry[7] = {
     [6] = 30, // Amount of HP to recover
 };
 
+#define EV_BERRY_FRIENDSHIP_CHANGE \
+    [7] = 10, \
+    [8] = 5, \
+    [9] = 2
+
+static const u8 sItemEffect_PomegBerry[10] = {
+    [4] = ITEM4_EV_HP,
+    [5] = ITEM5_FRIENDSHIP_ALL,
+    [6] = ITEM6_SUBTRACT_EV,
+    EV_BERRY_FRIENDSHIP_CHANGE,
+};
+
+static const u8 sItemEffect_KelpsyBerry[10] = {
+    [4] = ITEM4_EV_ATK,
+    [5] = ITEM5_FRIENDSHIP_ALL,
+    [6] = ITEM6_SUBTRACT_EV,
+    EV_BERRY_FRIENDSHIP_CHANGE,
+};
+
+static const u8 sItemEffect_QualotBerry[10] = {
+    [5] = ITEM5_EV_DEF | ITEM5_FRIENDSHIP_ALL,
+    [6] = ITEM6_SUBTRACT_EV,
+    EV_BERRY_FRIENDSHIP_CHANGE,
+};
+
+static const u8 sItemEffect_HondewBerry[10] = {
+    [5] = ITEM5_EV_SPATK | ITEM5_FRIENDSHIP_ALL,
+    [6] = ITEM6_SUBTRACT_EV,
+    EV_BERRY_FRIENDSHIP_CHANGE,
+};
+
+static const u8 sItemEffect_GrepaBerry[10] = {
+    [5] = ITEM5_EV_SPDEF | ITEM5_FRIENDSHIP_ALL,
+    [6] = ITEM6_SUBTRACT_EV,
+    EV_BERRY_FRIENDSHIP_CHANGE,
+};
+
+static const u8 sItemEffect_TamatoBerry[10] = {
+    [5] = ITEM5_EV_SPEED | ITEM5_FRIENDSHIP_ALL,
+    [6] = ITEM6_SUBTRACT_EV,
+    EV_BERRY_FRIENDSHIP_CHANGE,
+};
+
 const u8 *const gItemEffectTable[] =
 {
     [ITEM_POTION - ITEM_POTION]        = sItemEffect_Potion,
@@ -400,5 +443,11 @@ const u8 *const gItemEffectTable[] =
     [ITEM_PERSIM_BERRY - ITEM_POTION]  = sItemEffect_PersimBerry,
     [ITEM_LUM_BERRY - ITEM_POTION]     = sItemEffect_LumBerry,
     [ITEM_SITRUS_BERRY - ITEM_POTION]  = sItemEffect_SitrusBerry,
+    [ITEM_POMEG_BERRY - ITEM_POTION]   = sItemEffect_PomegBerry,
+    [ITEM_KELPSY_BERRY - ITEM_POTION]  = sItemEffect_KelpsyBerry,
+    [ITEM_QUALOT_BERRY - ITEM_POTION]  = sItemEffect_QualotBerry,
+    [ITEM_HONDEW_BERRY - ITEM_POTION]  = sItemEffect_HondewBerry,
+    [ITEM_GREPA_BERRY - ITEM_POTION]   = sItemEffect_GrepaBerry,
+    [ITEM_TAMATO_BERRY - ITEM_POTION]  = sItemEffect_TamatoBerry,
     [LAST_BERRY_INDEX - ITEM_POTION]   = NULL,
 };
