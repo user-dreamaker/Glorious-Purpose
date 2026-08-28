@@ -4339,6 +4339,8 @@ static bool8 IsHPRecoveryItem(u16 item)
 
 static void GetMedicineItemEffectMessage(u16 item)
 {
+    bool8 isEvBerry = (item >= ITEM_POMEG_BERRY && item <= ITEM_TAMATO_BERRY);
+    const u8 *evStatText = isEvBerry ? gText_PkmnBaseVar2StatDecreased : gText_PkmnBaseVar2StatIncreased;
     switch (GetItemEffectType(item))
     {
     case ITEM_EFFECT_CURE_POISON:
@@ -4367,27 +4369,27 @@ static void GetMedicineItemEffectMessage(u16 item)
         break;
     case ITEM_EFFECT_HP_EV:
         StringCopy(gStringVar2, gText_ItemEffect_HP);
-        StringExpandPlaceholders(gStringVar4, gText_PkmnBaseVar2StatIncreased);
+        StringExpandPlaceholders(gStringVar4, evStatText);
         break;
     case ITEM_EFFECT_ATK_EV:
         StringCopy(gStringVar2, gText_ItemEffect_Attack);
-        StringExpandPlaceholders(gStringVar4, gText_PkmnBaseVar2StatIncreased);
+        StringExpandPlaceholders(gStringVar4, evStatText);
         break;
     case ITEM_EFFECT_DEF_EV:
         StringCopy(gStringVar2, gText_ItemEffect_Defense);
-        StringExpandPlaceholders(gStringVar4, gText_PkmnBaseVar2StatIncreased);
+        StringExpandPlaceholders(gStringVar4, evStatText);
         break;
     case ITEM_EFFECT_SPEED_EV:
         StringCopy(gStringVar2, gText_ItemEffect_Speed);
-        StringExpandPlaceholders(gStringVar4, gText_PkmnBaseVar2StatIncreased);
+        StringExpandPlaceholders(gStringVar4, evStatText);
         break;
     case ITEM_EFFECT_SPATK_EV:
         StringCopy(gStringVar2, gText_ItemEffect_SpAtk);
-        StringExpandPlaceholders(gStringVar4, gText_PkmnBaseVar2StatIncreased);
+        StringExpandPlaceholders(gStringVar4, evStatText);
         break;
     case ITEM_EFFECT_SPDEF_EV:
         StringCopy(gStringVar2, gText_ItemEffect_SpDef);
-        StringExpandPlaceholders(gStringVar4, gText_PkmnBaseVar2StatIncreased);
+        StringExpandPlaceholders(gStringVar4, evStatText);
         break;
     case ITEM_EFFECT_PP_UP:
     case ITEM_EFFECT_PP_MAX:
