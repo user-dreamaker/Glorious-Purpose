@@ -4128,6 +4128,9 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
     u8 battleMonId = MAX_BATTLERS_COUNT;
     u16 heldItem;
     u8 val;
+    s32 dataSigned;
+    s8 evChange;
+    u16 evCount;
     u32 evDelta;
 
     // Get item hold effect
@@ -4345,6 +4348,25 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                     {
                     case 0: // ITEM4_EV_HP
                     case 1: // ITEM4_EV_ATK
+                        evChange = (s8)itemEffect[idx];
+                        if (evChange < 0)
+                        {
+                            s32 cur = GetMonData(mon, sGetMonDataEVConstants[i], NULL);
+                            if (cur == 0)
+                            {
+                                if (GetMonData(mon, MON_DATA_FRIENDSHIP, NULL) < MAX_FRIENDSHIP)
+                                    retVal = FALSE;
+                                idx++;
+                                break;
+                            }
+                            cur += evChange;
+                            if (cur < 0) cur = 0;
+                            SetMonData(mon, sGetMonDataEVConstants[i], &cur);
+                            CalculateMonStats(mon);
+                            idx++;
+                            retVal = FALSE;
+                            break;
+                        }
                         evCount = GetMonEVCount(mon);
 
                         // Has EV increase limit already been reached?
@@ -4552,6 +4574,25 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                     case 1: // ITEM5_EV_SPEED
                     case 2: // ITEM5_EV_SPDEF
                     case 3: // ITEM5_EV_SPATK
+                        evChange = (s8)itemEffect[idx];
+                        if (evChange < 0)
+                        {
+                            s32 cur = GetMonData(mon, sGetMonDataEVConstants[i + 2], NULL);
+                            if (cur == 0)
+                            {
+                                if (GetMonData(mon, MON_DATA_FRIENDSHIP, NULL) < MAX_FRIENDSHIP)
+                                    retVal = FALSE;
+                                idx++;
+                                break;
+                            }
+                            cur += evChange;
+                            if (cur < 0) cur = 0;
+                            SetMonData(mon, sGetMonDataEVConstants[i + 2], &cur);
+                            CalculateMonStats(mon);
+                            retVal = FALSE;
+                            idx++;
+                            break;
+                        }
                         evCount = GetMonEVCount(mon);
                         
                         // Has EV increase limit already been reached?
@@ -4812,6 +4853,14 @@ bool8 PokemonItemUseNoEffect(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mo
                     {
                     case 0: // ITEM4_EV_HP
                     case 1: // ITEM4_EV_ATK
+                        if ((s8)itemEffect[idx] < 0)
+                        {
+                            data = GetMonData(mon, sGetMonDataEVConstants[i], NULL);
+                            if (data > 0 || GetMonData(mon, MON_DATA_FRIENDSHIP, NULL) < MAX_FRIENDSHIP)
+                                retVal = FALSE;
+                            idx++;
+                            break;
+                        }
 
                         // Has EV increase limit already been reached?
                         if (GetMonEVCount(mon) >= MAX_TOTAL_EVS)
@@ -4898,6 +4947,14 @@ bool8 PokemonItemUseNoEffect(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mo
                     case 1: // ITEM5_EV_SPEED
                     case 2: // ITEM5_EV_SPDEF
                     case 3: // ITEM5_EV_SPATK
+                        if ((s8)itemEffect[idx] < 0)
+                        {
+                            data = GetMonData(mon, sGetMonDataEVConstants[i + 2], NULL);
+                            if (data > 0 || GetMonData(mon, MON_DATA_FRIENDSHIP, NULL) < MAX_FRIENDSHIP)
+                                retVal = FALSE;
+                            idx++;
+                            break;
+                        }
                         if (GetMonEVCount(mon) >= MAX_TOTAL_EVS)
                             return TRUE;
                         data = GetMonData(mon, sGetMonDataEVConstants[i + 2], NULL);
