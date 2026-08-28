@@ -104,5 +104,7 @@ bool32 BattlerHasAbility(u32 battlerId, u32 ability);
 bool8 IsNeutralizingGasOnField(void);
 bool8 IsNeutralizingGasOnBattler(u8 battler);
 bool8 TryNeutralizingGasRestore(u8 battler);
+u16 GetBattlerFriendship(u8 battlerId);
+bool8 IsBattlerFriendshipMaxed(u8 battlerId);
 
 #endif // GUARD_BATTLE_UTIL_H

@@ -1160,6 +1160,9 @@ static void Cmd_accuracycheck(void)
         if (holdEffect == HOLD_EFFECT_EVASION_UP)
             calc = (calc * (100 - param)) / 100;
 
+        // Happiness & Friendship System (10% Chance of move missing)
+        if (IsBattlerFriendshipMaxed(gBattlerTarget))
+            calc = (calc * 90) / 100;
         // final calculation
         if ((Random() % 100 + 1) > calc)
         {
@@ -1275,6 +1278,7 @@ static void Cmd_critcalc(void)
                 + (gBattleMoves[gCurrentMove].effect == EFFECT_BLAZE_KICK)
                 + (gBattleMoves[gCurrentMove].effect == EFFECT_POISON_TAIL)
                 + (holdEffect == HOLD_EFFECT_SCOPE_LENS)
+                + IsBattlerFriendshipMaxed(gBattlerAttacker) // Happiness & Friendship System (2* Critical Hit Rate)
                 + (gBattleMons[gBattlerAttacker].ability == ABILITY_SUPER_LUCK)
                 + 2 * (holdEffect == HOLD_EFFECT_LUCKY_PUNCH && gBattleMons[gBattlerAttacker].species == SPECIES_CHANSEY)
                 + 2 * (holdEffect == HOLD_EFFECT_STICK && gBattleMons[gBattlerAttacker].species == SPECIES_FARFETCHD);
@@ -1818,6 +1822,14 @@ static void Cmd_adjustnormaldamage(void)
         RecordItemEffectBattle(gBattlerTarget, holdEffect);
         gSpecialStatuses[gBattlerTarget].focusBanded = 1;
     }
+    // Happiness & Friendship System (20% chance of surviving a KO)
+    if (!gSpecialStatuses[gBattlerTarget].focusBanded
+     && IsBattlerFriendshipMaxed(gBattlerTarget)
+     && (Random() % 100) < 20)
+    {
+        gSpecialStatuses[gBattlerTarget].focusBanded = 1;
+        gSpecialStatuses[gBattlerTarget].friendshipSurvived = 1;
+    }
     if (!(gBattleMons[gBattlerTarget].status2 & STATUS2_SUBSTITUTE)
      && (gBattleMoves[gCurrentMove].effect == EFFECT_FALSE_SWIPE || gProtectStructs[gBattlerTarget].endured || gSpecialStatuses[gBattlerTarget].focusBanded || (gBattleMons[gBattlerTarget].ability == ABILITY_STURDY && gBattleMons[gBattlerTarget].hp == gBattleMons[gBattlerTarget].maxHP))
      && gBattleMons[gBattlerTarget].hp <= gBattleMoveDamage)
@@ -1825,6 +1837,11 @@ static void Cmd_adjustnormaldamage(void)
         gBattleMoveDamage = gBattleMons[gBattlerTarget].hp - 1;
         if (gProtectStructs[gBattlerTarget].endured)
         {
+            gMoveResultFlags |= MOVE_RESULT_FOE_ENDURED;
+        }
+        else if (gSpecialStatuses[gBattlerTarget].friendshipSurvived)
+        {
+            gSpecialStatuses[gBattlerTarget].friendshipSurvived = 0;
             gMoveResultFlags |= MOVE_RESULT_FOE_ENDURED;
         }
         else if (gSpecialStatuses[gBattlerTarget].focusBanded)
@@ -1866,6 +1883,14 @@ static void Cmd_adjustnormaldamage2(void)
         RecordItemEffectBattle(gBattlerTarget, holdEffect);
         gSpecialStatuses[gBattlerTarget].focusBanded = 1;
     }
+    // Happiness & Friendship System (20% chance of surviving a KO)
+    if (!gSpecialStatuses[gBattlerTarget].focusBanded
+     && IsBattlerFriendshipMaxed(gBattlerTarget)
+     && (Random() % 100) < 20)
+    {
+        gSpecialStatuses[gBattlerTarget].focusBanded = 1;
+        gSpecialStatuses[gBattlerTarget].friendshipSurvived = 1;
+    }
     if (!(gBattleMons[gBattlerTarget].status2 & STATUS2_SUBSTITUTE)
      && (gProtectStructs[gBattlerTarget].endured || gSpecialStatuses[gBattlerTarget].focusBanded)
      && gBattleMons[gBattlerTarget].hp <= gBattleMoveDamage)
@@ -1873,6 +1898,11 @@ static void Cmd_adjustnormaldamage2(void)
         gBattleMoveDamage = gBattleMons[gBattlerTarget].hp - 1;
         if (gProtectStructs[gBattlerTarget].endured)
         {
+            gMoveResultFlags |= MOVE_RESULT_FOE_ENDURED;
+        }
+        else if (gSpecialStatuses[gBattlerTarget].friendshipSurvived)
+        {
+            gSpecialStatuses[gBattlerTarget].friendshipSurvived = 0;
             gMoveResultFlags |= MOVE_RESULT_FOE_ENDURED;
         }
         else if (gSpecialStatuses[gBattlerTarget].focusBanded)
@@ -5953,6 +5983,14 @@ static void Cmd_adjustsetdamage(void)
         RecordItemEffectBattle(gBattlerTarget, holdEffect);
         gSpecialStatuses[gBattlerTarget].focusBanded = 1;
     }
+    // Happiness & Friendship System (20% chance of surviving a KO)
+    if (!gSpecialStatuses[gBattlerTarget].focusBanded
+     && IsBattlerFriendshipMaxed(gBattlerTarget)
+     && (Random() % 100) < 20)
+    {
+        gSpecialStatuses[gBattlerTarget].focusBanded = 1;
+        gSpecialStatuses[gBattlerTarget].friendshipSurvived = 1;
+    }
     if (!(gBattleMons[gBattlerTarget].status2 & STATUS2_SUBSTITUTE)
      && (gBattleMoves[gCurrentMove].effect == EFFECT_FALSE_SWIPE || gProtectStructs[gBattlerTarget].endured || gSpecialStatuses[gBattlerTarget].focusBanded)
      && gBattleMons[gBattlerTarget].hp <= gBattleMoveDamage)
@@ -5960,6 +5998,11 @@ static void Cmd_adjustsetdamage(void)
         gBattleMoveDamage = gBattleMons[gBattlerTarget].hp - 1;
         if (gProtectStructs[gBattlerTarget].endured)
         {
+            gMoveResultFlags |= MOVE_RESULT_FOE_ENDURED;
+        }
+        else if (gSpecialStatuses[gBattlerTarget].friendshipSurvived)
+        {
+            gSpecialStatuses[gBattlerTarget].friendshipSurvived = 0;
             gMoveResultFlags |= MOVE_RESULT_FOE_ENDURED;
         }
         else if (gSpecialStatuses[gBattlerTarget].focusBanded)

@@ -1672,6 +1672,18 @@ static const struct
     {ABILITY_SNOW_WARNING, B_WEATHER_HAIL_PERMANENT, B_WEATHER_HAIL, BattleScript_SnowWarningActivates},
 };
 
+    // Happiness & Friendship System
+u16 GetBattlerFriendship(u8 battlerId)
+{
+    struct Pokemon *party = (GetBattlerSide(battlerId) == B_SIDE_PLAYER) ? gPlayerParty : gEnemyParty;
+    return GetMonData(&party[gBattlerPartyIndexes[battlerId]], MON_DATA_FRIENDSHIP, NULL);
+}
+
+bool8 IsBattlerFriendshipMaxed(u8 battlerId)
+{
+    return (GetBattlerFriendship(battlerId) >= MAX_FRIENDSHIP);
+}
+
 u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveArg)
 {
     u8 effect = 0;
@@ -2025,6 +2037,31 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                     }
                     break;
                 }
+            }
+
+            // Happiness & Friendship System (20% of healing status)
+            if (!effect
+             && IsBattlerFriendshipMaxed(battler)
+             && (gBattleMons[battler].status1 & STATUS1_ANY)
+             && (Random() % 5) == 0)
+            {
+                if (gBattleMons[battler].status1 & (STATUS1_POISON | STATUS1_TOXIC_POISON))
+                    StringCopy(gBattleTextBuff1, gStatusConditionString_PoisonJpn);
+                if (gBattleMons[battler].status1 & STATUS1_SLEEP)
+                    StringCopy(gBattleTextBuff1, gStatusConditionString_SleepJpn);
+                if (gBattleMons[battler].status1 & STATUS1_PARALYSIS)
+                    StringCopy(gBattleTextBuff1, gStatusConditionString_ParalysisJpn);
+                if (gBattleMons[battler].status1 & STATUS1_BURN)
+                    StringCopy(gBattleTextBuff1, gStatusConditionString_BurnJpn);
+                if (gBattleMons[battler].status1 & STATUS1_FREEZE)
+                    StringCopy(gBattleTextBuff1, gStatusConditionString_IceJpn);
+                gBattleMons[battler].status1 = 0;
+                gBattleMons[battler].status2 &= ~STATUS2_NIGHTMARE; // fix nightmare glitch
+                gBattleScripting.battler = gActiveBattler = battler;
+                BattleScriptPushCursorAndCallback(BattleScript_ShedSkinActivates);
+                BtlController_EmitSetMonData(BUFFER_A, REQUEST_STATUS_BATTLE, 0, 4, &gBattleMons[battler].status1);
+                MarkBattlerForControllerExec(gActiveBattler);
+                effect++;
             }
             break;
         case ABILITYEFFECT_MOVES_BLOCK: // 2

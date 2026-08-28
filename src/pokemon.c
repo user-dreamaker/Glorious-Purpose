@@ -3104,7 +3104,7 @@ u32 GetBoxMonData(struct BoxPokemon *boxMon, s32 field, u8 *data)
     struct PokemonSubstruct2 *substruct2 = NULL;
     struct PokemonSubstruct3 *substruct3 = NULL;
 
-    if (field > MON_DATA_ENCRYPT_SEPARATOR)
+    if (field > MON_DATA_ENCRYPT_SEPARATOR || field == MON_DATA_MARKINGS)
     {
         substruct0 = &(GetSubstruct(boxMon, boxMon->personality, 0)->type0);
         substruct1 = &(GetSubstruct(boxMon, boxMon->personality, 1)->type1);
@@ -3194,8 +3194,22 @@ u32 GetBoxMonData(struct BoxPokemon *boxMon, s32 field, u8 *data)
         break;
     }
     case MON_DATA_MARKINGS:
-        retVal = boxMon->markings;
-        break;
+        {
+            u8 friendship = substruct0->friendship;
+            if (friendship >= 255)
+                retVal = 0xF;
+            else if (friendship >= 192)
+                retVal = 0x7;
+            else if (friendship >= 128)
+                retVal = 0x3;
+            else if (friendship >= 64)
+                retVal = 0x1;
+            else if (friendship == 0)
+                retVal = 0x0;
+            else
+                retVal = 0x1;
+            break;
+        }
     case MON_DATA_CHECKSUM:
         retVal = boxMon->checksum;
         break;
@@ -3445,7 +3459,7 @@ u32 GetBoxMonData(struct BoxPokemon *boxMon, s32 field, u8 *data)
         break;
     }
 
-    if (field > MON_DATA_ENCRYPT_SEPARATOR)
+    if (field > MON_DATA_ENCRYPT_SEPARATOR || field == MON_DATA_MARKINGS)
         EncryptBoxMon(boxMon);
 
     return retVal;
