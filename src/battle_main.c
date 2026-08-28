@@ -1,5 +1,6 @@
 #include "global.h"
 #include "gflib.h"
+#include "pokemon.h"
 #include "battle.h"
 #include "battle_anim.h"
 #include "battle_ai_script_commands.h"
@@ -2424,6 +2425,7 @@ void SwitchInClearSetData(void)
 
     gBattleResources->flags->flags[gActiveBattler] = 0;
     gCurrentMove = MOVE_NONE;
+    TryApplySecondaryTypeToBattleMon(gActiveBattler);
 }
 
 void FaintClearSetData(void)
@@ -2510,6 +2512,7 @@ void FaintClearSetData(void)
     gBattleResources->flags->flags[gActiveBattler] = 0;
     gBattleMons[gActiveBattler].type1 = gSpeciesInfo[gBattleMons[gActiveBattler].species].types[0];
     gBattleMons[gActiveBattler].type2 = gSpeciesInfo[gBattleMons[gActiveBattler].species].types[1];
+    TryApplySecondaryTypeToBattleMon(gActiveBattler);
 }
 
 static void BattleIntroGetMonsData(void)
@@ -2576,6 +2579,7 @@ static void BattleIntroDrawTrainersOrMonsSprites(void)
             gBattleMons[gActiveBattler].type1 = gSpeciesInfo[gBattleMons[gActiveBattler].species].types[0];
             gBattleMons[gActiveBattler].type2 = gSpeciesInfo[gBattleMons[gActiveBattler].species].types[1];
             gBattleMons[gActiveBattler].ability = GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].abilityNum);
+            TryApplySecondaryTypeToBattleMon(gActiveBattler);
             hpOnSwitchout = &gBattleStruct->hpOnSwitchout[GetBattlerSide(gActiveBattler)];
             *hpOnSwitchout = gBattleMons[gActiveBattler].hp;
             for (i = 0; i < NUM_BATTLE_STATS; i++)

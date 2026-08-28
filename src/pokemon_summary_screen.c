@@ -2126,6 +2126,13 @@ static void BufferMonInfo(void)
 
     sMonSummaryScreen->monTypes[0] = gSpeciesInfo[dexNum].types[0];
     sMonSummaryScreen->monTypes[1] = gSpeciesInfo[dexNum].types[1];
+    {
+        u8 secType = GetMonSecondaryTypeFromHiddenPower(&sMonSummaryScreen->currentMon);
+        if (secType != TYPE_NONE)
+        {
+            sMonSummaryScreen->monTypes[1] = secType;
+        }
+    }
 
     GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_NICKNAME, tempStr);
     StringCopyN_Multibyte(sMonSummaryScreen->summary.nicknameStrBuf, tempStr, POKEMON_NAME_LENGTH);
