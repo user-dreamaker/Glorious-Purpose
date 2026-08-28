@@ -782,6 +782,21 @@ static void Task_EvolutionScene(u8 taskId)
             GetSetPokedexFlag(SpeciesToNationalPokedexNum(gTasks[taskId].tPostEvoSpecies), FLAG_SET_SEEN);
             GetSetPokedexFlag(SpeciesToNationalPokedexNum(gTasks[taskId].tPostEvoSpecies), FLAG_SET_CAUGHT);
             IncrementGameStat(GAME_STAT_EVOLVED_POKEMON);
+            {
+                int i;
+                u16 heldItem = GetMonData(mon, MON_DATA_HELD_ITEM, NULL);
+                for (i = 0; i < EVOS_PER_MON; i++)
+                {
+                    if (gEvolutionTable[gTasks[taskId].tPreEvoSpecies][i].method == EVO_HELD_ITEM
+                     && gEvolutionTable[gTasks[taskId].tPreEvoSpecies][i].targetSpecies == gTasks[taskId].tPostEvoSpecies
+                     && gEvolutionTable[gTasks[taskId].tPreEvoSpecies][i].param == heldItem)
+                    {
+                        heldItem = ITEM_NONE;
+                        SetMonData(mon, MON_DATA_HELD_ITEM, &heldItem);
+                        break;
+                    }
+                }
+            }
         }
         break;
     case EVOSTATE_TRY_LEARN_MOVE:
