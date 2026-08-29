@@ -38,6 +38,7 @@
 #include "renewable_hidden_items.h"
 #include "roamer.h"
 #include "safari_zone.h"
+#include "save.h"
 #include "save_location.h"
 #include "scanline_effect.h"
 #include "script.h"
@@ -47,6 +48,7 @@
 #include "trainer_pokemon_sprites.h"
 #include "vs_seeker.h"
 #include "wild_encounter.h"
+#include "main.h"
 #include "constants/cable_club.h"
 #include "constants/event_objects.h"
 #include "constants/maps.h"
@@ -244,8 +246,28 @@ static const u16 sWhiteOutMoneyLossBadgeFlagIDs[] = {
 
 static void DoWhiteOut(void)
 {
+    u16 c;
+    u32 m;
+
     RunScriptImmediately(EventScript_ResetEliteFourEnd);
-    RemoveMoney(&gSaveBlock1Ptr->money, ComputeWhiteOutMoneyLoss());
+    c = VarGet(VAR_0x40A9) + 1;
+    VarSet(VAR_0x40A9, c);
+    if (c == 1)
+    {
+        m = GetMoney(&gSaveBlock1Ptr->money);
+        RemoveMoney(&gSaveBlock1Ptr->money, m / 2);
+    }
+    else if (c == 2)
+    {
+        SetMoney(&gSaveBlock1Ptr->money, 0);
+    }
+    else
+    {
+        SetMoney(&gSaveBlock1Ptr->money, 0);
+        ClearSaveData();
+        Save_ResetSaveCounters();
+        DoSoftReset();
+    }
     HealPlayerParty();
     Overworld_ResetStateAfterWhitingOut();
     Overworld_SetWhiteoutRespawnPoint();
@@ -254,13 +276,12 @@ static void DoWhiteOut(void)
 
 u32 ComputeWhiteOutMoneyLoss(void)
 {
-    u8 nbadges = CountBadgesForOverworldWhiteOutLossCalculation();
-    u8 toplevel = GetPlayerPartyHighestLevel();
-    u32 losings = toplevel * 4 * sWhiteOutMoneyLossMultipliers[nbadges];
-    u32 money = GetMoney(&gSaveBlock1Ptr->money);
-    if (losings > money)
-        losings = money;
-    return losings;
+    u16 n;
+    u32 m;
+
+    n = VarGet(VAR_0x40A9) + 1;
+    m = GetMoney(&gSaveBlock1Ptr->money);
+    return (n == 1) ? m / 2 : m;
 }
 
 void OverworldWhiteOutGetMoneyLoss(void)
