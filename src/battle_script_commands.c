@@ -5728,6 +5728,13 @@ static void Cmd_getmoneyreward(void)
                     lastMonLevel = lvl == 0 ? GetPlayerPartyHighestLevel() : lvl;
                 }
                 break;
+            case F_TRAINER_PARTY_FULL:
+                {
+                    const struct TrainerMonFull *party5 = gTrainers[gTrainerBattleOpponent_A].party.Full;
+                    u8 lvl = party5[gTrainers[gTrainerBattleOpponent_A].partySize - 1].lvl;
+                    lastMonLevel = lvl == 0 ? GetPlayerPartyHighestLevel() : lvl;
+                }
+                break;
             }
             for (; gTrainerMoneyTable[i].classId != 0xFF; i++)
             {

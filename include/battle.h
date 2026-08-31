@@ -100,10 +100,35 @@ struct TrainerMonItemCustomMoves
     u16 moves[MAX_MON_MOVES];
 };
 
+struct __attribute__((packed)) TrainerMonFull
+{
+    u8 lvl;
+    u16 species;
+    u16 heldItem;
+    u16 moves[MAX_MON_MOVES];
+    u8 nature;
+    u8 gender;
+    u8 ability;
+    u8 hpIV;
+    u8 atkIV;
+    u8 defIV;
+    u8 spAtkIV;
+    u8 spDefIV;
+    u8 speedIV;
+    u8 hpEV;
+    u8 atkEV;
+    u8 defEV;
+    u8 spAtkEV;
+    u8 spDefEV;
+    u8 speedEV;
+    u8 shiny;
+};
+
 #define NO_ITEM_DEFAULT_MOVES(party) { .NoItemDefaultMoves = party }, .partySize = ARRAY_COUNT(party), .partyFlags = 0
 #define NO_ITEM_CUSTOM_MOVES(party) { .NoItemCustomMoves = party }, .partySize = ARRAY_COUNT(party), .partyFlags = F_TRAINER_PARTY_CUSTOM_MOVESET
 #define ITEM_DEFAULT_MOVES(party) { .ItemDefaultMoves = party }, .partySize = ARRAY_COUNT(party), .partyFlags = F_TRAINER_PARTY_HELD_ITEM
 #define ITEM_CUSTOM_MOVES(party) { .ItemCustomMoves = party }, .partySize = ARRAY_COUNT(party), .partyFlags = F_TRAINER_PARTY_CUSTOM_MOVESET | F_TRAINER_PARTY_HELD_ITEM
+#define TRAINER_PARTY_FULL(party) { .Full = party }, .partySize = ARRAY_COUNT(party), .partyFlags = F_TRAINER_PARTY_FULL
 
 union TrainerMonPtr
 {
@@ -111,6 +136,7 @@ union TrainerMonPtr
     const struct TrainerMonNoItemCustomMoves *NoItemCustomMoves;
     const struct TrainerMonItemDefaultMoves *ItemDefaultMoves;
     const struct TrainerMonItemCustomMoves *ItemCustomMoves;
+    const struct TrainerMonFull *Full;
 };
 
 struct Trainer
