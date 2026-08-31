@@ -5702,29 +5702,30 @@ static void Cmd_getmoneyreward(void)
             case 0:
                 {
                     const struct TrainerMonNoItemDefaultMoves *party1 = gTrainers[gTrainerBattleOpponent_A].party.NoItemDefaultMoves;
-                    
-                    lastMonLevel = party1[gTrainers[gTrainerBattleOpponent_A].partySize - 1].lvl;
+                    u8 lvl = party1[gTrainers[gTrainerBattleOpponent_A].partySize - 1].lvl;
+                    lastMonLevel = lvl == 0 ? GetPlayerPartyHighestLevel() : lvl;
                 }
                 break;
             case F_TRAINER_PARTY_CUSTOM_MOVESET:
                 {
                     const struct TrainerMonNoItemCustomMoves *party2 = gTrainers[gTrainerBattleOpponent_A].party.NoItemCustomMoves;
-                    
-                    lastMonLevel = party2[gTrainers[gTrainerBattleOpponent_A].partySize - 1].lvl;
+                    u8 lvl = party2[gTrainers[gTrainerBattleOpponent_A].partySize - 1].lvl;
+                    lastMonLevel = lvl == 0 ? GetPlayerPartyHighestLevel() : lvl;
                 }
                 break;
             case F_TRAINER_PARTY_HELD_ITEM:
                 {
                     const struct TrainerMonItemDefaultMoves *party3 = gTrainers[gTrainerBattleOpponent_A].party.ItemDefaultMoves;
-                    
-                    lastMonLevel = party3[gTrainers[gTrainerBattleOpponent_A].partySize - 1].lvl;
+                    u8 lvl = party3[gTrainers[gTrainerBattleOpponent_A].partySize - 1].lvl;
+                    lastMonLevel = lvl == 0 ? GetPlayerPartyHighestLevel() : lvl;
                 }
                 break;
             case (F_TRAINER_PARTY_CUSTOM_MOVESET | F_TRAINER_PARTY_HELD_ITEM):
                 {
+                    u8 lvl;
                     party4 = gTrainers[gTrainerBattleOpponent_A].party.ItemCustomMoves;
-                    
-                    lastMonLevel = party4[gTrainers[gTrainerBattleOpponent_A].partySize - 1].lvl;
+                    lvl = party4[gTrainers[gTrainerBattleOpponent_A].partySize - 1].lvl;
+                    lastMonLevel = lvl == 0 ? GetPlayerPartyHighestLevel() : lvl;
                 }
                 break;
             }
