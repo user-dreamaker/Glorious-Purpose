@@ -778,6 +778,8 @@ static void Task_EvolutionScene(u8 taskId)
             gTasks[taskId].tState++;
             SetMonData(mon, MON_DATA_SPECIES, (void *)(&gTasks[taskId].tPostEvoSpecies));
             CalculateMonStats(mon);
+            if (IsEnvyEvolution(gTasks[taskId].tPreEvoSpecies, gTasks[taskId].tPostEvoSpecies))
+                ApplyEnvyEvolutionPenalties(mon);
             EvolutionRenameMon(mon, gTasks[taskId].tPreEvoSpecies, gTasks[taskId].tPostEvoSpecies);
             GetSetPokedexFlag(SpeciesToNationalPokedexNum(gTasks[taskId].tPostEvoSpecies), FLAG_SET_SEEN);
             GetSetPokedexFlag(SpeciesToNationalPokedexNum(gTasks[taskId].tPostEvoSpecies), FLAG_SET_CAUGHT);
@@ -802,6 +804,13 @@ static void Task_EvolutionScene(u8 taskId)
     case EVOSTATE_TRY_LEARN_MOVE:
         if (!IsTextPrinterActive(0))
         {
+            if (IsEnvyEvolution(gTasks[taskId].tPreEvoSpecies, gTasks[taskId].tPostEvoSpecies) && !gTasks[taskId].tEvoWasStopped)
+            {
+                HelpSystem_Enable();
+                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+                gTasks[taskId].tState++;
+                break;
+            }
             HelpSystem_Enable();
             var = MonTryLearningNewMoveEvolution(mon, gTasks[taskId].tLearnsFirstMove);
             if (var != MOVE_NONE && !gTasks[taskId].tEvoWasStopped)
