@@ -58,6 +58,10 @@ struct MonSpritesGfxManager
 static EWRAM_DATA u8 sLearningMoveTableID = 0;
 EWRAM_DATA u8 gPlayerPartyCount = 0;
 EWRAM_DATA u8 gEnemyPartyCount = 0;
+#define ENVY_SLOT_COUNT 6
+static EWRAM_DATA u16 sEnvyOpponentSpecies[PARTY_SIZE][ENVY_SLOT_COUNT];
+static EWRAM_DATA u8 sEnvyOpponentLevel[PARTY_SIZE][ENVY_SLOT_COUNT];
+static EWRAM_DATA u8 sEnvyPlayerLevel[PARTY_SIZE];
 EWRAM_DATA struct Pokemon gEnemyParty[PARTY_SIZE] = {};
 EWRAM_DATA struct Pokemon gPlayerParty[PARTY_SIZE] = {};
 EWRAM_DATA struct SpriteTemplate gMultiuseSpriteTemplate = {0};
@@ -5235,6 +5239,150 @@ u8 GetNatureFromPersonality(u32 personality)
     return personality % NUM_NATURES;
 }
 
+static bool8 SpeciesHasEnvyEvo(u16 species)
+{
+    s32 i;
+    if (species == SPECIES_NONE || species == SPECIES_EGG || species >= NUM_SPECIES)
+        return FALSE;
+    for (i = 0; i < EVOS_PER_MON; i++)
+    {
+        if (gEvolutionTable[species][i].method == EVO_ENVY)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static bool8 HasFacedEnvyOpponent(struct Pokemon *mon, u16 requiredSpecies)
+{
+    s32 partyIdx = mon - gPlayerParty;
+    s32 k;
+    if (partyIdx < 0 || partyIdx >= PARTY_SIZE)
+        return FALSE;
+    if (requiredSpecies == SPECIES_NONE)
+        return FALSE;
+    for (k = 0; k < ENVY_SLOT_COUNT; k++)
+    {
+        if (sEnvyOpponentSpecies[partyIdx][k] == requiredSpecies
+         && sEnvyOpponentLevel[partyIdx][k] >= sEnvyPlayerLevel[partyIdx])
+            return TRUE;
+    }
+    return FALSE;
+}
+
+void ClearEnvyBattleRecords(void)
+{
+    s32 i, j;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        sEnvyPlayerLevel[i] = 0;
+        for (j = 0; j < ENVY_SLOT_COUNT; j++)
+        {
+            sEnvyOpponentSpecies[i][j] = SPECIES_NONE;
+            sEnvyOpponentLevel[i][j] = 0;
+        }
+    }
+}
+
+void UpdateEnvyBattleRecords(void)
+{
+    s32 i, j, k;
+    if (gBattlersCount == 0 || gBattlersCount > MAX_BATTLERS_COUNT)
+        return;
+    for (i = 0; i < gBattlersCount; i++)
+    {
+        if (GetBattlerSide(i) != B_SIDE_PLAYER)
+            continue;
+        if (gAbsentBattlerFlags & gBitTable[i])
+            continue;
+        if (SpeciesHasEnvyEvo(gBattleMons[i].species))
+            break;
+    }
+    if (i == gBattlersCount)
+        return;
+    for (i = 0; i < gBattlersCount; i++)
+    {
+        u8 playerPartyIdx;
+        if (GetBattlerSide(i) != B_SIDE_PLAYER)
+            continue;
+        if (gAbsentBattlerFlags & gBitTable[i])
+            continue;
+        if (!SpeciesHasEnvyEvo(gBattleMons[i].species))
+            continue;
+        playerPartyIdx = gBattlerPartyIndexes[i];
+        if (playerPartyIdx >= PARTY_SIZE)
+            continue;
+        sEnvyPlayerLevel[playerPartyIdx] = gBattleMons[i].level;
+        for (j = 0; j < gBattlersCount; j++)
+        {
+            u16 oppSpecies;
+            u8 oppLevel;
+            s32 emptySlot = -1;
+            s32 foundSlot = -1;
+            if (GetBattlerSide(j) != B_SIDE_OPPONENT)
+                continue;
+            if (gAbsentBattlerFlags & gBitTable[j])
+                continue;
+            oppSpecies = gBattleMons[j].species;
+            oppLevel = gBattleMons[j].level;
+            if (oppSpecies == SPECIES_NONE || oppSpecies == SPECIES_EGG)
+                continue;
+            for (k = 0; k < ENVY_SLOT_COUNT; k++)
+            {
+                if (sEnvyOpponentSpecies[playerPartyIdx][k] == oppSpecies)
+                {
+                    foundSlot = k;
+                    break;
+                }
+                if (emptySlot < 0 && sEnvyOpponentSpecies[playerPartyIdx][k] == SPECIES_NONE)
+                    emptySlot = k;
+            }
+            if (foundSlot >= 0)
+            {
+                if (oppLevel > sEnvyOpponentLevel[playerPartyIdx][foundSlot])
+                    sEnvyOpponentLevel[playerPartyIdx][foundSlot] = oppLevel;
+            }
+            else if (emptySlot >= 0)
+            {
+                sEnvyOpponentSpecies[playerPartyIdx][emptySlot] = oppSpecies;
+                sEnvyOpponentLevel[playerPartyIdx][emptySlot] = oppLevel;
+            }
+        }
+    }
+}
+
+bool8 IsEnvyEvolution(u16 preEvoSpecies, u16 postEvoSpecies)
+{
+    s32 i;
+    if (preEvoSpecies >= NUM_SPECIES)
+        return FALSE;
+    for (i = 0; i < EVOS_PER_MON; i++)
+    {
+        if (gEvolutionTable[preEvoSpecies][i].method == EVO_ENVY
+         && gEvolutionTable[preEvoSpecies][i].targetSpecies == postEvoSpecies)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+void ApplyEnvyEvolutionPenalties(struct Pokemon *mon)
+{
+    u8 zero = 0;
+    u16 moveNone = MOVE_NONE;
+    u8 ppZero = 0;
+    s32 i;
+    for (i = 0; i < 6; i++)
+        SetMonData(mon, MON_DATA_HP_EV + i, &zero);
+    SetMonData(mon, MON_DATA_FRIENDSHIP, &zero);
+    SetMonData(mon, MON_DATA_PP_BONUSES, &zero);
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        SetMonData(mon, MON_DATA_MOVE1 + i, &moveNone);
+        SetMonData(mon, MON_DATA_PP1 + i, &ppZero);
+    }
+    SetMonMoveSlot(mon, MOVE_FRUSTRATION, 0);
+    CalculateMonStats(mon);
+}
+
 u16 GetEvolutionTargetSpecies(struct Pokemon *mon, u8 type, u16 evolutionItem)
 {
     int i;
@@ -5323,6 +5471,11 @@ u16 GetEvolutionTargetSpecies(struct Pokemon *mon, u8 type, u16 evolutionItem)
                 break;
             case EVO_HELD_ITEM:
                 if (gEvolutionTable[species][i].param == heldItem)
+                    targetSpecies = gEvolutionTable[species][i].targetSpecies;
+                break;
+            case EVO_ENVY:
+                if (friendship >= MAX_FRIENDSHIP
+                 && HasFacedEnvyOpponent(mon, gEvolutionTable[species][i].param))
                     targetSpecies = gEvolutionTable[species][i].targetSpecies;
                 break;
             }
