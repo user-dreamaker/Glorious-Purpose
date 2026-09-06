@@ -2105,6 +2105,7 @@ static u16 CalculateBoxMonChecksum(struct BoxPokemon *boxMon)
     s32 n = (((2 * baseStat + iv + ev / 4) * level) / 100) + 5; \
     u8 nature = GetNature(mon);                                 \
     n = ModifyStatByNature(nature, n, statIndex);               \
+    if (ev == 255) n += 1;                                      \
     SetMonData(mon, field, &n);                                 \
 }
 
@@ -2138,6 +2139,7 @@ void CalculateMonStats(struct Pokemon *mon)
     {
         s32 n = 2 * gSpeciesInfo[species].baseHP + hpIV;
         newMaxHP = (((n + hpEV / 4) * level) / 100) + level + 10;
+        if (hpEV == 255) newMaxHP += 1;
     }
 
     gBattleScripting.levelUpHP = newMaxHP - oldMaxHP;
