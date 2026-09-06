@@ -283,6 +283,7 @@
 #define EVO_BEAUTY           15 // Pokémon levels up with beauty ≥ specified value
 #define EVO_HELD_ITEM        16 // Pokémon levels up while holding specified item
 #define EVO_LEVEL_HELD_ITEM  16 // Pokémon levels up while holding specified item
+#define EVO_ENVY             17 // Pokémon levels up with friendship ≥ 255 battled against param species with Lv >= its own
 
 #define EVOS_PER_MON 5
 
