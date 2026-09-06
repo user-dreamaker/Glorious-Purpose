@@ -2200,6 +2200,7 @@ void BeginBattleIntro(void)
 static void BattleMainCB1(void)
 {
     gBattleMainFunc();
+    UpdateEnvyBattleRecords();
 
     for (gActiveBattler = 0; gActiveBattler < gBattlersCount; gActiveBattler++)
         gBattlerControllerFuncs[gActiveBattler]();
@@ -2211,6 +2212,7 @@ static void BattleStartClearSetData(void)
     u32 j;
     u8 *dataPtr;
 
+    ClearEnvyBattleRecords();
     TurnValuesCleanUp(FALSE);
     SpecialStatusesClear();
 
@@ -3947,6 +3949,7 @@ static void ReturnFromBattleToOverworld(void)
 {
     s32 i;
 
+    ClearEnvyBattleRecords();
     for (i = 0; i < PARTY_SIZE; i++)
     {
         if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL) != SPECIES_NONE
