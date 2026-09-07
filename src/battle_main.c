@@ -1640,6 +1640,163 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum)
                 }
                 break;
             }
+            case F_TRAINER_PARTY_FULL:
+            {
+                const struct TrainerMonFull *partyData = gTrainers[trainerNum].party.Full;
+                u32 personality;
+                u32 otId;
+                u8 ivVal;
+                u16 evVal;
+                int b;
+                int diff;
+                bool8 hasGender;
+                u8 targetGender;
+                u8 lvl;
+
+                for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
+                    nameHash += gSpeciesNames[partyData[i].species][j];
+
+                personalityValue += nameHash << 8;
+                personality = personalityValue;
+                otId = 0x12345678;
+
+                hasGender = FALSE;
+                targetGender = MON_MALE;
+                if (partyData[i].gender == MON_MALE)
+                {
+                    targetGender = MON_MALE;
+                    hasGender = TRUE;
+                }
+                else if (partyData[i].gender == MON_FEMALE)
+                {
+                    targetGender = MON_FEMALE;
+                    hasGender = TRUE;
+                }
+                else if (partyData[i].gender == MON_GENDERLESS)
+                {
+                    hasGender = FALSE;
+                }
+
+                if (hasGender && gSpeciesInfo[partyData[i].species].genderRatio != MON_GENDERLESS
+                    && gSpeciesInfo[partyData[i].species].genderRatio != MON_MALE
+                    && gSpeciesInfo[partyData[i].species].genderRatio != MON_FEMALE)
+                {
+                    u8 curGender = GetGenderFromSpeciesAndPersonality(partyData[i].species, personality);
+                    if (curGender != targetGender)
+                    {
+                        u32 basePid = personality & ~0xFF;
+                        u32 bestByte = 0;
+                        for (b = 0; b < 256; b++)
+                        {
+                            u32 testPid = basePid | b;
+                            if (GetGenderFromSpeciesAndPersonality(partyData[i].species, testPid) == targetGender)
+                            {
+                                bestByte = b;
+                                break;
+                            }
+                        }
+                        personality = basePid | bestByte;
+                    }
+                }
+
+                if (partyData[i].nature < NUM_NATURES)
+                {
+                    u32 basePid = personality;
+                    int bestDiff = 0;
+                    for (diff = 0; diff < NUM_NATURES; diff++)
+                    {
+                        u32 testPid = basePid + diff;
+                        if (GetNatureFromPersonality(testPid) == partyData[i].nature)
+                        {
+                            bool8 genderOk = TRUE;
+                            if (hasGender && gSpeciesInfo[partyData[i].species].genderRatio != MON_GENDERLESS
+                                && gSpeciesInfo[partyData[i].species].genderRatio != MON_MALE
+                                && gSpeciesInfo[partyData[i].species].genderRatio != MON_FEMALE)
+                            {
+                                if (GetGenderFromSpeciesAndPersonality(partyData[i].species, testPid) != targetGender)
+                                    genderOk = FALSE;
+                            }
+                            if (genderOk)
+                            {
+                                bestDiff = diff;
+                                break;
+                            }
+                        }
+                    }
+                    personality += bestDiff;
+                }
+
+                lvl = GetDynamicTrainerMonLevel(partyData[i].lvl);
+                if (partyData[i].shiny != 0)
+                {
+                    u16 baseLohalf = LOHALF(personality);
+                    u16 otXor = HIHALF(otId) ^ LOHALF(otId);
+                    u16 targetHihalf = otXor ^ baseLohalf ^ (Random() % 8);
+                    personality = (targetHihalf << 16) | baseLohalf;
+                    CreateMon(&party[i], partyData[i].species, lvl, 0, TRUE, personality, OT_ID_PRESET, otId);
+                }
+                else
+                {
+                    CreateMon(&party[i], partyData[i].species, lvl, 0, TRUE, personality, OT_ID_RANDOM_NO_SHINY, 0);
+                }
+
+                SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
+
+                {
+                    bool8 hasCustomMoves = FALSE;
+                    for (j = 0; j < MAX_MON_MOVES; j++)
+                    {
+                        if (partyData[i].moves[j] != MOVE_NONE)
+                        {
+                            hasCustomMoves = TRUE;
+                            break;
+                        }
+                    }
+                    if (hasCustomMoves)
+                    {
+                        for (j = 0; j < MAX_MON_MOVES; j++)
+                        {
+                            SetMonData(&party[i], MON_DATA_MOVE1 + j, &partyData[i].moves[j]);
+                            SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[partyData[i].moves[j]].pp);
+                        }
+                    }
+                }
+
+                if (partyData[i].ability > 0)
+                {
+                    u8 abilityNum = partyData[i].ability - 1;
+                    SetMonData(&party[i], MON_DATA_ABILITY_NUM, &abilityNum);
+                }
+
+                ivVal = partyData[i].hpIV;
+                SetMonData(&party[i], MON_DATA_HP_IV, &ivVal);
+                ivVal = partyData[i].atkIV;
+                SetMonData(&party[i], MON_DATA_ATK_IV, &ivVal);
+                ivVal = partyData[i].defIV;
+                SetMonData(&party[i], MON_DATA_DEF_IV, &ivVal);
+                ivVal = partyData[i].speedIV;
+                SetMonData(&party[i], MON_DATA_SPEED_IV, &ivVal);
+                ivVal = partyData[i].spAtkIV;
+                SetMonData(&party[i], MON_DATA_SPATK_IV, &ivVal);
+                ivVal = partyData[i].spDefIV;
+                SetMonData(&party[i], MON_DATA_SPDEF_IV, &ivVal);
+
+                evVal = partyData[i].hpEV;
+                SetMonData(&party[i], MON_DATA_HP_EV, &evVal);
+                evVal = partyData[i].atkEV;
+                SetMonData(&party[i], MON_DATA_ATK_EV, &evVal);
+                evVal = partyData[i].defEV;
+                SetMonData(&party[i], MON_DATA_DEF_EV, &evVal);
+                evVal = partyData[i].speedEV;
+                SetMonData(&party[i], MON_DATA_SPEED_EV, &evVal);
+                evVal = partyData[i].spAtkEV;
+                SetMonData(&party[i], MON_DATA_SPATK_EV, &evVal);
+                evVal = partyData[i].spDefEV;
+                SetMonData(&party[i], MON_DATA_SPDEF_EV, &evVal);
+
+                CalculateMonStats(&party[i]);
+                break;
+            }
             }
         }
 
