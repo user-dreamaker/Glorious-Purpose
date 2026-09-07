@@ -3582,6 +3582,11 @@ static void Task_UpdateHeldItemSprite(u8 taskId)
     if (IsPartyMenuTextPrinterActive() != TRUE)
     {
         UpdatePartyMonHeldItemSprite(&gPlayerParty[slotId], &sPartyMenuBoxes[slotId]);
+        DisplayPartyPokemonHPCheck(&gPlayerParty[slotId], &sPartyMenuBoxes[slotId], DRAW_MENU_BOX_AND_TEXT);
+        DisplayPartyPokemonMaxHPCheck(&gPlayerParty[slotId], &sPartyMenuBoxes[slotId], DRAW_MENU_BOX_AND_TEXT);
+        DisplayPartyPokemonHPBarCheck(&gPlayerParty[slotId], &sPartyMenuBoxes[slotId]);
+        UpdatePartyMonHPBar(sPartyMenuBoxes[slotId].monSpriteId, &gPlayerParty[slotId]);
+        ScheduleBgCopyTilemapToVram(0);
         Task_ReturnToChooseMonAfterText(taskId);
     }
 }
