@@ -1049,6 +1049,17 @@ void ShowPokemonSummaryScreen(struct Pokemon * party, u8 cursorPos, u8 lastIdx, 
     sMonSummaryScreen->unk3228 = 0;
     sMonSummaryScreen->unk322C = 1;
 
+    if (sMonSummaryScreen->mode != PSS_MODE_BOX && party != NULL && cursorPos <= lastIdx
+     && GetMonData(&party[cursorPos], MON_DATA_SANITY_IS_BAD_EGG) == FALSE
+     && GetMonData(&party[cursorPos], MON_DATA_SANITY_IS_EGG) == FALSE)
+        CalculateMonStats(&party[cursorPos]);
+    BufferSelectedMonData(&sMonSummaryScreen->currentMon);
+    sMonSummaryScreen->isEgg = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_IS_EGG);
+    sMonSummaryScreen->isBadEgg = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SANITY_IS_BAD_EGG);
+
+    if (sMonSummaryScreen->isBadEgg == TRUE)
+        sMonSummaryScreen->isEgg = TRUE;
+
     BufferSelectedMonData(&sMonSummaryScreen->currentMon);
     sMonSummaryScreen->isEgg = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_IS_EGG);
     sMonSummaryScreen->isBadEgg = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SANITY_IS_BAD_EGG);

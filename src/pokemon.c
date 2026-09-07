@@ -2103,15 +2103,16 @@ static u16 CalculateBoxMonChecksum(struct BoxPokemon *boxMon)
     return checksum;
 }
 
-#define CALC_STAT(base, iv, ev, statIndex, field)               \
+#define CALC_STAT(baseStat, iv, ev, statIndex, field)           \
 {                                                               \
-    u8 baseStat = gSpeciesInfo[species].base;                   \
     s32 n = (((2 * baseStat + iv + ev / 4) * level) / 100) + 5; \
     u8 nature = GetNature(mon);                                 \
     n = ModifyStatByNature(nature, n, statIndex);               \
     if (ev == 255) n += 1;                                      \
     SetMonData(mon, field, &n);                                 \
 }
+
+static u16 GetEverstoneStatSpecies(struct Pokemon *mon);
 
 void CalculateMonStats(struct Pokemon *mon)
 {
@@ -2132,6 +2133,26 @@ void CalculateMonStats(struct Pokemon *mon)
     u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
     s32 level = GetLevelFromMonExp(mon);
     s32 newMaxHP;
+    u16 statSpecies = species;
+    u8 customHP = 0, customAttack = 0, customDefense = 0, customSpeed = 0, customSpAttack = 0, customSpDefense = 0;
+    bool8 useCustomStats = GetMonCustomBaseStats(mon, &customHP, &customAttack, &customDefense, &customSpeed, &customSpAttack, &customSpDefense);
+    u8 baseHP, baseAttack, baseDefense, baseSpeed, baseSpAttack, baseSpDefense;
+
+    if (!useCustomStats)
+    {
+        u16 overrideSpecies = GetMonStatOverrideSpecies(mon);
+        if (overrideSpecies == STAT_OVERRIDE_NONE)
+            overrideSpecies = GetEverstoneStatSpecies(mon);
+        if (overrideSpecies != STAT_OVERRIDE_NONE)
+            statSpecies = overrideSpecies;
+    }
+
+    baseHP = useCustomStats ? customHP : gSpeciesInfo[statSpecies].baseHP;
+    baseAttack = useCustomStats ? customAttack : gSpeciesInfo[statSpecies].baseAttack;
+    baseDefense = useCustomStats ? customDefense : gSpeciesInfo[statSpecies].baseDefense;
+    baseSpeed = useCustomStats ? customSpeed : gSpeciesInfo[statSpecies].baseSpeed;
+    baseSpAttack = useCustomStats ? customSpAttack : gSpeciesInfo[statSpecies].baseSpAttack;
+    baseSpDefense = useCustomStats ? customSpDefense : gSpeciesInfo[statSpecies].baseSpDefense;
 
     SetMonData(mon, MON_DATA_LEVEL, &level);
 
@@ -2141,7 +2162,7 @@ void CalculateMonStats(struct Pokemon *mon)
     }
     else
     {
-        s32 n = 2 * gSpeciesInfo[species].baseHP + hpIV;
+        s32 n = 2 * baseHP + hpIV;
         newMaxHP = (((n + hpEV / 4) * level) / 100) + level + 10;
         if (hpEV == 255) newMaxHP += 1;
     }
@@ -2170,7 +2191,6 @@ void CalculateMonStats(struct Pokemon *mon)
         if (currentHP == 0 && oldMaxHP == 0)
             currentHP = newMaxHP;
         else if (currentHP != 0) {
-            // BUG: currentHP is unintentionally able to become <= 0 after the instruction below.
             currentHP += newMaxHP - oldMaxHP;
             #ifdef BUGFIX
             if (currentHP <= 0)
@@ -2222,7 +2242,10 @@ u8 GetLevelFromBoxMonExp(struct BoxPokemon *boxMon)
 
 u16 GiveMoveToMon(struct Pokemon *mon, u16 move)
 {
-    return GiveMoveToBoxMon(&mon->box, move);
+    u16 result = GiveMoveToBoxMon(&mon->box, move);
+    if (result != MON_ALREADY_KNOWS_MOVE && result != MON_HAS_MAX_MOVES)
+        CalculateMonStats(mon);
+    return result;
 }
 
 static u16 GiveMoveToBoxMon(struct BoxPokemon *boxMon, u16 move)
@@ -2554,7 +2577,7 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         spAttack = (150 * spAttack) / 100;
     if (attacker->ability == ABILITY_SOLAR_POWER && WEATHER_HAS_EFFECT && (gBattleWeather & B_WEATHER_SUN))
         spAttack = (150 * spAttack) / 100;
-    if (attacker->ability == ABILITY_GUTS && attacker->status1)
+    if ((attacker->ability == ABILITY_GUTS && attacker->status1) || IsUrsaringDualActiveBattleMon(attacker))
         attack = (150 * attack) / 100;
     if (defender->ability == ABILITY_MARVEL_SCALE && defender->status1)
         defense = (150 * defense) / 100;
@@ -2680,7 +2703,7 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         damage /= 50;
 
         // Burn cuts attack in half
-        if ((attacker->status1 & STATUS1_BURN) && attacker->ability != ABILITY_GUTS && gBattleMoves[move].effect != EFFECT_FACADE)
+        if ((attacker->status1 & STATUS1_BURN) && attacker->ability != ABILITY_GUTS && !IsUrsaringDualActiveBattleMon(attacker) && gBattleMoves[move].effect != EFFECT_FACADE)
             damage /= 2;
 
         // Apply Reflect
@@ -3244,6 +3267,9 @@ u32 GetBoxMonData(struct BoxPokemon *boxMon, s32 field, u8 *data)
     case MON_DATA_SPECIES:
         retVal = boxMon->isBadEgg ? SPECIES_EGG : substruct0->species;
         break;
+    case MON_DATA_STAT_OVERRIDE:
+        retVal = substruct0->filler;
+        break;
     case MON_DATA_HELD_ITEM:
         retVal = substruct0->heldItem;
         break;
@@ -3560,6 +3586,26 @@ void SetMonData(struct Pokemon *mon, s32 field, const void *dataArg)
         SetBoxMonData(&mon->box, field, data);
         break;
     }
+
+    if (field == MON_DATA_HELD_ITEM
+     || (field >= MON_DATA_MOVE1 && field <= MON_DATA_MOVE4)
+     || field == MON_DATA_FRIENDSHIP)
+    {
+        u32 oldHp = GetMonData(mon, MON_DATA_HP, NULL);
+        u32 oldMaxHp = GetMonData(mon, MON_DATA_MAX_HP, NULL);
+        u32 newHp;
+        u32 newMaxHp;
+        CalculateMonStats(mon);
+        newHp = GetMonData(mon, MON_DATA_HP, NULL);
+        newMaxHp = GetMonData(mon, MON_DATA_MAX_HP, NULL);
+        if (oldHp != 0 && oldMaxHp != 0 && (newHp == 0 || newHp > newMaxHp))
+        {
+            newHp = oldHp <= newMaxHp ? oldHp : newMaxHp;
+            if (newHp == 0)
+                newHp = 1;
+            SetMonData(mon, MON_DATA_HP, &newHp);
+        }
+    }
 }
 
 void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
@@ -3642,6 +3688,9 @@ void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
             boxMon->hasSpecies = FALSE;
         break;
     }
+    case MON_DATA_STAT_OVERRIDE:
+        SET16(substruct0->filler);
+        break;
     case MON_DATA_HELD_ITEM:
         SET16(substruct0->heldItem);
         break;
@@ -4588,7 +4637,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
 
                             if (targetSpecies != SPECIES_NONE)
                             {
-                                BeginEvolutionScene(mon, targetSpecies, FALSE, partyIndex);
+                                BeginEvolutionScene(mon, targetSpecies, TRUE, partyIndex);
                                 return FALSE;
                             }
                         }
@@ -5381,6 +5430,345 @@ void ApplyEnvyEvolutionPenalties(struct Pokemon *mon)
     }
     SetMonMoveSlot(mon, MOVE_FRUSTRATION, 0);
     CalculateMonStats(mon);
+}
+
+static u8 GetMonHiddenPowerTypeClean(struct Pokemon *mon);
+
+struct CancelStatOverride
+{
+    u16 species;
+    u8 hpType;
+    u16 heldItem;
+    u16 move;
+    u8 maxHappiness;
+    u8 baseHP;
+    u8 baseAttack;
+    u8 baseDefense;
+    u8 baseSpAttack;
+    u8 baseSpDefense;
+    u8 baseSpeed;
+};
+
+static const struct CancelStatOverride sCancelStatOverrides[] =
+{
+    // Primeape: Hidden Power Ghost + Held Spell Tag
+    {SPECIES_PRIMEAPE, TYPE_GHOST, ITEM_SPELL_TAG, MOVE_HIDDEN_POWER, FALSE, 110, 115, 80, 50, 90, 90},
+    // Magneton: Hidden Power Electric + Held Magnet
+    {SPECIES_MAGNETON, TYPE_ELECTRIC, ITEM_MAGNET, MOVE_NONE, FALSE, 70, 70, 115, 130, 90, 60},
+    // Farfetch'd: Hidden Power Fighting + Held Stick
+    {SPECIES_FARFETCHD, TYPE_FIGHTING, ITEM_STICK, MOVE_HIDDEN_POWER, FALSE, 62, 135, 95, 68, 82, 65},
+    // Lickitung: Move Rollout in moveset
+    {SPECIES_LICKITUNG, TYPE_NONE, ITEM_NONE, MOVE_ROLLOUT, FALSE, 110, 85, 95, 80, 95, 50},
+    // Rhydon: Hidden Power Rock + Held Hard Stone
+    {SPECIES_RHYDON, TYPE_ROCK, ITEM_HARD_STONE, MOVE_NONE, FALSE, 115, 140, 130, 55, 55, 40},
+    // Tangela: Move Ancient Power in moveset
+    {SPECIES_TANGELA, TYPE_NONE, ITEM_NONE, MOVE_ANCIENT_POWER, FALSE, 100, 100, 125, 110, 50, 50},
+    // Mr. Mime: Hidden Power Ice + Held Never-Melt Ice
+    {SPECIES_MR_MIME, TYPE_ICE, ITEM_NEVER_MELT_ICE, MOVE_HIDDEN_POWER, FALSE, 80, 85, 75, 110, 100, 70},
+    // Scyther: Hidden Power Rock + Held Hard Stone
+    {SPECIES_SCYTHER, TYPE_ROCK, ITEM_HARD_STONE, MOVE_HIDDEN_POWER, FALSE, 70, 135, 95, 45, 70, 85},
+    // Electabuzz: Hidden Power Electric + Held Magnet
+    {SPECIES_ELECTABUZZ, TYPE_ELECTRIC, ITEM_MAGNET, MOVE_NONE, FALSE, 75, 123, 67, 95, 85, 95},
+    // Magmar: Hidden Power Fire + Held Charcoal
+    {SPECIES_MAGMAR, TYPE_FIRE, ITEM_CHARCOAL, MOVE_NONE, FALSE, 75, 95, 67, 125, 95, 83},
+    // Eevee: Hidden Power Water + Held Mystic Water
+    {SPECIES_EEVEE, TYPE_WATER, ITEM_MYSTIC_WATER, MOVE_HIDDEN_POWER, FALSE, 130, 65, 60, 110, 95, 65},
+    // Eevee: Hidden Power Electric + Held Magnet
+    {SPECIES_EEVEE, TYPE_ELECTRIC, ITEM_MAGNET, MOVE_HIDDEN_POWER, FALSE, 65, 65, 60, 110, 95, 130},
+    // Eevee: Hidden Power Fire + Held Charcoal
+    {SPECIES_EEVEE, TYPE_FIRE, ITEM_CHARCOAL, MOVE_HIDDEN_POWER, FALSE, 65, 130, 60, 95, 110, 65},
+    // Eevee: Hidden Power Psychic + Held Twisted Spoon
+    {SPECIES_EEVEE, TYPE_PSYCHIC, ITEM_TWISTED_SPOON, MOVE_HIDDEN_POWER, FALSE, 65, 65, 60, 130, 95, 110},
+    // Eevee: Hidden Power Dark + Held Black Glasses
+    {SPECIES_EEVEE, TYPE_DARK, ITEM_BLACK_GLASSES, MOVE_HIDDEN_POWER, FALSE, 95, 65, 110, 60, 130, 65},
+    // Eevee: Hidden Power Grass + Held Miracle Seed
+    {SPECIES_EEVEE, TYPE_GRASS, ITEM_MIRACLE_SEED, MOVE_HIDDEN_POWER, FALSE, 65, 110, 130, 60, 65, 95},
+    // Eevee: Hidden Power Ice + Held Never-Melt Ice
+    {SPECIES_EEVEE, TYPE_ICE, ITEM_NEVER_MELT_ICE, MOVE_HIDDEN_POWER, FALSE, 65, 60, 110, 130, 95, 65},
+    // Porygon2: Held Up-Grade
+    {SPECIES_PORYGON2, TYPE_NONE, ITEM_UP_GRADE, MOVE_NONE, FALSE, 85, 80, 70, 135, 75, 90},
+    // Togetic: Max Happiness
+    {SPECIES_TOGETIC, TYPE_NONE, ITEM_NONE, MOVE_NONE, TRUE, 85, 50, 95, 120, 115, 80},
+    // Aipom: Max Happiness
+    {SPECIES_AIPOM, TYPE_NONE, ITEM_NONE, MOVE_NONE, TRUE, 75, 100, 66, 60, 66, 115},
+    // Yanma: Move Ancient Power in moveset
+    {SPECIES_YANMA, TYPE_NONE, ITEM_NONE, MOVE_ANCIENT_POWER, FALSE, 86, 76, 86, 116, 56, 95},
+    // Murkrow: Hidden Power Dark + Held Black Glasses
+    {SPECIES_MURKROW, TYPE_DARK, ITEM_BLACK_GLASSES, MOVE_NONE, FALSE, 100, 125, 52, 105, 52, 71},
+    // Misdreavus: Hidden Power Ghost + Held Spell Tag
+    {SPECIES_MISDREAVUS, TYPE_GHOST, ITEM_SPELL_TAG, MOVE_NONE, FALSE, 60, 60, 60, 105, 105, 105},
+    // Girafarig: Hidden Power Psychic + Held Twisted Spoon
+    {SPECIES_GIRAFARIG, TYPE_PSYCHIC, ITEM_TWISTED_SPOON, MOVE_NONE, FALSE, 120, 90, 70, 110, 70, 60},
+    // Dunsparce: Max Happiness
+    {SPECIES_DUNSPARCE, TYPE_NONE, ITEM_NONE, MOVE_NONE, TRUE, 125, 100, 80, 85, 75, 55},
+    // Gligar: Held Razor Fang
+    {SPECIES_GLIGAR, TYPE_NONE, ITEM_RAZOR_FANG, MOVE_NONE, FALSE, 75, 95, 125, 45, 75, 95},
+    // Qwilfish: Hidden Power Dark + Held Black Glasses
+    {SPECIES_QWILFISH, TYPE_DARK, ITEM_BLACK_GLASSES, MOVE_HIDDEN_POWER, FALSE, 85, 115, 95, 65, 65, 85},
+    // Sneasel: Held Razor Claw
+    {SPECIES_SNEASEL, TYPE_NONE, ITEM_RAZOR_CLAW, MOVE_NONE, FALSE, 70, 120, 65, 45, 85, 125},
+    // Piloswine: Move Ancient Power in moveset
+    {SPECIES_PILOSWINE, TYPE_NONE, ITEM_NONE, MOVE_ANCIENT_POWER, FALSE, 100, 130, 80, 70, 60, 80},
+    // Stantler: Hidden Power Psychic + Held Twisted Spoon
+    {SPECIES_STANTLER, TYPE_PSYCHIC, ITEM_TWISTED_SPOON, MOVE_NONE, FALSE, 103, 105, 72, 105, 75, 65},
+};
+
+bool8 GetMonCustomBaseStats(struct Pokemon *mon, u8 *baseHP, u8 *baseAttack, u8 *baseDefense, u8 *baseSpeed, u8 *baseSpAttack, u8 *baseSpDefense)
+{
+    u32 i;
+    u16 species;
+    u16 heldItem;
+    u16 friendship;
+
+    if (mon == NULL)
+        return FALSE;
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    if (species == SPECIES_NONE || species == SPECIES_EGG || species >= NUM_SPECIES)
+        return FALSE;
+    heldItem = GetMonData(mon, MON_DATA_HELD_ITEM, NULL);
+    friendship = GetMonData(mon, MON_DATA_FRIENDSHIP, NULL);
+
+    for (i = 0; i < ARRAY_COUNT(sCancelStatOverrides); i++)
+    {
+        const struct CancelStatOverride *entry = &sCancelStatOverrides[i];
+        if (entry->species != species)
+            continue;
+        if (entry->hpType != TYPE_NONE && GetMonHiddenPowerTypeClean(mon) != entry->hpType)
+            continue;
+        if (entry->heldItem != ITEM_NONE && heldItem != entry->heldItem)
+            continue;
+        if (entry->move != MOVE_NONE && !MonKnowsMove(mon, entry->move))
+            continue;
+        if (entry->maxHappiness && friendship < MAX_FRIENDSHIP)
+            continue;
+        *baseHP = entry->baseHP;
+        *baseAttack = entry->baseAttack;
+        *baseDefense = entry->baseDefense;
+        *baseSpeed = entry->baseSpeed;
+        *baseSpAttack = entry->baseSpAttack;
+        *baseSpDefense = entry->baseSpDefense;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+u16 GetMonStatOverrideSpecies(struct Pokemon *mon)
+{
+    u16 overrideSpecies;
+    u16 species;
+    if (mon == NULL)
+        return STAT_OVERRIDE_NONE;
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    overrideSpecies = GetMonData(mon, MON_DATA_STAT_OVERRIDE, NULL);
+    if (overrideSpecies == STAT_OVERRIDE_NONE || overrideSpecies >= NUM_SPECIES)
+        return STAT_OVERRIDE_NONE;
+    if (overrideSpecies == species)
+        return STAT_OVERRIDE_NONE;
+    return overrideSpecies;
+}
+
+void ClearMonStatOverride(struct Pokemon *mon)
+{
+    u16 none = STAT_OVERRIDE_NONE;
+    if (mon == NULL)
+        return;
+    if (GetMonData(mon, MON_DATA_STAT_OVERRIDE, NULL) != STAT_OVERRIDE_NONE)
+        SetMonData(mon, MON_DATA_STAT_OVERRIDE, &none);
+}
+
+static u16 ChaseStatChain(u16 species, u8 level, u16 friendship, u32 personality, u32 atk, u32 def)
+{
+    s32 guard;
+    s32 i;
+    u16 upperPersonality = personality >> 16;
+    for (guard = 0; guard < 8; guard++)
+    {
+        u16 next = SPECIES_NONE;
+        if (species == SPECIES_NONE || species >= NUM_SPECIES)
+            break;
+        for (i = 0; i < EVOS_PER_MON; i++)
+        {
+            u16 method = gEvolutionTable[species][i].method;
+            u16 param = gEvolutionTable[species][i].param;
+            u16 target = gEvolutionTable[species][i].targetSpecies;
+            if (target == SPECIES_NONE || target >= NUM_SPECIES)
+                continue;
+            switch (method)
+            {
+            case EVO_LEVEL:
+            case EVO_LEVEL_NINJASK:
+                if (param < level)
+                    next = target;
+                break;
+            case EVO_LEVEL_ATK_GT_DEF:
+                if (param < level && atk > def)
+                    next = target;
+                break;
+            case EVO_LEVEL_ATK_EQ_DEF:
+                if (param < level && atk == def)
+                    next = target;
+                break;
+            case EVO_LEVEL_ATK_LT_DEF:
+                if (param < level && atk < def)
+                    next = target;
+                break;
+            case EVO_LEVEL_SILCOON:
+                if (param < level && (upperPersonality % 10) <= 4)
+                    next = target;
+                break;
+            case EVO_LEVEL_CASCOON:
+                if (param < level && (upperPersonality % 10) > 4)
+                    next = target;
+                break;
+            case EVO_FRIENDSHIP:
+                if (friendship >= MAX_FRIENDSHIP)
+                    next = target;
+                break;
+            default:
+                break;
+            }
+            if (next != SPECIES_NONE)
+                break;
+        }
+        if (next == SPECIES_NONE)
+            break;
+        species = next;
+    }
+    return species;
+}
+
+static u16 ChaseStatChainForMon(struct Pokemon *mon, u16 startSpecies)
+{
+    u8 level = GetMonData(mon, MON_DATA_LEVEL, NULL);
+    u16 friendship = GetMonData(mon, MON_DATA_FRIENDSHIP, NULL);
+    u32 personality = GetMonData(mon, MON_DATA_PERSONALITY, NULL);
+    u32 atk = GetMonData(mon, MON_DATA_ATK, NULL);
+    u32 def = GetMonData(mon, MON_DATA_DEF, NULL);
+    return ChaseStatChain(startSpecies, level, friendship, personality, atk, def);
+}
+
+void ApplyCancelledEvolutionStats(struct Pokemon *mon, u16 cancelledTargetSpecies)
+{
+    u16 species;
+    u16 finalSpecies;
+    if (mon == NULL)
+        return;
+    if (cancelledTargetSpecies == SPECIES_NONE || cancelledTargetSpecies >= NUM_SPECIES)
+        return;
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    if (species == SPECIES_NONE || species == SPECIES_EGG)
+        return;
+    if (cancelledTargetSpecies == species)
+        return;
+    finalSpecies = ChaseStatChainForMon(mon, cancelledTargetSpecies);
+    if (finalSpecies == SPECIES_NONE || finalSpecies >= NUM_SPECIES || finalSpecies == species)
+        finalSpecies = STAT_OVERRIDE_NONE;
+    SetMonData(mon, MON_DATA_STAT_OVERRIDE, &finalSpecies);
+    CalculateMonStats(mon);
+}
+
+static u16 GetEverstoneStatSpecies(struct Pokemon *mon)
+{
+    u16 species;
+    u16 heldItem;
+    u8 holdEffect;
+    u16 finalSpecies;
+
+    if (mon == NULL)
+        return STAT_OVERRIDE_NONE;
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    if (species == SPECIES_NONE || species == SPECIES_EGG || species >= NUM_SPECIES)
+        return STAT_OVERRIDE_NONE;
+    heldItem = GetMonData(mon, MON_DATA_HELD_ITEM, NULL);
+    if (heldItem == ITEM_ENIGMA_BERRY)
+        holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+    else
+        holdEffect = ItemId_GetHoldEffect(heldItem);
+    if (holdEffect != HOLD_EFFECT_PREVENT_EVOLVE)
+        return STAT_OVERRIDE_NONE;
+    finalSpecies = ChaseStatChainForMon(mon, species);
+    if (finalSpecies == species)
+        return STAT_OVERRIDE_NONE;
+    return finalSpecies;
+}
+
+struct UrsaringInduceCond
+{
+    u16 move;
+    u16 heldItem;
+    u8 excludedHpType;
+    u8 status;
+};
+
+static const struct UrsaringInduceCond sUrsaringInduceConds[] =
+{
+    {MOVE_FIRE_PUNCH, ITEM_CHARCOAL, TYPE_FIRE, STATUS1_BURN},
+    {MOVE_ICE_PUNCH, ITEM_NEVER_MELT_ICE, TYPE_ICE, STATUS1_FREEZE},
+    {MOVE_THUNDER_PUNCH, ITEM_MAGNET, TYPE_ELECTRIC, STATUS1_PARALYSIS},
+};
+
+static u8 GetBattleMonHiddenPowerTypeClean(struct BattlePokemon *battleMon);
+
+u32 GetUrsaringMoveInduceStatus(struct BattlePokemon *battleMon, u16 move)
+{
+    u32 i;
+    u8 hpType;
+    if (battleMon == NULL)
+        return STATUS1_NONE;
+    if (battleMon->species != SPECIES_URSARING)
+        return STATUS1_NONE;
+    if (battleMon->status1 != STATUS1_NONE)
+        return STATUS1_NONE;
+    if (battleMon->hp == 0)
+        return STATUS1_NONE;
+    hpType = GetBattleMonHiddenPowerTypeClean(battleMon);
+    for (i = 0; i < ARRAY_COUNT(sUrsaringInduceConds); i++)
+    {
+        if (sUrsaringInduceConds[i].move != move)
+            continue;
+        if (sUrsaringInduceConds[i].heldItem != battleMon->item)
+            continue;
+        if (sUrsaringInduceConds[i].excludedHpType == hpType)
+            continue;
+        return sUrsaringInduceConds[i].status;
+    }
+    return STATUS1_NONE;
+}
+
+static bool8 BattleMonMeetsUrsaringCond(struct BattlePokemon *battleMon)
+{
+    u32 i;
+    s32 j;
+    u8 hpType;
+    if (battleMon == NULL)
+        return FALSE;
+    if (battleMon->species != SPECIES_URSARING)
+        return FALSE;
+    hpType = GetBattleMonHiddenPowerTypeClean(battleMon);
+    for (i = 0; i < ARRAY_COUNT(sUrsaringInduceConds); i++)
+    {
+        if (sUrsaringInduceConds[i].heldItem != battleMon->item)
+            continue;
+        if (sUrsaringInduceConds[i].excludedHpType == hpType)
+            continue;
+        for (j = 0; j < MAX_MON_MOVES; j++)
+        {
+            if (battleMon->moves[j] == sUrsaringInduceConds[i].move)
+                return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+bool8 IsUrsaringDualActiveBattleMon(struct BattlePokemon *battleMon)
+{
+    if (battleMon == NULL)
+        return FALSE;
+    if (battleMon->species != SPECIES_URSARING)
+        return FALSE;
+    if (battleMon->status1 == STATUS1_NONE)
+        return FALSE;
+    return BattleMonMeetsUrsaringCond(battleMon);
 }
 
 u16 GetEvolutionTargetSpecies(struct Pokemon *mon, u8 type, u16 evolutionItem)
