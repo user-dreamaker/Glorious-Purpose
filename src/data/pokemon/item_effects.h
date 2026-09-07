@@ -292,6 +292,86 @@ static const u8 sItemEffect_LeafStone[6] = {
     [4] = ITEM4_EVO_STONE,
 };
 
+static const u8 sItemEffect_KingsRock[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_SilverPowder[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_MetalCoat[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_DragonScale[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_SoftSand[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_HardStone[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_MiracleSeed[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_BlackGlasses[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_BlackBelt[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_Magnet[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_MysticWater[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_SharpBeak[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_PoisonBarb[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_NeverMeltIce[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_SpellTag[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_TwistedSpoon[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_Charcoal[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_DragonFang[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_SilkScarf[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
+static const u8 sItemEffect_UpGrade[6] = {
+    [4] = ITEM4_EVO_STONE,
+};
+
 static const u8 sItemEffect_CheriBerry[6] = {
     [3] = ITEM3_PARALYSIS,
 };
@@ -433,6 +513,26 @@ const u8 *const gItemEffectTable[] =
     [ITEM_THUNDER_STONE - ITEM_POTION] = sItemEffect_ThunderStone,
     [ITEM_WATER_STONE - ITEM_POTION]   = sItemEffect_WaterStone,
     [ITEM_LEAF_STONE - ITEM_POTION]    = sItemEffect_LeafStone,
+    [ITEM_KINGS_ROCK - ITEM_POTION]    = sItemEffect_KingsRock,
+    [ITEM_SILVER_POWDER - ITEM_POTION] = sItemEffect_SilverPowder,
+    [ITEM_METAL_COAT - ITEM_POTION]    = sItemEffect_MetalCoat,
+    [ITEM_DRAGON_SCALE - ITEM_POTION]  = sItemEffect_DragonScale,
+    [ITEM_SOFT_SAND - ITEM_POTION]     = sItemEffect_SoftSand,
+    [ITEM_HARD_STONE - ITEM_POTION]    = sItemEffect_HardStone,
+    [ITEM_MIRACLE_SEED - ITEM_POTION]  = sItemEffect_MiracleSeed,
+    [ITEM_BLACK_GLASSES - ITEM_POTION] = sItemEffect_BlackGlasses,
+    [ITEM_BLACK_BELT - ITEM_POTION]    = sItemEffect_BlackBelt,
+    [ITEM_MAGNET - ITEM_POTION]        = sItemEffect_Magnet,
+    [ITEM_MYSTIC_WATER - ITEM_POTION]  = sItemEffect_MysticWater,
+    [ITEM_SHARP_BEAK - ITEM_POTION]    = sItemEffect_SharpBeak,
+    [ITEM_POISON_BARB - ITEM_POTION]   = sItemEffect_PoisonBarb,
+    [ITEM_NEVER_MELT_ICE - ITEM_POTION] = sItemEffect_NeverMeltIce,
+    [ITEM_SPELL_TAG - ITEM_POTION]     = sItemEffect_SpellTag,
+    [ITEM_TWISTED_SPOON - ITEM_POTION] = sItemEffect_TwistedSpoon,
+    [ITEM_CHARCOAL - ITEM_POTION]      = sItemEffect_Charcoal,
+    [ITEM_DRAGON_FANG - ITEM_POTION]   = sItemEffect_DragonFang,
+    [ITEM_SILK_SCARF - ITEM_POTION]    = sItemEffect_SilkScarf,
+    [ITEM_UP_GRADE - ITEM_POTION]      = sItemEffect_UpGrade,
     [ITEM_CHERI_BERRY - ITEM_POTION]   = sItemEffect_CheriBerry,
     [ITEM_CHESTO_BERRY - ITEM_POTION]  = sItemEffect_ChestoBerry,
     [ITEM_PECHA_BERRY - ITEM_POTION]   = sItemEffect_PechaBerry,
