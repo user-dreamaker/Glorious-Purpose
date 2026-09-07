@@ -557,6 +557,11 @@ static u16 GetSumOfPlayerPartyLevel(u8 numMons)
     return sum;
 }
 
+static inline u8 GetDynamicLevel(u8 lvl)
+{
+    return lvl == 0 ? GetPlayerPartyHighestLevel() : lvl;
+}
+
 static u8 GetSumOfEnemyPartyLevel(u16 opponentId, u8 numMons)
 {
     u8 i;
@@ -574,7 +579,7 @@ static u8 GetSumOfEnemyPartyLevel(u16 opponentId, u8 numMons)
 
             party = gTrainers[opponentId].party.NoItemDefaultMoves;
             for (i = 0; i < count; ++i)
-                sum += party[i].lvl;
+                sum += GetDynamicLevel(party[i].lvl);
         }
         break;
     case F_TRAINER_PARTY_CUSTOM_MOVESET:
@@ -583,7 +588,7 @@ static u8 GetSumOfEnemyPartyLevel(u16 opponentId, u8 numMons)
 
             party = gTrainers[opponentId].party.NoItemCustomMoves;
             for (i = 0; i < count; ++i)
-                sum += party[i].lvl;
+                sum += GetDynamicLevel(party[i].lvl);
         }
         break;
     case F_TRAINER_PARTY_HELD_ITEM:
@@ -592,7 +597,7 @@ static u8 GetSumOfEnemyPartyLevel(u16 opponentId, u8 numMons)
 
             party = gTrainers[opponentId].party.ItemDefaultMoves;
             for (i = 0; i < count; ++i)
-                sum += party[i].lvl;
+                sum += GetDynamicLevel(party[i].lvl);
         }
         break;
     case F_TRAINER_PARTY_CUSTOM_MOVESET | F_TRAINER_PARTY_HELD_ITEM:
@@ -601,7 +606,7 @@ static u8 GetSumOfEnemyPartyLevel(u16 opponentId, u8 numMons)
 
             party = gTrainers[opponentId].party.ItemCustomMoves;
             for (i = 0; i < count; ++i)
-                sum += party[i].lvl;
+                sum += GetDynamicLevel(party[i].lvl);
         }
         break;
     }
