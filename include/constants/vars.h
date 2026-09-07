@@ -220,7 +220,7 @@
 #define VAR_0x40A6                 0x40A6
 #define VAR_0x40A7                 0x40A7
 #define VAR_0x40A8                 0x40A8
-#define VAR_0x40A9                 0x40A9
+#define VAR_0x40A9                 0x40A9 // Black out / White out / Game Over
 
 #define VAR_QLBAK_TRAINER_REMATCHES 0x40AA // array of 4
 #define VAR_QLBAK_MAP_LAYOUT        0x40AE
