@@ -1782,8 +1782,21 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
 // Multiplies the damage by a random factor between 85% to 100% inclusive
 static inline void ApplyRandomDmgMultiplier(void)
 {
-    u16 rand = Random();
-    u16 randPercent = 100 - (rand % 16);
+    u16 randPercent;
+
+    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
+    {
+        u16 rand = Random();
+        randPercent = 100 - (rand % 16);
+    }
+    else if (GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER)
+    {
+        randPercent = 85;
+    }
+    else
+    {
+        randPercent = 100;
+    }
 
     if (gBattleMoveDamage != 0)
     {
