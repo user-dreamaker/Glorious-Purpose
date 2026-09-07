@@ -37,6 +37,7 @@
 #include "constants/weather.h"
 #include "field_weather.h"
 #include "battle_setup.h"
+#include "constants/hold_effects.h"
 
 // needs conflicting header to match (curIndex is s8 in the function, but has to be defined as u8 here)
 extern s16 SeekToNextMonInBox(struct BoxPokemon * boxMons, u8 curIndex, u8 maxIndex, u8 flags);
@@ -334,6 +335,7 @@ static EWRAM_DATA u8 sAbilityDisplayState = 0;
 static EWRAM_DATA u8 sMoveSwapCursorPos = 0;
 static EWRAM_DATA struct MonPicBounceState * sMonPicBounceState = NULL;
 static EWRAM_DATA bool8 sShowEVsOnSkillsPage = FALSE;
+static EWRAM_DATA bool8 sStatItemBoosted[5];
 
 extern const u32 gSummaryScreen_PageSkills_Tilemap[];
 extern const u32 gSummaryScreen_PageMoves_Tilemap[];
@@ -923,6 +925,8 @@ static const u8 sLevelNickTextColors[][3] =
     {0, 2, 3},
     {0, 11, 10},
 };
+
+static const u8 sBoostedStatTextColor[3] = {0, 1, 10};
 
 static const u8 ALIGNED(4) sMultiBattlePartyOrder[] =
 {
@@ -2261,6 +2265,34 @@ static void BufferMonSkills(void)
             break;
     }
 
+    {
+        u16 summarySpecies = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPECIES, NULL);
+        u16 summaryHeldItem = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HELD_ITEM, NULL);
+        u8 summaryHoldEffect = ItemId_GetHoldEffect(summaryHeldItem);
+        bool8 boostAtk = FALSE, boostDef = FALSE, boostSpa = FALSE, boostSpd = FALSE, boostSpe = FALSE;
+        if (summarySpecies != SPECIES_NONE && summarySpecies != SPECIES_EGG && summaryHeldItem != ITEM_NONE)
+        {
+            u8 type1 = gSpeciesInfo[summarySpecies].types[0];
+            u8 type2 = gSpeciesInfo[summarySpecies].types[1];
+            bool8 isWater = (type1 == TYPE_WATER || type2 == TYPE_WATER);
+            if (summaryHoldEffect == HOLD_EFFECT_DEEP_SEA_TOOTH && isWater)
+                boostSpa = TRUE;
+            else if (summaryHoldEffect == HOLD_EFFECT_DEEP_SEA_SCALE && isWater)
+                boostSpd = TRUE;
+            else if (summaryHoldEffect == HOLD_EFFECT_LIGHT_BALL && summarySpecies == SPECIES_PIKACHU)
+                boostAtk = TRUE, boostSpa = TRUE;
+            else if (summaryHoldEffect == HOLD_EFFECT_THICK_CLUB && (summarySpecies == SPECIES_CUBONE || summarySpecies == SPECIES_MAROWAK))
+                boostAtk = TRUE;
+            else if (summaryHoldEffect == HOLD_EFFECT_METAL_POWDER && summarySpecies == SPECIES_DITTO)
+                boostDef = TRUE, boostSpd = TRUE, boostSpe = TRUE;
+        }
+        sStatItemBoosted[PSS_STAT_ATK] = boostAtk;
+        sStatItemBoosted[PSS_STAT_DEF] = boostDef;
+        sStatItemBoosted[PSS_STAT_SPA] = boostSpa;
+        sStatItemBoosted[PSS_STAT_SPD] = boostSpd;
+        sStatItemBoosted[PSS_STAT_SPE] = boostSpe;
+    }
+
     hp = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP);
     ConvertIntToDecimalStringN(sMonSummaryScreen->summary.curHpStrBuf, hp, STR_CONV_MODE_LEFT_ALIGN, 3);
     StringAppend(sMonSummaryScreen->summary.curHpStrBuf, gText_Slash);
@@ -2274,6 +2306,13 @@ static void BufferMonSkills(void)
     if (sMonSummaryScreen->savedCallback == CB2_ReturnToTradeMenuFromSummary && sMonSummaryScreen->isEnemyParty == TRUE)
     {
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK2);
+        if (sStatItemBoosted[PSS_STAT_ATK])
+        {
+            if (ItemId_GetHoldEffect(GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HELD_ITEM, NULL)) == HOLD_EFFECT_METAL_POWDER)
+                statValue = (150 * statValue) / 100;
+            else
+                statValue *= 2;
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 1)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK][0] = 0x79;
@@ -2284,6 +2323,8 @@ static void BufferMonSkills(void)
         sMonSkillsPrinterXpos->atkStr = GetNumberRightAlign27(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK]);
 
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF2);
+        if (sStatItemBoosted[PSS_STAT_DEF])
+            statValue = (150 * statValue) / 100;
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 2)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF][0] = 0x79;
@@ -2294,6 +2335,8 @@ static void BufferMonSkills(void)
         sMonSkillsPrinterXpos->defStr = GetNumberRightAlign27(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF]);
 
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK2);
+        if (sStatItemBoosted[PSS_STAT_SPA])
+            statValue *= 2;
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 4)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA][0] = 0x79;
@@ -2304,6 +2347,13 @@ static void BufferMonSkills(void)
         sMonSkillsPrinterXpos->spAStr = GetNumberRightAlign27(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA]);
 
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF2);
+        if (sStatItemBoosted[PSS_STAT_SPD])
+        {
+            if (ItemId_GetHoldEffect(GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HELD_ITEM, NULL)) == HOLD_EFFECT_METAL_POWDER)
+                statValue = (150 * statValue) / 100;
+            else
+                statValue *= 2;
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 5)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD][0] = 0x79;
@@ -2314,6 +2364,8 @@ static void BufferMonSkills(void)
         sMonSkillsPrinterXpos->spDStr = GetNumberRightAlign27(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD]);
 
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED2);
+        if (sStatItemBoosted[PSS_STAT_SPE])
+            statValue = (150 * statValue) / 100;
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 3)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE][0] = 0x79;
@@ -2326,6 +2378,13 @@ static void BufferMonSkills(void)
     else
     {
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK);
+        if (sStatItemBoosted[PSS_STAT_ATK])
+        {
+            if (ItemId_GetHoldEffect(GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HELD_ITEM, NULL)) == HOLD_EFFECT_METAL_POWDER)
+                statValue = (150 * statValue) / 100;
+            else
+                statValue *= 2;
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 1)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK][0] = 0x79;
@@ -2336,6 +2395,8 @@ static void BufferMonSkills(void)
         sMonSkillsPrinterXpos->atkStr = GetNumberRightAlign27(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK]);
 
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF);
+        if (sStatItemBoosted[PSS_STAT_DEF])
+            statValue = (150 * statValue) / 100;
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 2)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF][0] = 0x79;
@@ -2346,6 +2407,8 @@ static void BufferMonSkills(void)
         sMonSkillsPrinterXpos->defStr = GetNumberRightAlign27(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF]);
 
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK);
+        if (sStatItemBoosted[PSS_STAT_SPA])
+            statValue *= 2;
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 4)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA][0] = 0x79;
@@ -2356,6 +2419,13 @@ static void BufferMonSkills(void)
         sMonSkillsPrinterXpos->spAStr = GetNumberRightAlign27(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA]);
 
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF);
+        if (sStatItemBoosted[PSS_STAT_SPD])
+        {
+            if (ItemId_GetHoldEffect(GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HELD_ITEM, NULL)) == HOLD_EFFECT_METAL_POWDER)
+                statValue = (150 * statValue) / 100;
+            else
+                statValue *= 2;
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 5)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD][0] = 0x79;
@@ -2366,6 +2436,8 @@ static void BufferMonSkills(void)
         sMonSkillsPrinterXpos->spDStr = GetNumberRightAlign27(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD]);
 
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED);
+        if (sStatItemBoosted[PSS_STAT_SPE])
+            statValue = (150 * statValue) / 100;
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 3)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE][0] = 0x79;
@@ -2750,11 +2822,11 @@ static void PrintSkillsPage(void)
     spDefIv = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF_IV);
     spdIv = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED_IV);
     AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 14 + sMonSkillsPrinterXpos->curHpStr, 4, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.curHpStrBuf);
-    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->atkStr, 22, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK]);
-    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->defStr, 35, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF]);
-    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->spAStr, 48, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA]);
-    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->spDStr, 61, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD]);
-    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->speStr, 74, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE]);
+    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->atkStr, 22, sStatItemBoosted[PSS_STAT_ATK] ? sBoostedStatTextColor : sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK]);
+    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->defStr, 35, sStatItemBoosted[PSS_STAT_DEF] ? sBoostedStatTextColor : sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF]);
+    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->spAStr, 48, sStatItemBoosted[PSS_STAT_SPA] ? sBoostedStatTextColor : sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA]);
+    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->spDStr, 61, sStatItemBoosted[PSS_STAT_SPD] ? sBoostedStatTextColor : sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD]);
+    AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 44 + sMonSkillsPrinterXpos->speStr, 74, sStatItemBoosted[PSS_STAT_SPE] ? sBoostedStatTextColor : sLevelNickTextColors[0], TEXT_SKIP_DRAW, sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE]);
     if (sShowEVsOnSkillsPage)
     {
         u8 evX;
