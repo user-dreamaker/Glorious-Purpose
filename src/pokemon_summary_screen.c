@@ -17,6 +17,7 @@
 #include "constants/party_menu.h"
 #include "trade.h"
 #include "battle_main.h"
+#include "battle_util.h"
 #include "scanline_effect.h"
 #include "constants/moves.h"
 #include "dynamic_placeholder_text_util.h"
@@ -2190,6 +2191,48 @@ static void BufferMonInfo(void)
 #define GetNumberRightAlign63(x) (63 - StringLength((x)) * 6)
 #define GetNumberRightAlign27(x) (27 - StringLength((x)) * 6)
 
+static u16 ApplyBattleAbilityStatModifiers(u16 statValue, u8 statId, u8 battlerId)
+{
+    if (gMain.inBattle)
+    {
+        u8 ability = GetMonAbility(&sMonSummaryScreen->currentMon);
+        u32 status = (battlerId != MAX_BATTLERS_COUNT) ? gBattleMons[battlerId].status1 : GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_STATUS);
+        switch (statId)
+        {
+        case PSS_STAT_ATK:
+            if (ability == ABILITY_HUGE_POWER || ability == ABILITY_PURE_POWER)
+                statValue *= 2;
+            else if (ability == ABILITY_HUSTLE)
+                statValue = (150 * statValue) / 100;
+            else if ((ability == ABILITY_GUTS && status) || (battlerId != MAX_BATTLERS_COUNT && IsUrsaringDualActiveBattleMon(&gBattleMons[battlerId])))
+                statValue = (150 * statValue) / 100;
+            break;
+        case PSS_STAT_DEF:
+            if (ability == ABILITY_MARVEL_SCALE && status)
+                statValue = (150 * statValue) / 100;
+            break;
+        case PSS_STAT_SPA:
+            if (ability == ABILITY_SOLAR_POWER && WEATHER_HAS_EFFECT && (gBattleWeather & B_WEATHER_SUN))
+                statValue = (150 * statValue) / 100;
+            else if (ability == ABILITY_PLUS && ABILITY_ON_FIELD(ABILITY_MINUS))
+                statValue = (150 * statValue) / 100;
+            else if (ability == ABILITY_MINUS && ABILITY_ON_FIELD(ABILITY_PLUS))
+                statValue = (150 * statValue) / 100;
+            break;
+        case PSS_STAT_SPE:
+            if ((ability == ABILITY_SWIFT_SWIM && WEATHER_HAS_EFFECT && (gBattleWeather & B_WEATHER_RAIN))
+             || (ability == ABILITY_CHLOROPHYLL && WEATHER_HAS_EFFECT && (gBattleWeather & B_WEATHER_SUN)))
+                statValue *= 2;
+            else if ((ability == ABILITY_QUICK_FEET && status) || (battlerId != MAX_BATTLERS_COUNT && IsUrsaringDualActiveBattleMon(&gBattleMons[battlerId])))
+                statValue = (150 * statValue) / 100;
+            break;
+        default:
+            break;
+        }
+    }
+    return statValue;
+}
+
 static void BufferMonSkills(void)
 {
     u8 tempStr[20];
@@ -2203,6 +2246,9 @@ static void BufferMonSkills(void)
     u8 plusStat = 0;
     u8 minusStat = 0;
     u8 nature = GetNature(&sMonSummaryScreen->currentMon);
+    u8 inBattle = gMain.inBattle;
+    u8 battlerId = MAX_BATTLERS_COUNT;
+    u8 i;
 
     switch(nature)
     {
@@ -2304,6 +2350,19 @@ static void BufferMonSkills(void)
         sStatItemBoosted[PSS_STAT_SPE] = boostSpe;
     }
 
+    if (inBattle)
+    {
+        u16 partyIndex = sLastViewedMonIndex;
+        for (i = 0; i < gBattlersCount; i++)
+        {
+            if (gBattlerPartyIndexes[i] == partyIndex)
+            {
+                battlerId = i;
+                break;
+            }
+        }
+    }
+
     hp = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP);
     ConvertIntToDecimalStringN(sMonSummaryScreen->summary.curHpStrBuf, hp, STR_CONV_MODE_LEFT_ALIGN, 3);
     StringAppend(sMonSummaryScreen->summary.curHpStrBuf, gText_Slash);
@@ -2324,6 +2383,11 @@ static void BufferMonSkills(void)
             else
                 statValue *= 2;
         }
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_ATK, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_ATK]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_ATK]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 1)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK][0] = 0x79;
@@ -2336,6 +2400,11 @@ static void BufferMonSkills(void)
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF2);
         if (sStatItemBoosted[PSS_STAT_DEF])
             statValue = (150 * statValue) / 100;
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_DEF, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_DEF]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_DEF]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 2)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF][0] = 0x79;
@@ -2348,6 +2417,11 @@ static void BufferMonSkills(void)
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK2);
         if (sStatItemBoosted[PSS_STAT_SPA])
             statValue *= 2;
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_SPA, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPATK]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPATK]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 4)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA][0] = 0x79;
@@ -2365,6 +2439,11 @@ static void BufferMonSkills(void)
             else
                 statValue *= 2;
         }
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_SPD, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPDEF]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPDEF]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 5)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD][0] = 0x79;
@@ -2377,6 +2456,11 @@ static void BufferMonSkills(void)
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED2);
         if (sStatItemBoosted[PSS_STAT_SPE])
             statValue = (150 * statValue) / 100;
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_SPE, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPEED]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPEED]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 3)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE][0] = 0x79;
@@ -2396,6 +2480,11 @@ static void BufferMonSkills(void)
             else
                 statValue *= 2;
         }
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_ATK, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_ATK]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_ATK]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 1)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_ATK][0] = 0x79;
@@ -2408,6 +2497,11 @@ static void BufferMonSkills(void)
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF);
         if (sStatItemBoosted[PSS_STAT_DEF])
             statValue = (150 * statValue) / 100;
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_DEF, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_DEF]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_DEF]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 2)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_DEF][0] = 0x79;
@@ -2420,6 +2514,11 @@ static void BufferMonSkills(void)
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK);
         if (sStatItemBoosted[PSS_STAT_SPA])
             statValue *= 2;
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_SPA, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPATK]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPATK]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 4)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPA][0] = 0x79;
@@ -2437,6 +2536,11 @@ static void BufferMonSkills(void)
             else
                 statValue *= 2;
         }
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_SPD, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPDEF]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPDEF]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 5)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPD][0] = 0x79;
@@ -2449,6 +2553,11 @@ static void BufferMonSkills(void)
         statValue = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED);
         if (sStatItemBoosted[PSS_STAT_SPE])
             statValue = (150 * statValue) / 100;
+        statValue = ApplyBattleAbilityStatModifiers(statValue, PSS_STAT_SPE, battlerId);
+        if (battlerId != MAX_BATTLERS_COUNT)
+        {
+            statValue = statValue * gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPEED]][0] / gStatStageRatios[gBattleMons[battlerId].statStages[STAT_SPEED]][1];
+        }
         ConvertIntToDecimalStringN(sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE], statValue, STR_CONV_MODE_RIGHT_ALIGN, 4);
         if(plusStat == 3)
             sMonSummaryScreen->summary.statValueStrBufs[PSS_STAT_SPE][0] = 0x79;
