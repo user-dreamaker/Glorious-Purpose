@@ -44,6 +44,7 @@
 #include "pokemon_special_anim.h"
 #include "pokemon_summary_screen.h"
 #include "quest_log.h"
+#include "level_cap.h"
 #include "region_map.h"
 #include "reshow_battle_screen.h"
 #include "scanline_effect.h"
@@ -5027,6 +5028,18 @@ void ItemUseCB_RareCandy(u8 taskId, TaskFunc func)
     struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
     u16 item = gSpecialVar_ItemId;
     bool8 noEffect;
+
+    if (!CanUseRareCandy(mon))
+    {
+        PlaySE(SE_SELECT);
+        gPartyMenuUseExitCallback = FALSE;
+        ConvertIntToDecimalStringN(gStringVar2, GetCurrentLevelCap(), STR_CONV_MODE_LEFT_ALIGN, 3);
+        StringExpandPlaceholders(gStringVar4, gText_RareCandyLevelCapBlocked);
+        DisplayPartyMenuMessage(gStringVar4, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = func;
+        return;
+    }
 
     if (GetMonData(mon, MON_DATA_LEVEL) != MAX_LEVEL)
         noEffect = PokemonItemUseNoEffect(mon, item, gPartyMenu.slotId, 0);
