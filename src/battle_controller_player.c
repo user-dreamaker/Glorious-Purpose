@@ -20,6 +20,8 @@
 #include "battle_script_commands.h"
 #include "reshow_battle_screen.h"
 #include "constants/battle_anim.h"
+#include "constants/battle_move_effects.h"
+#include "constants/abilities.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/songs.h"
@@ -1465,29 +1467,71 @@ static void MoveSelectionDisplayMoveType(void)
     MoveSelectionDisplaySplitIcon();
 }
 
+static u16 GetMoveSelectionDisplayPower(u16 move, u8 battlerAtk, u8 battlerDef)
+{
+    u16 power = gBattleMoves[move].power;
+
+    switch (gBattleMoves[move].effect)
+    {
+    case EFFECT_FACADE:
+        // Facade's power doubles if the user is poisoned, paralyzed, or burned.
+        if (gBattleMons[battlerAtk].status1 & (STATUS1_POISON | STATUS1_TOXIC_POISON | STATUS1_BURN | STATUS1_PARALYSIS))
+            power *= 2;
+        break;
+    case EFFECT_FURY_CUTTER:
+        // Fury Cutter's power doubles with each consecutive hit, up to a maximum of 160.
+        if (gDisableStructs[battlerAtk].furyCutterCounter != 0)
+        {
+            u8 counter = gDisableStructs[battlerAtk].furyCutterCounter;
+            if (counter != 5)
+                counter++;
+            power <<= (counter - 1);
+        }
+        break;
+    case EFFECT_KNOCK_OFF:
+        // Knock Off's power is boosted by 50% if the target holds an item that can be knocked off.
+        if (gBattleMons[battlerDef].item != ITEM_NONE && gBattleMons[battlerDef].ability != ABILITY_STICKY_HOLD)
+            power = (power * 150) / 100;
+        break;
+    case EFFECT_ROLLOUT:
+        // Rollout/Ice Ball's power doubles with each consecutive hit over five turns, and is doubled again if Defense Curl was used beforehand.
+        if ((gBattleMons[battlerAtk].status2 & STATUS2_MULTIPLETURNS) && gLockedMoves[battlerAtk] == move)
+        {
+            u8 timer = gDisableStructs[battlerAtk].rolloutTimer;
+            if (timer != 0)
+                power <<= (5 - timer);
+        }
+        if (gBattleMons[battlerAtk].status2 & STATUS2_DEFENSE_CURL)
+            power *= 2;
+        break;
+    case EFFECT_SMELLINGSALT:
+        // Smelling Salt's power doubles against a paralyzed target.
+        if (gBattleMons[battlerDef].status1 & STATUS1_PARALYSIS)
+            power *= 2;
+        break;
+    case EFFECT_FLINCH_MINIMIZE_HIT:
+        // Stomp (and similar moves) deal double damage to a target that used Minimize.
+        if (gStatuses3[battlerDef] & STATUS3_MINIMIZED)
+            power *= 2;
+        break;
+    case EFFECT_WEATHER_BALL:
+        // Weather Ball's power doubles during any kind of weather.
+        if (WEATHER_HAS_EFFECT && (gBattleWeather & B_WEATHER_ANY))
+            power *= 2;
+        break;
+    }
+
+    return power;
+}
+
 static void MoveSelectionDisplayMovePower(void)
 {
 	u8 flags, effect, target;
 	struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct *)(&gBattleBufferA[gActiveBattler][4]);
 	u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
 	
-	// Print power
-	if (gBattleMoves[move].power <= 1)
-		StringCopy(gDisplayedStringBattle, gText_ThreeHyphens);
-	else if (move == MOVE_HIDDEN_POWER)
-		ConvertIntToDecimalStringN(gDisplayedStringBattle, GetHiddenPowerPower(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]]), STR_CONV_MODE_RIGHT_ALIGN, 3);
-	else
-		ConvertIntToDecimalStringN(gDisplayedStringBattle, gBattleMoves[move].power, STR_CONV_MODE_RIGHT_ALIGN, 3);
+	target = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
 	
-	// Calc effectiveness
-	target = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT); // default target
-	effect = 0;
-	
-	// check if move is stab
-    if (!IS_TYPE_STATUS(gBattleMoves[move]) && IS_BATTLER_OF_TYPE(gActiveBattler, GetInterfaceMoveType(move)))
-        effect = 2;
-	
-	// try change move target in double
     if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
     {
         if (gBattlerControllerFuncs[gActiveBattler] == HandleInputChooseTarget)
@@ -1495,6 +1539,21 @@ static void MoveSelectionDisplayMovePower(void)
         else if (gBattleMons[target].hp == 0)
             target = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
     }
+	
+	// Print power
+	if (gBattleMoves[move].power <= 1)
+		StringCopy(gDisplayedStringBattle, gText_ThreeHyphens);
+	else if (move == MOVE_HIDDEN_POWER)
+		ConvertIntToDecimalStringN(gDisplayedStringBattle, GetHiddenPowerPower(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]]), STR_CONV_MODE_RIGHT_ALIGN, 3);
+	else
+		ConvertIntToDecimalStringN(gDisplayedStringBattle, GetMoveSelectionDisplayPower(move, gActiveBattler, target), STR_CONV_MODE_RIGHT_ALIGN, 3);
+	
+	// Calc effectiveness
+	effect = 0;
+	
+	// check if move is stab
+    if (!IS_TYPE_STATUS(gBattleMoves[move]) && IS_BATTLER_OF_TYPE(gActiveBattler, GetInterfaceMoveType(move)))
+        effect = 2;
 	
 	flags = TypeCalc(move, gActiveBattler, target);
 	
