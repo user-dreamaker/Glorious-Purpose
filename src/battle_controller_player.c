@@ -19,6 +19,7 @@
 #include "battle_message.h"
 #include "battle_script_commands.h"
 #include "reshow_battle_screen.h"
+#include "level_cap.h"
 #include "constants/battle_anim.h"
 #include "constants/battle_move_effects.h"
 #include "constants/abilities.h"
@@ -1078,13 +1079,23 @@ static void Task_GiveExpToMon(u8 taskId)
         u32 currExp = GetMonData(mon, MON_DATA_EXP);
         u32 nextLvlExp = gExperienceTables[gSpeciesInfo[species].growthRate][level + 1];
 
+        if (IsMonAtLevelCap(level))
+        {
+            gBattlerControllerFuncs[battlerId] = CompleteOnInactiveTextPrinter;
+            DestroyTask(taskId);
+            return;
+        }
+
         if (currExp + gainedExp >= nextLvlExp)
         {
             u8 savedActiveBattler;
 
             SetMonData(mon, MON_DATA_EXP, &nextLvlExp);
             CalculateMonStats(mon);
-            gainedExp -= nextLvlExp - currExp;
+            if (WouldExceedLevelCap(level))
+                gainedExp = 0;
+            else
+                gainedExp -= nextLvlExp - currExp;
             savedActiveBattler = gActiveBattler;
             gActiveBattler = battlerId;
             BtlController_EmitTwoReturnValues(1, RET_VALUE_LEVELED_UP, gainedExp);
@@ -1154,6 +1165,12 @@ static void Task_GiveExpWithExpBar(u8 taskId)
             level = GetMonData(&gPlayerParty[monId], MON_DATA_LEVEL);
             currExp = GetMonData(&gPlayerParty[monId], MON_DATA_EXP);
             species = GetMonData(&gPlayerParty[monId], MON_DATA_SPECIES);
+            if (IsMonAtLevelCap(level))
+            {
+                gBattlerControllerFuncs[battlerId] = CompleteOnInactiveTextPrinter;
+                DestroyTask(taskId);
+                return;
+            }
             expOnNextLvl = gExperienceTables[gSpeciesInfo[species].growthRate][level + 1];
             if (currExp + gainedExp >= expOnNextLvl)
             {
@@ -1161,7 +1178,10 @@ static void Task_GiveExpWithExpBar(u8 taskId)
 
                 SetMonData(&gPlayerParty[monId], MON_DATA_EXP, &expOnNextLvl);
                 CalculateMonStats(&gPlayerParty[monId]);
-                gainedExp -= expOnNextLvl - currExp;
+                if (WouldExceedLevelCap(level))
+                    gainedExp = 0;
+                else
+                    gainedExp -= expOnNextLvl - currExp;
                 savedActiveBattler = gActiveBattler;
                 gActiveBattler = battlerId;
                 BtlController_EmitTwoReturnValues(1, RET_VALUE_LEVELED_UP, gainedExp);

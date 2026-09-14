@@ -24,6 +24,7 @@
 #include "party_menu.h"
 #include "field_specials.h"
 #include "berry.h"
+#include "level_cap.h"
 #include "constants/items.h"
 #include "constants/item_effects.h"
 #include "constants/hoenn_cries.h"
@@ -6458,6 +6459,12 @@ bool8 TryIncrementMonLevel(struct Pokemon *mon)
     u8 level = GetMonData(mon, MON_DATA_LEVEL, NULL);
     u8 newLevel = level + 1;
     u32 exp = GetMonData(mon, MON_DATA_EXP, NULL);
+
+    if (IsMonAtLevelCap(level))
+    {
+        SetMonExpWithMaxLevelCheck(mon, species, level, exp);
+        return FALSE;
+    }
 
     if (level < MAX_LEVEL)
     {
