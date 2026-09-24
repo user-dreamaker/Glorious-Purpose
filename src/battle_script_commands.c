@@ -4407,6 +4407,9 @@ static void Cmd_moveend(void)
     u16 *choicedMoveAtk = NULL;
     u8 endMode, endState;
     u16 originallyUsedMove;
+    u32 ursaringStatus;
+    u8 partyIndex;
+    u32 status32;
 
     if (gChosenMove == MOVE_UNAVAILABLE)
         originallyUsedMove = MOVE_NONE;
@@ -4415,6 +4418,10 @@ static void Cmd_moveend(void)
 
     endMode = gBattlescriptCurrInstr[1];
     endState = gBattlescriptCurrInstr[2];
+
+    ursaringStatus = STATUS1_NONE;
+    if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT))
+        ursaringStatus = GetUrsaringMoveInduceStatus(&gBattleMons[gBattlerAttacker], gCurrentMove);
 
     if (gBattleMons[gBattlerAttacker].item == ITEM_ENIGMA_BERRY)
         holdEffectAtk = gEnigmaBerries[gBattlerAttacker].holdEffect;
@@ -4684,7 +4691,22 @@ static void Cmd_moveend(void)
 
     } while (gBattleScripting.moveendState != MOVEEND_COUNT && effect == FALSE);
 
-    if (gBattleScripting.moveendState == MOVEEND_COUNT && effect == FALSE)
+    if (ursaringStatus != STATUS1_NONE)
+    {
+        partyIndex = gBattlerPartyIndexes[gBattlerAttacker];
+        gBattleMons[gBattlerAttacker].status1 = ursaringStatus;
+        status32 = ursaringStatus;
+        if (partyIndex < PARTY_SIZE)
+        {
+            if (GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER)
+                SetMonData(&gPlayerParty[partyIndex], MON_DATA_STATUS, &status32);
+            else
+                SetMonData(&gEnemyParty[partyIndex], MON_DATA_STATUS, &status32);
+        }
+        BattleScriptPushCursor();
+        gBattlescriptCurrInstr = BattleScript_UrsaringStatusIcon;
+    }
+    else if (gBattleScripting.moveendState == MOVEEND_COUNT && effect == FALSE)
         gBattlescriptCurrInstr += 3;
 }
 

@@ -4724,3 +4724,8 @@ BattleScript_CursedBodyActivates::
 	waitmessage B_WAIT_TIME_LONG
 	swapattackerwithtarget
 	return
+	
+BattleScript_UrsaringStatusIcon::
+	updatestatusicon BS_ATTACKER
+	waitstate
+	return
