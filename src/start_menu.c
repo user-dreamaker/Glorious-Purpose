@@ -36,6 +36,8 @@
 #include "help_system.h"
 #include "constants/songs.h"
 #include "constants/field_weather.h"
+#include "level_cap.h"
+#include "gflib.h"
 
 enum StartMenuOption
 {
@@ -331,6 +333,7 @@ static s8 DoDrawStartMenu(void)
             DrawHelpMessageWindowWithText(sStartMenuDescPointers[sStartMenuOrder[sStartMenuCursorPos]]);
         }
         CopyWindowToVram(GetStartMenuWindowId(), COPYWIN_MAP);
+        CreateLevelCapPopupWindow();
         return TRUE;
     }
     return FALSE;
@@ -481,6 +484,8 @@ static bool8 StartMenuPokemonCallback(void)
     {
         PlayRainStoppingSoundEffect();
         DestroySafariZoneStatsWindow();
+        if (sPopupWindowId != 0xFF)
+            DestroyLevelCapPopupWindow();
         CleanupOverworldWindowsAndTilemaps();
         SetMainCallback2(CB2_PartyMenuFromStartMenu);
         return TRUE;
@@ -494,6 +499,8 @@ static bool8 StartMenuBagCallback(void)
     {
         PlayRainStoppingSoundEffect();
         DestroySafariZoneStatsWindow();
+        if (sPopupWindowId != 0xFF)
+            DestroyLevelCapPopupWindow();
         CleanupOverworldWindowsAndTilemaps();
         SetMainCallback2(CB2_BagMenuFromStartMenu);
         return TRUE;
@@ -507,6 +514,8 @@ static bool8 StartMenuPlayerCallback(void)
     {
         PlayRainStoppingSoundEffect();
         DestroySafariZoneStatsWindow();
+        if (sPopupWindowId != 0xFF)
+            DestroyLevelCapPopupWindow();
         CleanupOverworldWindowsAndTilemaps();
         ShowPlayerTrainerCard(CB2_ReturnToFieldWithOpenMenu);
         return TRUE;
@@ -526,6 +535,8 @@ static bool8 StartMenuOptionCallback(void)
     {
         PlayRainStoppingSoundEffect();
         DestroySafariZoneStatsWindow();
+        if (sPopupWindowId != 0xFF)
+            DestroyLevelCapPopupWindow();
         CleanupOverworldWindowsAndTilemaps();
         SetMainCallback2(CB2_OptionsMenuFromStartMenu);
         gMain.savedCallback = CB2_ReturnToFieldWithOpenMenu;
@@ -566,6 +577,8 @@ static bool8 StartMenuLinkPlayerCallback(void)
 
 static bool8 StartCB_Save1(void)
 {
+    if (sPopupWindowId != 0xFF)
+        DestroyLevelCapPopupWindow();
     BackupHelpContext();
     SetHelpContext(HELPCONTEXT_SAVE);
     StartMenu_PrepareForSave();
@@ -1001,6 +1014,8 @@ static void CloseSaveStatsWindow(void)
 static void CloseStartMenu(void)
 {
     PlaySE(SE_SELECT);
+    if (sPopupWindowId != 0xFF)
+        DestroyLevelCapPopupWindow();
     ClearStdWindowAndFrame(GetStartMenuWindowId(), TRUE);
     RemoveStartMenuWindow();
     ClearPlayerHeldMovementAndUnfreezeObjectEvents();
