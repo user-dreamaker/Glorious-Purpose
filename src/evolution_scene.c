@@ -777,6 +777,7 @@ static void Task_EvolutionScene(u8 taskId)
             PlayBGM(MUS_EVOLVED);
             gTasks[taskId].tState++;
             SetMonData(mon, MON_DATA_SPECIES, (void *)(&gTasks[taskId].tPostEvoSpecies));
+            ClearMonStatOverride(mon);
             CalculateMonStats(mon);
             if (IsEnvyEvolution(gTasks[taskId].tPreEvoSpecies, gTasks[taskId].tPostEvoSpecies))
                 ApplyEnvyEvolutionPenalties(mon);
@@ -882,6 +883,7 @@ static void Task_EvolutionScene(u8 taskId)
 
             BattlePutTextOnWindow(gStringVar4, B_WIN_MSG);
             gTasks[taskId].tEvoWasStopped = TRUE;
+            ApplyCancelledEvolutionStats(mon, gTasks[taskId].tPostEvoSpecies);
             gTasks[taskId].tState = EVOSTATE_TRY_LEARN_MOVE;
         }
         break;
@@ -1235,6 +1237,7 @@ static void Task_TradeEvolutionScene(u8 taskId)
             PlayFanfare(MUS_EVOLVED);
             gTasks[taskId].tState++;
             SetMonData(mon, MON_DATA_SPECIES, (&gTasks[taskId].tPostEvoSpecies));
+            ClearMonStatOverride(mon);
             CalculateMonStats(mon);
             EvolutionRenameMon(mon, gTasks[taskId].tPreEvoSpecies, gTasks[taskId].tPostEvoSpecies);
             GetSetPokedexFlag(SpeciesToNationalPokedexNum(gTasks[taskId].tPostEvoSpecies), FLAG_SET_SEEN);
@@ -1302,6 +1305,7 @@ static void Task_TradeEvolutionScene(u8 taskId)
             StringExpandPlaceholders(gStringVar4, gText_EllipsisQuestionMark);
             DrawTextOnTradeWindow(0, gStringVar4, 1);
             gTasks[taskId].tEvoWasStopped = TRUE;
+            ApplyCancelledEvolutionStats(mon, gTasks[taskId].tPostEvoSpecies);
             gTasks[taskId].tState = T_EVOSTATE_TRY_LEARN_MOVE;
         }
         break;

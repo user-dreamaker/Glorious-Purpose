@@ -441,4 +441,12 @@ u8 GetMonSecondaryTypeFromHiddenPower(struct Pokemon *mon);
 u8 GetBattleMonSecondaryTypeFromHiddenPower(struct BattlePokemon *battleMon);
 void TryApplySecondaryTypeToBattleMon(u8 battlerId);
 
+#define STAT_OVERRIDE_NONE 0
+void ApplyCancelledEvolutionStats(struct Pokemon *mon, u16 cancelledTargetSpecies);
+void ClearMonStatOverride(struct Pokemon *mon);
+u16 GetMonStatOverrideSpecies(struct Pokemon *mon);
+bool8 GetMonCustomBaseStats(struct Pokemon *mon, u8 *baseHP, u8 *baseAttack, u8 *baseDefense, u8 *baseSpeed, u8 *baseSpAttack, u8 *baseSpDefense);
+bool8 IsUrsaringDualActiveBattleMon(struct BattlePokemon *battleMon);
+u32 GetUrsaringMoveInduceStatus(struct BattlePokemon *battleMon, u16 move);
+
 #endif // GUARD_POKEMON_H
