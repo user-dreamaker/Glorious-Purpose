@@ -2216,6 +2216,13 @@ static void BattleStartClearSetData(void)
     TurnValuesCleanUp(FALSE);
     SpecialStatusesClear();
 
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG, NULL);
+        if (species != SPECIES_NONE && species != SPECIES_EGG)
+            CalculateMonStats(&gPlayerParty[i]);
+    }
+
     for (i = 0; i < MAX_BATTLERS_COUNT; i++)
     {
         gStatuses3[i] = 0;
@@ -3441,7 +3448,7 @@ u8 GetWhoStrikesFirst(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
                 / (gStatStageRatios[gBattleMons[battler1].statStages[STAT_SPEED]][1]);
 
     // Quick Feet: Boost Speed by 50% when statused, and prevent paralysis speed drop
-    if (gBattleMons[battler1].ability == ABILITY_QUICK_FEET && gBattleMons[battler1].status1)
+    if ((gBattleMons[battler1].ability == ABILITY_QUICK_FEET && gBattleMons[battler1].status1) || IsUrsaringDualActiveBattleMon(&gBattleMons[battler1]))
         speedBattler1 = (150 * speedBattler1) / 100;
 
     if (gBattleMons[battler1].item == ITEM_ENIGMA_BERRY)
@@ -3461,7 +3468,7 @@ u8 GetWhoStrikesFirst(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
         speedBattler1 = (speedBattler1 * 110) / 100;
     if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
         speedBattler1 /= 2;
-    if ((gBattleMons[battler1].status1 & STATUS1_PARALYSIS) && gBattleMons[battler1].ability != ABILITY_QUICK_FEET)
+    if ((gBattleMons[battler1].status1 & STATUS1_PARALYSIS) && gBattleMons[battler1].ability != ABILITY_QUICK_FEET && !IsUrsaringDualActiveBattleMon(&gBattleMons[battler1]))
         speedBattler1 /= 2;
     if (holdEffect == HOLD_EFFECT_QUICK_CLAW && gRandomTurnNumber < (0xFFFF * holdEffectParam) / 100)
         speedBattler1 = UINT_MAX;
@@ -3484,7 +3491,7 @@ u8 GetWhoStrikesFirst(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
                     / (gStatStageRatios[gBattleMons[battler2].statStages[STAT_SPEED]][1]);
 
     // Quick Feet: Boost Speed by 50% when statused, and prevent paralysis speed drop
-    if (gBattleMons[battler2].ability == ABILITY_QUICK_FEET && gBattleMons[battler2].status1)
+    if ((gBattleMons[battler2].ability == ABILITY_QUICK_FEET && gBattleMons[battler2].status1) || IsUrsaringDualActiveBattleMon(&gBattleMons[battler2]))
         speedBattler2 = (150 * speedBattler2) / 100;
 
     if (gBattleMons[battler2].item == ITEM_ENIGMA_BERRY)
@@ -3504,7 +3511,7 @@ u8 GetWhoStrikesFirst(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
         speedBattler2 = (speedBattler2 * 110) / 100;
     if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
         speedBattler2 /= 2;
-    if ((gBattleMons[battler2].status1 & STATUS1_PARALYSIS) && gBattleMons[battler2].ability != ABILITY_QUICK_FEET)
+    if ((gBattleMons[battler2].status1 & STATUS1_PARALYSIS) && gBattleMons[battler2].ability != ABILITY_QUICK_FEET && !IsUrsaringDualActiveBattleMon(&gBattleMons[battler2]))
         speedBattler2 /= 2;
     if (holdEffect == HOLD_EFFECT_QUICK_CLAW && gRandomTurnNumber < (0xFFFF * holdEffectParam) / 100)
         speedBattler2 = UINT_MAX;
