@@ -1548,4 +1548,8 @@ extern const u8 gText_PokeSum_EggOrigin_NicePlace[];
 extern const u8 gText_PokeSum_EggOrigin_Spa[];
 extern const u8 gText_PokeSum_EggOrigin_Trade[];
 
+// level_cap
+extern const u8 gText_LevelCapPopup[];
+extern const u8 gText_RareCandyLevelCapBlocked[];
+
 #endif //GUARD_STRINGS_H
