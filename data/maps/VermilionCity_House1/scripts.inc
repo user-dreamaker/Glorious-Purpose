@@ -4,30 +4,54 @@ VermilionCity_House1_MapScripts::
 VermilionCity_House1_EventScript_FishingGuru::
 	lock
 	faceplayer
-	goto_if_set FLAG_GOT_OLD_ROD, VermilionCity_House1_EventScript_AlreadyGotOldRod
+	goto_if_set FLAG_GOT_OLD_ROD, VermilionCity_House1_EventScript_AlreadyGaveRod
+	checkitem ITEM_GOOD_ROD
+	goto_if_eq VAR_RESULT, TRUE, VermilionCity_House1_EventScript_GiveSuperRod
+	checkitem ITEM_OLD_ROD
+	goto_if_eq VAR_RESULT, TRUE, VermilionCity_House1_EventScript_GiveGoodRod
 	msgbox VermilionCity_House1_Text_ImFishingGuruDoYouLikeToFish, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, YES, VermilionCity_House1_EventScript_GiveOldRod
-	msgbox VermilionCity_House1_Text_OhThatsSoDisappointing
-	release
-	end
-
-VermilionCity_House1_EventScript_AlreadyGotOldRod::
-	msgbox VermilionCity_House1_Text_HowAreTheFishBiting
-	release
-	end
-
-VermilionCity_House1_EventScript_GiveOldRod::
-	checkitemspace ITEM_OLD_ROD
-	goto_if_eq VAR_RESULT, FALSE, VermilionCity_House1_EventScript_NoRoomForOldRod
-	additem ITEM_OLD_ROD
+	goto_if_eq VAR_RESULT, NO, VermilionCity_House1_EventScript_Disappointed
 	msgbox VermilionCity_House1_Text_TakeThisAndFish
-	msgreceiveditem VermilionCity_House1_Text_ReceivedOldRodFromFishingGuru, ITEM_OLD_ROD
+	giveitem ITEM_OLD_ROD
+	goto_if_eq VAR_RESULT, FALSE, VermilionCity_House1_EventScript_NoRoomForRod
 	setflag FLAG_GOT_OLD_ROD
 	msgbox VermilionCity_House1_Text_FishingIsAWayOfLife
 	release
 	end
 
-VermilionCity_House1_EventScript_NoRoomForOldRod::
+VermilionCity_House1_EventScript_GiveGoodRod::
+	msgbox VermilionCity_House1_Text_ImFishingGuruDoYouLikeToFish, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, VermilionCity_House1_EventScript_Disappointed
+	msgbox VermilionCity_House1_Text_TakeThisAndFish
+	giveitem ITEM_GOOD_ROD
+	goto_if_eq VAR_RESULT, FALSE, VermilionCity_House1_EventScript_NoRoomForRod
+	setflag FLAG_GOT_OLD_ROD
+	msgbox FuchsiaCity_House2_Text_GoodRodCanCatchBetterMons
+	release
+	end
+
+VermilionCity_House1_EventScript_GiveSuperRod::
+	msgbox VermilionCity_House1_Text_ImFishingGuruDoYouLikeToFish, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, VermilionCity_House1_EventScript_Disappointed
+	msgbox VermilionCity_House1_Text_TakeThisAndFish
+	giveitem ITEM_SUPER_ROD
+	goto_if_eq VAR_RESULT, FALSE, VermilionCity_House1_EventScript_NoRoomForRod
+	setflag FLAG_GOT_OLD_ROD
+	msgbox Route12_FishingHouse_Text_IfYouCatchBigMagikarpShowMe
+	release
+	end
+
+VermilionCity_House1_EventScript_AlreadyGaveRod::
+	msgbox VermilionCity_House1_Text_HowAreTheFishBiting
+	release
+	end
+
+VermilionCity_House1_EventScript_Disappointed::
+	msgbox VermilionCity_House1_Text_OhThatsSoDisappointing
+	release
+	end
+
+VermilionCity_House1_EventScript_NoRoomForRod::
 	msgbox VermilionCity_House1_Text_NoRoomForNiceGift
 	release
 	end
