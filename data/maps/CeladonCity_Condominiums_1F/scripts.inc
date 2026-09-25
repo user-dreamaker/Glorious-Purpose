@@ -7,6 +7,7 @@ CeladonCity_Condominiums_1F_EventScript_TeaWoman::
 	goto_if_set FLAG_TALKED_TO_TEA_LADY_AFTER_HOF, CeladonCity_Condominiums_1F_EventScript_TeaWomanAfterTea
 	goto_if_set FLAG_SYS_GAME_CLEAR, CeladonCity_Condominiums_1F_EventScript_TeaWomanMentionDaisy
 	goto_if_set FLAG_GOT_TEA, CeladonCity_Condominiums_1F_EventScript_TeaWomanAfterTea
+	goto_if_unset FLAG_DEFEATED_KOGA, CeladonCity_Condominiums_1F_EventScript_TeaWomanNeedKoga
 	msgbox CeladonCity_Condominiums_1F_Text_TryThisDrinkInstead
 	setflag FLAG_GOT_TEA
 	giveitem ITEM_TEA
@@ -17,6 +18,11 @@ CeladonCity_Condominiums_1F_EventScript_TeaWoman::
 
 CeladonCity_Condominiums_1F_EventScript_TeaWomanAfterTea::
 	msgbox CeladonCity_Condominiums_1F_Text_MyDearMonsKeepMeCompany
+	release
+	end
+
+CeladonCity_Condominiums_1F_EventScript_TeaWomanNeedKoga::
+	msgbox CeladonCity_Condominiums_1F_Text_NeedSecretIngredient
 	release
 	end
 
