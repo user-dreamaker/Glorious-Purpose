@@ -4,29 +4,54 @@ FuchsiaCity_House2_MapScripts::
 FuchsiaCity_House2_EventScript_FishingGurusBrother::
 	lock
 	faceplayer
-	goto_if_set FLAG_GOT_GOOD_ROD, FuchsiaCity_House2_EventScript_AlreadyGotGoodRod
+	goto_if_set FLAG_GOT_GOOD_ROD, FuchsiaCity_House2_EventScript_AlreadyGaveRod
+	checkitem ITEM_GOOD_ROD
+	goto_if_eq VAR_RESULT, TRUE, FuchsiaCity_House2_EventScript_GiveSuperRod
+	checkitem ITEM_OLD_ROD
+	goto_if_eq VAR_RESULT, TRUE, FuchsiaCity_House2_EventScript_GiveGoodRod
 	msgbox FuchsiaCity_House2_Text_DoYouLikeToFish, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, YES, FuchsiaCity_House2_EventScript_GiveGoodRod
-	msgbox FuchsiaCity_House2_Text_OhThatsDisappointing
-	release
-	end
-
-FuchsiaCity_House2_EventScript_AlreadyGotGoodRod::
-	msgbox FuchsiaCity_House2_Text_HowAreTheFishBiting
+	goto_if_eq VAR_RESULT, NO, FuchsiaCity_House2_EventScript_Disappointed
+	msgbox FuchsiaCity_House2_Text_LikeYourStyleTakeThis
+	giveitem ITEM_OLD_ROD
+	goto_if_eq VAR_RESULT, FALSE, FuchsiaCity_House2_EventScript_NoRoomForRod
+	setflag FLAG_GOT_GOOD_ROD
+	msgbox VermilionCity_House1_Text_FishingIsAWayOfLife
 	release
 	end
 
 FuchsiaCity_House2_EventScript_GiveGoodRod::
+	msgbox FuchsiaCity_House2_Text_DoYouLikeToFish, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, FuchsiaCity_House2_EventScript_Disappointed
 	msgbox FuchsiaCity_House2_Text_LikeYourStyleTakeThis
-	checkitemspace ITEM_GOOD_ROD
-	goto_if_eq VAR_RESULT, FALSE, FuchsiaCity_House2_EventScript_NoRoomForGoodRod
-	giveitem_msg FuchsiaCity_House2_Text_ReceivedGoodRod, ITEM_GOOD_ROD
-	msgbox FuchsiaCity_House2_Text_GoodRodCanCatchBetterMons
+	giveitem ITEM_GOOD_ROD
+	goto_if_eq VAR_RESULT, FALSE, FuchsiaCity_House2_EventScript_NoRoomForRod
 	setflag FLAG_GOT_GOOD_ROD
+	msgbox FuchsiaCity_House2_Text_GoodRodCanCatchBetterMons
 	release
 	end
 
-FuchsiaCity_House2_EventScript_NoRoomForGoodRod::
+FuchsiaCity_House2_EventScript_GiveSuperRod::
+	msgbox FuchsiaCity_House2_Text_DoYouLikeToFish, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, FuchsiaCity_House2_EventScript_Disappointed
+	msgbox FuchsiaCity_House2_Text_LikeYourStyleTakeThis
+	giveitem ITEM_SUPER_ROD
+	goto_if_eq VAR_RESULT, FALSE, FuchsiaCity_House2_EventScript_NoRoomForRod
+	setflag FLAG_GOT_GOOD_ROD
+	msgbox Route12_FishingHouse_Text_IfYouCatchBigMagikarpShowMe
+	release
+	end
+
+FuchsiaCity_House2_EventScript_AlreadyGaveRod::
+	msgbox FuchsiaCity_House2_Text_HowAreTheFishBiting
+	release
+	end
+
+FuchsiaCity_House2_EventScript_Disappointed::
+	msgbox FuchsiaCity_House2_Text_OhThatsDisappointing
+	release
+	end
+
+FuchsiaCity_House2_EventScript_NoRoomForRod::
 	msgbox FuchsiaCity_House2_Text_YouHaveNoRoomForGift
 	release
 	end
