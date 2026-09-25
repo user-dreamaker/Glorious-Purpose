@@ -6,6 +6,11 @@ CeladonCity_Condominiums_1F_Text_TryThisDrinkInstead::
     .string "on drinks.\p"
     .string "Try this instead.$"
 
+CeladonCity_Condominiums_1F_Text_NeedSecretIngredient::
+    .string "I could offer you TEA.\p"
+    .string "But you need to get the secret\n"
+    .string "ingredient from KOGA.$"
+
 CeladonCity_Condominiums_1F_Text_NothingBeatsThirstLikeTea::
     .string "Nothing beats thirst like some hot\n"
     .string "TEA.\p"
