@@ -6,7 +6,7 @@ PokemonTower_6F_EventScript_MarowakGhost::
 	textcolor NPC_TEXT_COLOR_MON
 	msgbox PokemonTower_6F_Text_BeGoneIntruders
 	goto_if_questlog EventScript_ReleaseEnd
-	setwildbattle SPECIES_MAROWAK, 30
+	setwildbattle SPECIES_MAROWAK, 33
 	special StartMarowakBattle
 	waitstate
 	special QuestLog_CutRecording
