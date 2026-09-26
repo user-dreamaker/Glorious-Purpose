@@ -120,3 +120,5 @@ PewterCity_Gym_Text_GymStatuePlayerWon::
     .string "WINNING TRAINERS:\n"
     .string "{RIVAL}, {PLAYER}$"
 
+PewterCity_Gym_Text_BrockRematch::
+    .string "Rematch?$"

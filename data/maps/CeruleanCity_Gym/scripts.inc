@@ -3,9 +3,22 @@ CeruleanCity_Gym_MapScripts::
 
 CeruleanCity_Gym_EventScript_Misty::
 	famechecker FAMECHECKER_MISTY, FCPICKSTATE_COLORED, UpdatePickStateFromSpecialVar8005
+	goto_if_set FLAG_DEFEATED_MISTY, CeruleanCity_Gym_EventScript_MistyRematch
 	trainerbattle_single TRAINER_LEADER_MISTY, CeruleanCity_Gym_Text_MistyIntro, CeruleanCity_Gym_Text_MistyDefeat, CeruleanCity_Gym_EventScript_MistyDefeated, NO_MUSIC
 	goto_if_unset FLAG_GOT_TM03_FROM_MISTY, CeruleanCity_Gym_EventScript_GiveTM03
-	msgbox CeruleanCity_Gym_Text_ExplainTM03
+	msgbox CeruleanCity_Gym_Text_MistyRematch
+	release
+	end
+
+CeruleanCity_Gym_EventScript_MistyRematch::
+	msgbox MistyRematch_Text_RematchIntro, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, CeruleanCity_Gym_EventScript_MistyRematchDecline
+	trainerbattle_no_intro TRAINER_LEADER_MISTY_2, MistyRematch_Text_ChoosePrize
+	goto CeruleanCity_Gym_EventScript_MistyRematchDefeated
+	release
+	end
+
+CeruleanCity_Gym_EventScript_MistyRematchDecline::
 	release
 	end
 
@@ -20,11 +33,10 @@ CeruleanCity_Gym_EventScript_MistyDefeated::
 
 CeruleanCity_Gym_EventScript_GiveTM03::
 	msgbox CeruleanCity_Gym_Text_ExplainCascadeBadge
-	checkitemspace ITEM_TM03
+	checkitemspace ITEM_RARE_CANDY
 	goto_if_eq VAR_RESULT, FALSE, CeruleanCity_Gym_EventScript_NoRoomForTM03
-	giveitem_msg CeruleanCity_Gym_Text_ReceivedTM03FromMisty, ITEM_TM03
+	giveitem ITEM_RARE_CANDY
 	setflag FLAG_GOT_TM03_FROM_MISTY
-	msgbox CeruleanCity_Gym_Text_ExplainTM03
 	release
 	end
 

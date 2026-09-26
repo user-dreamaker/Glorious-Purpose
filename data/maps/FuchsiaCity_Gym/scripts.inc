@@ -3,9 +3,22 @@ FuchsiaCity_Gym_MapScripts::
 
 FuchsiaCity_Gym_EventScript_Koga::
 	famechecker FAMECHECKER_KOGA, FCPICKSTATE_COLORED, UpdatePickStateFromSpecialVar8005
+	goto_if_set FLAG_DEFEATED_KOGA, FuchsiaCity_Gym_EventScript_KogaRematch
 	trainerbattle_single TRAINER_LEADER_KOGA, FuchsiaCity_Gym_Text_KogaIntro, FuchsiaCity_Gym_Text_KogaDefeat, FuchsiaCity_Gym_EventScript_DefeatedKoga, NO_MUSIC
 	goto_if_unset FLAG_GOT_TM06_FROM_KOGA, FuchsiaCity_Gym_EventScript_GiveTM06
-	msgbox FuchsiaCity_Gym_Text_KogaPostBattle
+	msgbox FuchsiaCity_Gym_Text_KogaRematch
+	release
+	end
+
+FuchsiaCity_Gym_EventScript_KogaRematch::
+	msgbox KogaRematch_Text_RematchIntro, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, FuchsiaCity_Gym_EventScript_KogaRematchDecline
+	trainerbattle_no_intro TRAINER_LEADER_KOGA_2, KogaRematch_Text_ChoosePrize
+	goto FuchsiaCity_Gym_EventScript_KogaRematchDefeated
+	release
+	end
+
+FuchsiaCity_Gym_EventScript_KogaRematchDecline::
 	release
 	end
 
@@ -20,11 +33,10 @@ FuchsiaCity_Gym_EventScript_DefeatedKoga::
 
 FuchsiaCity_Gym_EventScript_GiveTM06::
 	msgbox FuchsiaCity_Gym_Text_KogaExplainSoulBadge
-	checkitemspace ITEM_TM06
+	checkitemspace ITEM_RARE_CANDY
 	goto_if_eq VAR_RESULT, FALSE, FuchsiaCity_Gym_EventScript_NoRoomForTM06
-	giveitem_msg FuchsiaCity_Gym_Text_ReceivedTM06FromKoga, ITEM_TM06
+	giveitem ITEM_RARE_CANDY
 	setflag FLAG_GOT_TM06_FROM_KOGA
-	msgbox FuchsiaCity_Gym_Text_KogaExplainTM06
 	release
 	end
 

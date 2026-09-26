@@ -496,6 +496,113 @@ static const struct MenuAction sMultichoiceList_Exit[] = {
     { gOtherText_Exit }
 };
 
+// Gym Rematch rewards
+static const u8 sText_GymReward_HeldItem[] = _("HELD ITEM");
+static const u8 sText_GymReward_MoveTutor[] = _("MOVE TUTOR");
+static const u8 sText_GymReward_TM[] = _("TM");
+
+static const struct MenuAction sMultichoiceList_GymReward[] = {
+    { sText_GymReward_HeldItem },
+    { sText_GymReward_MoveTutor },
+    { sText_GymReward_TM }
+};
+
+static const u8 sText_BrockTutor_AncientPower[] = _("ANCIENT POWER");
+static const u8 sText_BrockTutor_RockSlide[] = _("ROCK SLIDE");
+static const u8 sText_BrockTutor_RockThrow[] = _("ROCK THROW");
+static const u8 sText_BrockTutor_Rollout[] = _("ROLLOUT");
+
+static const struct MenuAction sMultichoiceList_BrockTutor[] = {
+    { sText_BrockTutor_AncientPower },
+    { sText_BrockTutor_RockSlide },
+    { sText_BrockTutor_RockThrow },
+    { sText_BrockTutor_Rollout }
+};
+
+static const u8 sText_BrockTM_Sandstorm[] = _("SANDSTORM");
+static const u8 sText_BrockTM_RockTomb[] = _("ROCK TOMB");
+
+static const struct MenuAction sMultichoiceList_BrockTM[] = {
+    { sText_BrockTM_Sandstorm },
+    { sText_BrockTM_RockTomb }
+};
+
+static const u8 sText_MistyTutor_Bubble[] = _("BUBBLE");
+static const u8 sText_MistyTutor_HydroCannon[] = _("HYDRO CANNON");
+static const u8 sText_MistyTutor_HydroPump[] = _("HYDRO PUMP");
+
+static const struct MenuAction sMultichoiceList_MistyTutor[] = {
+    { sText_MistyTutor_Bubble },
+    { sText_MistyTutor_HydroCannon },
+    { sText_MistyTutor_HydroPump }
+};
+
+static const u8 sText_MistyTM_RainDance[] = _("RAIN DANCE");
+static const u8 sText_MistyTM_WaterPulse[] = _("WATER PULSE");
+
+static const struct MenuAction sMultichoiceList_MistyTM[] = {
+    { sText_MistyTM_RainDance },
+    { sText_MistyTM_WaterPulse }
+};
+
+static const u8 sText_SurgeTutor_ThunderPunch[] = _("THUNDER PUNCH");
+static const u8 sText_SurgeTutor_ThunderWave[] = _("THUNDER WAVE");
+static const u8 sText_SurgeTutor_ZapCannon[] = _("ZAP CANNON");
+
+static const struct MenuAction sMultichoiceList_SurgeTutor[] = {
+    { sText_SurgeTutor_ThunderPunch },
+    { sText_SurgeTutor_ThunderWave },
+    { sText_SurgeTutor_ZapCannon }
+};
+
+static const u8 sText_SurgeTM_ShockWave[] = _("SHOCK WAVE");
+static const u8 sText_SurgeTM_Thunder[] = _("THUNDER");
+static const u8 sText_SurgeTM_Thunderbolt[] = _("THUNDERBOLT");
+
+static const struct MenuAction sMultichoiceList_SurgeTM[] = {
+    { sText_SurgeTM_ShockWave },
+    { sText_SurgeTM_Thunder },
+    { sText_SurgeTM_Thunderbolt }
+};
+
+static const u8 sText_ErikaTutor_Absorb[] = _("ABSORB");
+static const u8 sText_ErikaTutor_FrenzyPlant[] = _("FRENZY PLANT");
+static const u8 sText_ErikaTutor_LeechSeed[] = _("LEECH SEED");
+static const u8 sText_ErikaTutor_PetalDance[] = _("PETAL DANCE");
+static const u8 sText_ErikaTutor_Synthesis[] = _("SYNTHESIS");
+
+static const struct MenuAction sMultichoiceList_ErikaTutor[] = {
+    { sText_ErikaTutor_Absorb },
+    { sText_ErikaTutor_FrenzyPlant },
+    { sText_ErikaTutor_LeechSeed },
+    { sText_ErikaTutor_PetalDance },
+    { sText_ErikaTutor_Synthesis }
+};
+
+static const u8 sText_ErikaTM_BulletSeed[] = _("BULLET SEED");
+static const u8 sText_ErikaTM_GigaDrain[] = _("GIGA DRAIN");
+static const u8 sText_ErikaTM_SolarBeam[] = _("SOLAR BEAM");
+
+static const struct MenuAction sMultichoiceList_ErikaTM[] = {
+    { sText_ErikaTM_BulletSeed },
+    { sText_ErikaTM_GigaDrain },
+    { sText_ErikaTM_SolarBeam }
+};
+
+static const u8 sText_KogaTutor_PoisonTail[] = _("POISON TAIL");
+
+static const struct MenuAction sMultichoiceList_KogaTutor[] = {
+    { sText_KogaTutor_PoisonTail }
+};
+
+static const u8 sText_KogaTM_SludgeBomb[] = _("SLUDGE BOMB");
+static const u8 sText_KogaTM_Toxic[] = _("TOXIC");
+
+static const struct MenuAction sMultichoiceList_KogaTM[] = {
+    { sText_KogaTM_SludgeBomb },
+    { sText_KogaTM_Toxic }
+};
+
 static const struct MultichoiceListStruct sMultichoiceLists[] = {
     [MULTICHOICE_YES_NO]                                     = MULTICHOICE(sMultichoiceList_YesNo),
     [MULTICHOICE_EEVEELUTIONS]                               = MULTICHOICE(sMultichoiceList_Eeveelutions),
@@ -562,6 +669,17 @@ static const struct MultichoiceListStruct sMultichoiceLists[] = {
     [MULTICHOICE_62]                                         = MULTICHOICE(sMultichoiceList_62),
     [MULTICHOICE_JOIN_OR_LEAD]                               = MULTICHOICE(sMultichoiceList_JoinOrLead),
     [MULTICHOICE_TRAINER_TOWER_MODE]                         = MULTICHOICE(sMultichoiceList_TrainerTowerMode),
+    [MULTICHOICE_GYM_REWARD]                                 = MULTICHOICE(sMultichoiceList_GymReward),
+    [MULTICHOICE_BROCK_TUTOR]                                = MULTICHOICE(sMultichoiceList_BrockTutor),
+    [MULTICHOICE_BROCK_TM]                                   = MULTICHOICE(sMultichoiceList_BrockTM),
+    [MULTICHOICE_MISTY_TUTOR]                                = MULTICHOICE(sMultichoiceList_MistyTutor),
+    [MULTICHOICE_MISTY_TM]                                   = MULTICHOICE(sMultichoiceList_MistyTM),
+    [MULTICHOICE_SURGE_TUTOR]                                = MULTICHOICE(sMultichoiceList_SurgeTutor),
+    [MULTICHOICE_SURGE_TM]                                   = MULTICHOICE(sMultichoiceList_SurgeTM),
+    [MULTICHOICE_ERIKA_TUTOR]                                = MULTICHOICE(sMultichoiceList_ErikaTutor),
+    [MULTICHOICE_ERIKA_TM]                                   = MULTICHOICE(sMultichoiceList_ErikaTM),
+    [MULTICHOICE_KOGA_TUTOR]                                 = MULTICHOICE(sMultichoiceList_KogaTutor),
+    [MULTICHOICE_KOGA_TM]                                    = MULTICHOICE(sMultichoiceList_KogaTM),
 };
 
 // From Cool to Berries goes unused

@@ -205,9 +205,22 @@ VermilionCity_Gym_EventScript_SetBeamsOn::
 
 VermilionCity_Gym_EventScript_LtSurge::
 	famechecker FAMECHECKER_LTSURGE, FCPICKSTATE_COLORED, UpdatePickStateFromSpecialVar8005
+	goto_if_set FLAG_DEFEATED_LT_SURGE, VermilionCity_Gym_EventScript_LtSurgeRematch
 	trainerbattle_single TRAINER_LEADER_LT_SURGE, VermilionCity_Gym_Text_LtSurgeIntro, VermilionCity_Gym_Text_LtSurgeDefeat, VermilionCity_Gym_EventScript_DefeatedLtSurge, NO_MUSIC
 	goto_if_unset FLAG_GOT_TM34_FROM_SURGE, VermilionCity_Gym_EventScript_GiveTM34
-	msgbox VermilionCity_Gym_Text_LtSurgePostBattle
+	msgbox VermilionCity_Gym_Text_LtSurgeRematch
+	release
+	end
+
+VermilionCity_Gym_EventScript_LtSurgeRematch::
+	msgbox SurgeRematch_Text_RematchIntro, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, VermilionCity_Gym_EventScript_LtSurgeRematchDecline
+	trainerbattle_no_intro TRAINER_LEADER_LT_SURGE_2, SurgeRematch_Text_ChoosePrize
+	goto VermilionCity_Gym_EventScript_SurgeRematchDefeated
+	release
+	end
+
+VermilionCity_Gym_EventScript_LtSurgeRematchDecline::
 	release
 	end
 
@@ -227,11 +240,10 @@ VermilionCity_Gym_EventScript_ShowOaksAide::
 
 VermilionCity_Gym_EventScript_GiveTM34::
 	msgbox VermilionCity_Gym_Text_ExplainThunderBadgeTakeThis
-	checkitemspace ITEM_TM34
+	checkitemspace ITEM_RARE_CANDY
 	goto_if_eq VAR_RESULT, FALSE, VermilionCity_Gym_EventScript_NoRoomForTM34
-	giveitem_msg VermilionCity_Gym_Text_ReceivedTM34FromLtSurge, ITEM_TM34
+	giveitem ITEM_RARE_CANDY
 	setflag FLAG_GOT_TM34_FROM_SURGE
-	msgbox VermilionCity_Gym_Text_ExplainTM34
 	release
 	end
 

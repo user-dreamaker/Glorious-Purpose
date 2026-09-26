@@ -3,9 +3,22 @@ PewterCity_Gym_MapScripts::
 
 PewterCity_Gym_EventScript_Brock::
 	famechecker FAMECHECKER_BROCK, FCPICKSTATE_COLORED, UpdatePickStateFromSpecialVar8005
+	goto_if_set FLAG_DEFEATED_BROCK, PewterCity_Gym_EventScript_BrockRematch
 	trainerbattle_single TRAINER_LEADER_BROCK, PewterCity_Gym_Text_BrockIntro, PewterCity_Gym_Text_BrockDefeat, PewterCity_Gym_EventScript_DefeatedBrock, NO_MUSIC
 	goto_if_unset FLAG_GOT_TM39_FROM_BROCK, PewterCity_Gym_EventScript_GiveTM39
-	msgbox PewterCity_Gym_Text_BrockPostBattle
+	msgbox PewterCity_Gym_Text_BrockRematch
+	release
+	end
+
+PewterCity_Gym_EventScript_BrockRematch::
+	msgbox BrockRematch_Text_RematchIntro, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, PewterCity_Gym_EventScript_BrockRematchDecline
+	trainerbattle_no_intro TRAINER_LEADER_BROCK_2, BrockRematch_Text_ChoosePrize
+	goto PewterCity_Gym_EventScript_BrockRematchDefeated
+	release
+	end
+
+PewterCity_Gym_EventScript_BrockRematchDecline::
 	release
 	end
 
@@ -22,11 +35,10 @@ PewterCity_Gym_EventScript_DefeatedBrock::
 
 PewterCity_Gym_EventScript_GiveTM39::
 	msgbox PewterCity_Gym_Text_TakeThisWithYou
-	checkitemspace ITEM_TM39
+	checkitemspace ITEM_RARE_CANDY
 	goto_if_eq VAR_RESULT, FALSE, PewterCity_Gym_EventScript_NoRoomForTM39
-	giveitem_msg PewterCity_Gym_Text_ReceivedTM39FromBrock, ITEM_TM39
+	giveitem ITEM_RARE_CANDY
 	setflag FLAG_GOT_TM39_FROM_BROCK
-	msgbox PewterCity_Gym_Text_ExplainTM39
 	release
 	end
 

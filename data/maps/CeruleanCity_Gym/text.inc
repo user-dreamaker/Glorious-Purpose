@@ -19,8 +19,10 @@ CeruleanCity_Gym_Text_ExplainCascadeBadge::
     .string "There's more. You can now use CUT\n"
     .string "anytime, even out of battle.\p"
     .string "You can CUT down small trees to\n"
-    .string "open new pathways.\p"
-    .string "You can also have my favorite TM.$"
+    .string "open new pathways.$"
+	
+CeruleanCity_Gym_Text_MistyRematch::
+    .string "Rematch?$"
 
 CeruleanCity_Gym_Text_ReceivedTM03FromMisty::
     .string "{PLAYER} received TM03\n"

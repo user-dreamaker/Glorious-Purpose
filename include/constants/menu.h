@@ -69,6 +69,17 @@
 #define MULTICHOICE_62                                         62
 #define MULTICHOICE_JOIN_OR_LEAD                               63
 #define MULTICHOICE_TRAINER_TOWER_MODE                         64
+#define MULTICHOICE_GYM_REWARD                                 65
+#define MULTICHOICE_BROCK_TUTOR                                66
+#define MULTICHOICE_BROCK_TM                                   67
+#define MULTICHOICE_MISTY_TUTOR                                68
+#define MULTICHOICE_MISTY_TM                                   69
+#define MULTICHOICE_SURGE_TUTOR                                70
+#define MULTICHOICE_SURGE_TM                                   71
+#define MULTICHOICE_ERIKA_TUTOR                                72
+#define MULTICHOICE_ERIKA_TM                                   73
+#define MULTICHOICE_KOGA_TUTOR                                 74
+#define MULTICHOICE_KOGA_TM                                    75
 
 #define MULTICHOICE_NONE                                      255
 

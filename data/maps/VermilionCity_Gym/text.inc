@@ -138,3 +138,5 @@ VermilionCity_Gym_Text_OnlyTrashLocksWereReset::
     .string "Hey!\n"
     .string "The electric locks were reset!$"
 
+VermilionCity_Gym_Text_LtSurgeRematch::
+    .string "Rematch?$"

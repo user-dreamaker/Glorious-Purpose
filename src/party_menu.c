@@ -854,7 +854,7 @@ static bool8 DisplayPartyPokemonDataForMoveTutorOrEvolutionItem(u8 slot)
     if (gPartyMenu.action == PARTY_ACTION_MOVE_TUTOR)
     {
         gSpecialVar_Result = FALSE;
-        if (gSpecialVar_0x8005 >= TUTOR_MOVE_COUNT)
+        if (gSpecialVar_0x8005 >= TUTOR_MOVE_COUNT && gSpecialVar_0x8005 != TUTOR_MOVE_FRENZY_PLANT && gSpecialVar_0x8005 != TUTOR_MOVE_BLAST_BURN && gSpecialVar_0x8005 != TUTOR_MOVE_HYDRO_CANNON && gSpecialVar_0x8005 != TUTOR_MOVE_ANCIENT_POWER && gSpecialVar_0x8005 != TUTOR_MOVE_ROCK_THROW && gSpecialVar_0x8005 != TUTOR_MOVE_ROLLOUT && gSpecialVar_0x8005 != TUTOR_MOVE_ROCK_SLIDE && gSpecialVar_0x8005 != TUTOR_MOVE_BUBBLE && gSpecialVar_0x8005 != TUTOR_MOVE_HYDRO_PUMP && gSpecialVar_0x8005 != TUTOR_MOVE_THUNDER_PUNCH && gSpecialVar_0x8005 != TUTOR_MOVE_ZAP_CANNON && gSpecialVar_0x8005 != TUTOR_MOVE_ABSORB && gSpecialVar_0x8005 != TUTOR_MOVE_LEECH_SEED && gSpecialVar_0x8005 != TUTOR_MOVE_PETAL_DANCE && gSpecialVar_0x8005 != TUTOR_MOVE_SYNTHESIS && gSpecialVar_0x8005 != TUTOR_MOVE_POISON_TAIL)
             return FALSE;
         DisplayPartyPokemonDataToTeachMove(slot, 0, gSpecialVar_0x8005);
     }
@@ -1900,6 +1900,30 @@ static u16 GetTutorMove(u8 tutor)
         return MOVE_BLAST_BURN;
     case TUTOR_MOVE_HYDRO_CANNON:
         return MOVE_HYDRO_CANNON;
+    case TUTOR_MOVE_ANCIENT_POWER:
+        return MOVE_ANCIENT_POWER;
+    case TUTOR_MOVE_ROCK_THROW:
+        return MOVE_ROCK_THROW;
+    case TUTOR_MOVE_ROLLOUT:
+        return MOVE_ROLLOUT;
+    case TUTOR_MOVE_BUBBLE:
+        return MOVE_BUBBLE;
+    case TUTOR_MOVE_HYDRO_PUMP:
+        return MOVE_HYDRO_PUMP;
+    case TUTOR_MOVE_THUNDER_PUNCH:
+        return MOVE_THUNDER_PUNCH;
+    case TUTOR_MOVE_ZAP_CANNON:
+        return MOVE_ZAP_CANNON;
+    case TUTOR_MOVE_ABSORB:
+        return MOVE_ABSORB;
+    case TUTOR_MOVE_LEECH_SEED:
+        return MOVE_LEECH_SEED;
+    case TUTOR_MOVE_PETAL_DANCE:
+        return MOVE_PETAL_DANCE;
+    case TUTOR_MOVE_SYNTHESIS:
+        return MOVE_SYNTHESIS;
+    case TUTOR_MOVE_POISON_TAIL:
+        return MOVE_POISON_TAIL;
     default:
         return sTutorMoves[tutor];
     }
@@ -1910,17 +1934,431 @@ static bool8 CanLearnTutorMove(u16 species, u8 tutor)
     switch (tutor)
     {
     case TUTOR_MOVE_FRENZY_PLANT:
-        if (species == SPECIES_VENUSAUR)
+        switch (species)
+        {
+        case SPECIES_VENUSAUR:
+        case SPECIES_MEW:
+        case SPECIES_MEGANIUM:
             return TRUE;
-        else
+        default:
             return FALSE;
+        }
     case TUTOR_MOVE_BLAST_BURN:
         if (species == SPECIES_CHARIZARD)
             return TRUE;
         else
             return FALSE;
     case TUTOR_MOVE_HYDRO_CANNON:
-        if (species == SPECIES_BLASTOISE)
+        switch (species)
+        {
+        case SPECIES_BLASTOISE:
+        case SPECIES_MEW:
+        case SPECIES_FERALIGATR:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_BUBBLE:
+        switch (species)
+        {
+        case SPECIES_MAGIKARP:
+        case SPECIES_GYARADOS:
+        case SPECIES_MEW:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_HYDRO_PUMP:
+        switch (species)
+        {
+        case SPECIES_DRATINI:
+        case SPECIES_DRAGONAIR:
+        case SPECIES_DRAGONITE:
+        case SPECIES_MEW:
+        case SPECIES_MARILL:
+        case SPECIES_AZUMARILL:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_ANCIENT_POWER:
+        switch (species)
+        {
+        case SPECIES_BULBASAUR:
+        case SPECIES_IVYSAUR:
+        case SPECIES_VENUSAUR:
+        case SPECIES_MEW:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_ROCK_THROW:
+        switch (species)
+        {
+        case SPECIES_PINSIR:
+        case SPECIES_OMANYTE:
+        case SPECIES_OMASTAR:
+        case SPECIES_KABUTO:
+        case SPECIES_KABUTOPS:
+        case SPECIES_AERODACTYL:
+        case SPECIES_MEW:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_ROCK_SLIDE:
+        switch (species)
+        {
+        case SPECIES_CHARMANDER:
+        case SPECIES_CHARMELEON:
+        case SPECIES_CHARIZARD:
+        case SPECIES_EKANS:
+        case SPECIES_ARBOK:
+        case SPECIES_SANDSHREW:
+        case SPECIES_SANDSLASH:
+        case SPECIES_NIDOQUEEN:
+        case SPECIES_NIDOKING:
+        case SPECIES_DIGLETT:
+        case SPECIES_DUGTRIO:
+        case SPECIES_MANKEY:
+        case SPECIES_PRIMEAPE:
+        case SPECIES_POLIWRATH:
+        case SPECIES_MACHOP:
+        case SPECIES_MACHOKE:
+        case SPECIES_MACHAMP:
+        case SPECIES_GEODUDE:
+        case SPECIES_GRAVELER:
+        case SPECIES_GOLEM:
+        case SPECIES_ONIX:
+        case SPECIES_CUBONE:
+        case SPECIES_MAROWAK:
+        case SPECIES_HITMONLEE:
+        case SPECIES_HITMONCHAN:
+        case SPECIES_LICKITUNG:
+        case SPECIES_RHYHORN:
+        case SPECIES_RHYDON:
+        case SPECIES_KANGASKHAN:
+        case SPECIES_PINSIR:
+        case SPECIES_OMANYTE:
+        case SPECIES_OMASTAR:
+        case SPECIES_KABUTO:
+        case SPECIES_KABUTOPS:
+        case SPECIES_AERODACTYL:
+        case SPECIES_SNORLAX:
+        case SPECIES_MEW:
+        case SPECIES_TYPHLOSION:
+        case SPECIES_TOTODILE:
+        case SPECIES_CROCONAW:
+        case SPECIES_FERALIGATR:
+        case SPECIES_SUDOWOODO:
+        case SPECIES_PINECO:
+        case SPECIES_FORRETRESS:
+        case SPECIES_DUNSPARCE:
+        case SPECIES_GLIGAR:
+        case SPECIES_STEELIX:
+        case SPECIES_GRANBULL:
+        case SPECIES_SHUCKLE:
+        case SPECIES_HERACROSS:
+        case SPECIES_TEDDIURSA:
+        case SPECIES_URSARING:
+        case SPECIES_SLUGMA:
+        case SPECIES_MAGCARGO:
+        case SPECIES_SWINUB:
+        case SPECIES_PILOSWINE:
+        case SPECIES_CORSOLA:
+        case SPECIES_SKARMORY:
+        case SPECIES_DONPHAN:
+        case SPECIES_TYROGUE:
+        case SPECIES_HITMONTOP:
+        case SPECIES_MILTANK:
+        case SPECIES_LARVITAR:
+        case SPECIES_PUPITAR:
+        case SPECIES_TYRANITAR:
+            return TRUE;
+        default:
+            break;
+        }
+        if (sTutorLearnsets[species] & (1 << tutor))
+            return TRUE;
+        else
+            return FALSE;
+    case TUTOR_MOVE_ROLLOUT:
+        switch (species)
+        {
+        case SPECIES_SQUIRTLE:
+        case SPECIES_WARTORTLE:
+        case SPECIES_BLASTOISE:
+        case SPECIES_PIKACHU:
+        case SPECIES_RAICHU:
+        case SPECIES_SANDSHREW:
+        case SPECIES_SANDSLASH:
+        case SPECIES_CLEFAIRY:
+        case SPECIES_CLEFABLE:
+        case SPECIES_JIGGLYPUFF:
+        case SPECIES_WIGGLYTUFF:
+        case SPECIES_GEODUDE:
+        case SPECIES_GRAVELER:
+        case SPECIES_GOLEM:
+        case SPECIES_MAGNEMITE:
+        case SPECIES_MAGNETON:
+        case SPECIES_VOLTORB:
+        case SPECIES_ELECTRODE:
+        case SPECIES_EXEGGCUTE:
+        case SPECIES_EXEGGUTOR:
+        case SPECIES_LICKITUNG:
+        case SPECIES_KOFFING:
+        case SPECIES_WEEZING:
+        case SPECIES_RHYHORN:
+        case SPECIES_RHYDON:
+        case SPECIES_CHANSEY:
+        case SPECIES_OMANYTE:
+        case SPECIES_OMASTAR:
+        case SPECIES_KABUTO:
+        case SPECIES_KABUTOPS:
+        case SPECIES_SNORLAX:
+        case SPECIES_MEW:
+        case SPECIES_CYNDAQUIL:
+        case SPECIES_QUILAVA:
+        case SPECIES_TYPHLOSION:
+        case SPECIES_SENTRET:
+        case SPECIES_FURRET:
+        case SPECIES_LEDYBA:
+        case SPECIES_LEDIAN:
+        case SPECIES_PICHU:
+        case SPECIES_CLEFFA:
+        case SPECIES_IGGLYBUFF:
+        case SPECIES_TOGEPI:
+        case SPECIES_TOGETIC:
+        case SPECIES_MARILL:
+        case SPECIES_AZUMARILL:
+        case SPECIES_SUDOWOODO:
+        case SPECIES_WOOPER:
+        case SPECIES_QUAGSIRE:
+        case SPECIES_PINECO:
+        case SPECIES_FORRETRESS:
+        case SPECIES_DUNSPARCE:
+        case SPECIES_STEELIX:
+        case SPECIES_QWILFISH:
+        case SPECIES_SHUCKLE:
+        case SPECIES_TEDDIURSA:
+        case SPECIES_URSARING:
+        case SPECIES_SLUGMA:
+        case SPECIES_MAGCARGO:
+        case SPECIES_CORSOLA:
+        case SPECIES_PHANPY:
+        case SPECIES_DONPHAN:
+        case SPECIES_MILTANK:
+        case SPECIES_BLISSEY:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_THUNDER_PUNCH:
+        switch (species)
+        {
+        case SPECIES_PIKACHU:
+        case SPECIES_RAICHU:
+        case SPECIES_NIDOQUEEN:
+        case SPECIES_NIDOKING:
+        case SPECIES_CLEFAIRY:
+        case SPECIES_CLEFABLE:
+        case SPECIES_JIGGLYPUFF:
+        case SPECIES_WIGGLYTUFF:
+        case SPECIES_MANKEY:
+        case SPECIES_PRIMEAPE:
+        case SPECIES_ABRA:
+        case SPECIES_KADABRA:
+        case SPECIES_ALAKAZAM:
+        case SPECIES_MACHOP:
+        case SPECIES_MACHOKE:
+        case SPECIES_MACHAMP:
+        case SPECIES_GRIMER:
+        case SPECIES_MUK:
+        case SPECIES_GENGAR:
+        case SPECIES_DROWZEE:
+        case SPECIES_HYPNO:
+        case SPECIES_CUBONE:
+        case SPECIES_MAROWAK:
+        case SPECIES_HITMONCHAN:
+        case SPECIES_LICKITUNG:
+        case SPECIES_RHYDON:
+        case SPECIES_KANGASKHAN:
+        case SPECIES_MR_MIME:
+        case SPECIES_ELECTABUZZ:
+        case SPECIES_MAGMAR:
+        case SPECIES_SNORLAX:
+        case SPECIES_DRAGONITE:
+        case SPECIES_MEWTWO:
+        case SPECIES_MEW:
+        case SPECIES_TYPHLOSION:
+        case SPECIES_SENTRET:
+        case SPECIES_FURRET:
+        case SPECIES_LEDYBA:
+        case SPECIES_LEDIAN:
+        case SPECIES_FLAAFFY:
+        case SPECIES_AMPHAROS:
+        case SPECIES_SUDOWOODO:
+        case SPECIES_AIPOM:
+        case SPECIES_SNUBBULL:
+        case SPECIES_GRANBULL:
+        case SPECIES_TEDDIURSA:
+        case SPECIES_URSARING:
+        case SPECIES_ELEKID:
+        case SPECIES_MAGBY:
+        case SPECIES_MILTANK:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_THUNDER_WAVE:
+        switch (species)
+        {
+        case SPECIES_RATTATA:
+        case SPECIES_RATICATE:
+        case SPECIES_PIKACHU:
+        case SPECIES_RAICHU:
+        case SPECIES_CLEFAIRY:
+        case SPECIES_CLEFABLE:
+        case SPECIES_JIGGLYPUFF:
+        case SPECIES_WIGGLYTUFF:
+        case SPECIES_ABRA:
+        case SPECIES_KADABRA:
+        case SPECIES_ALAKAZAM:
+        case SPECIES_SLOWPOKE:
+        case SPECIES_SLOWBRO:
+        case SPECIES_MAGNEMITE:
+        case SPECIES_MAGNETON:
+        case SPECIES_DROWZEE:
+        case SPECIES_HYPNO:
+        case SPECIES_VOLTORB:
+        case SPECIES_ELECTRODE:
+        case SPECIES_CHANSEY:
+        case SPECIES_STARYU:
+        case SPECIES_STARMIE:
+        case SPECIES_MR_MIME:
+        case SPECIES_ELECTABUZZ:
+        case SPECIES_GYARADOS:
+        case SPECIES_JOLTEON:
+        case SPECIES_PORYGON:
+        case SPECIES_ZAPDOS:
+        case SPECIES_DRATINI:
+        case SPECIES_DRAGONAIR:
+        case SPECIES_DRAGONITE:
+        case SPECIES_MEWTWO:
+        case SPECIES_MEW:
+        case SPECIES_CHINCHOU:
+        case SPECIES_LANTURN:
+        case SPECIES_PICHU:
+        case SPECIES_CLEFFA:
+        case SPECIES_IGGLYBUFF:
+        case SPECIES_TOGEPI:
+        case SPECIES_TOGETIC:
+        case SPECIES_NATU:
+        case SPECIES_XATU:
+        case SPECIES_MAREEP:
+        case SPECIES_FLAAFFY:
+        case SPECIES_AMPHAROS:
+        case SPECIES_AIPOM:
+        case SPECIES_MURKROW:
+        case SPECIES_SLOWKING:
+        case SPECIES_MISDREAVUS:
+        case SPECIES_GIRAFARIG:
+        case SPECIES_DUNSPARCE:
+        case SPECIES_SNUBBULL:
+        case SPECIES_GRANBULL:
+        case SPECIES_QWILFISH:
+        case SPECIES_REMORAID:
+        case SPECIES_OCTILLERY:
+        case SPECIES_PORYGON2:
+        case SPECIES_STANTLER:
+        case SPECIES_ELEKID:
+        case SPECIES_MILTANK:
+        case SPECIES_BLISSEY:
+        case SPECIES_RAIKOU:
+        case SPECIES_TYRANITAR:
+        case SPECIES_LUGIA:
+        case SPECIES_HO_OH:
+        case SPECIES_CELEBI:
+            return TRUE;
+        default:
+            break;
+        }
+        if (sTutorLearnsets[species] & (1 << tutor))
+            return TRUE;
+        else
+            return FALSE;
+    case TUTOR_MOVE_ZAP_CANNON:
+        switch (species)
+        {
+        case SPECIES_SQUIRTLE:
+        case SPECIES_WARTORTLE:
+        case SPECIES_BLASTOISE:
+        case SPECIES_MEW:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_ABSORB:
+        switch (species)
+        {
+        case SPECIES_MEW:
+        case SPECIES_PHANPY:
+        case SPECIES_DONPHAN:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_LEECH_SEED:
+        switch (species)
+        {
+        case SPECIES_ODDISH:
+        case SPECIES_GLOOM:
+        case SPECIES_VILEPLUME:
+        case SPECIES_BELLOSSOM:
+        case SPECIES_MEW:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_PETAL_DANCE:
+        switch (species)
+        {
+        case SPECIES_PICHU:
+        case SPECIES_PIKACHU:
+        case SPECIES_RAICHU:
+        case SPECIES_CLEFFA:
+        case SPECIES_CLEFAIRY:
+        case SPECIES_CLEFABLE:
+        case SPECIES_IGGLYBUFF:
+        case SPECIES_JIGGLYPUFF:
+        case SPECIES_WIGGLYTUFF:
+        case SPECIES_PSYDUCK:
+        case SPECIES_GOLDUCK:
+        case SPECIES_SMOOCHUM:
+        case SPECIES_JYNX:
+        case SPECIES_CHIKORITA:
+        case SPECIES_BAYLEEF:
+        case SPECIES_MEGANIUM:
+        case SPECIES_MEOWTH:
+        case SPECIES_PERSIAN:
+        case SPECIES_MEW:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_SYNTHESIS:
+        switch (species)
+        {
+        case SPECIES_PARAS:
+        case SPECIES_PARASECT:
+        case SPECIES_TANGELA:
+        case SPECIES_MEW:
+            return TRUE;
+        default:
+            return FALSE;
+        }
+    case TUTOR_MOVE_POISON_TAIL:
+        if (species == SPECIES_GLIGAR)
             return TRUE;
         else
             return FALSE;
@@ -5812,7 +6250,7 @@ void ChooseMonForTradingBoard(u8 menuType, MainCallback callback)
 
 void ChooseMonForMoveTutor(void)
 {
-    if (gSpecialVar_0x8005 < TUTOR_MOVE_COUNT)
+    if (gSpecialVar_0x8005 < TUTOR_MOVE_COUNT || gSpecialVar_0x8005 == TUTOR_MOVE_FRENZY_PLANT || gSpecialVar_0x8005 == TUTOR_MOVE_BLAST_BURN || gSpecialVar_0x8005 == TUTOR_MOVE_ANCIENT_POWER || gSpecialVar_0x8005 == TUTOR_MOVE_ROCK_THROW || gSpecialVar_0x8005 == TUTOR_MOVE_ROLLOUT || gSpecialVar_0x8005 == TUTOR_MOVE_BUBBLE || gSpecialVar_0x8005 == TUTOR_MOVE_HYDRO_PUMP || gSpecialVar_0x8005 == TUTOR_MOVE_HYDRO_CANNON || gSpecialVar_0x8005 == TUTOR_MOVE_THUNDER_PUNCH || gSpecialVar_0x8005 == TUTOR_MOVE_ZAP_CANNON || gSpecialVar_0x8005 == TUTOR_MOVE_ABSORB || gSpecialVar_0x8005 == TUTOR_MOVE_LEECH_SEED || gSpecialVar_0x8005 == TUTOR_MOVE_PETAL_DANCE || gSpecialVar_0x8005 == TUTOR_MOVE_SYNTHESIS || gSpecialVar_0x8005 == TUTOR_MOVE_POISON_TAIL)
     {
         InitPartyMenu(PARTY_MENU_TYPE_FIELD,
                       PARTY_LAYOUT_SINGLE,
