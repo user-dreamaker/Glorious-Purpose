@@ -342,15 +342,15 @@ static const u16 sCreditsMonCircle_Pal[] = INCBIN_U16("graphics/credits/white_ci
 static const u32 sCreditsMonCircle_Tiles[] = INCBIN_U32("graphics/credits/white_circle.8bpp.lz");
 static const u32 sCreditsMonCircle_Tilemap[] = INCBIN_U32("graphics/credits/white_circle.bin.lz");
 
-static const u32 sCharizard1_Tiles[] = INCBIN_U32("graphics/credits/charizard_1.4bpp.lz");
-static const u32 sCharizard2_Tiles[] = INCBIN_U32("graphics/credits/charizard_2.4bpp.lz");
+const u32 gCreditsMonCharizard1_Tiles[] = INCBIN_U32("graphics/credits/charizard_1.4bpp.lz");
+const u32 gCreditsMonCharizard2_Tiles[] = INCBIN_U32("graphics/credits/charizard_2.4bpp.lz");
 
 static const u32 sVenusaurUnused_Tiles[] = INCBIN_U32("graphics/credits/venusaur_unused.4bpp.lz");
-static const u32 sVenusaur1_Tiles[] = INCBIN_U32("graphics/credits/venusaur_1.4bpp.lz");
-static const u32 sVenusaur2_Tiles[] = INCBIN_U32("graphics/credits/venusaur_2.4bpp.lz");
+const u32 gCreditsMonVenusaur1_Tiles[] = INCBIN_U32("graphics/credits/venusaur_1.4bpp.lz");
+const u32 gCreditsMonVenusaur2_Tiles[] = INCBIN_U32("graphics/credits/venusaur_2.4bpp.lz");
 
-static const u32 sBlastoise1_Tiles[] = INCBIN_U32("graphics/credits/blastoise_1.4bpp.lz");
-static const u32 sBlastoise2_Tiles[] = INCBIN_U32("graphics/credits/blastoise_2.4bpp.lz");
+const u32 gCreditsMonBlastoise1_Tiles[] = INCBIN_U32("graphics/credits/blastoise_1.4bpp.lz");
+const u32 gCreditsMonBlastoise2_Tiles[] = INCBIN_U32("graphics/credits/blastoise_2.4bpp.lz");
 
 static const u32 sPikachu1_Tiles[] = INCBIN_U32("graphics/credits/pikachu_1.4bpp.lz");
 static const u32 sPikachu2_Tiles[] = INCBIN_U32("graphics/credits/pikachu_2.4bpp.lz");
@@ -1051,22 +1051,22 @@ static void LoadCreditsMonPic(u8 whichMon)
         InitWindows(sWindowTemplates_Charizard);
         FillWindowPixelBuffer(0, PIXEL_FILL(0));
         LoadMonPicInWindow(SPECIES_CHARIZARD, SHINY_ODDS, 0, TRUE, 10, 0);
-        CopyToWindowPixelBuffer(1, (const void *)sCharizard1_Tiles, 0, 0);
-        CopyToWindowPixelBuffer(2, (const void *)sCharizard2_Tiles, 0, 0);
+        CopyToWindowPixelBuffer(1, (const void *)gCreditsMonCharizard1_Tiles, 0, 0);
+        CopyToWindowPixelBuffer(2, (const void *)gCreditsMonCharizard2_Tiles, 0, 0);
         break;
     case CREDITSMON_VENUSAUR:
         InitWindows(sWindowTemplates_Venusaur);
         FillWindowPixelBuffer(0, PIXEL_FILL(0));
         LoadMonPicInWindow(SPECIES_VENUSAUR, SHINY_ODDS, 0, TRUE, 10, 0);
-        CopyToWindowPixelBuffer(1, (const void *)sVenusaur1_Tiles, 0, 0);
-        CopyToWindowPixelBuffer(2, (const void *)sVenusaur2_Tiles, 0, 0);
+        CopyToWindowPixelBuffer(1, (const void *)gCreditsMonVenusaur1_Tiles, 0, 0);
+        CopyToWindowPixelBuffer(2, (const void *)gCreditsMonVenusaur2_Tiles, 0, 0);
         break;
     case CREDITSMON_BLASTOISE:
         InitWindows(sWindowTemplates_Blastoise);
         FillWindowPixelBuffer(0, PIXEL_FILL(0));
         LoadMonPicInWindow(SPECIES_BLASTOISE, SHINY_ODDS, 0, TRUE, 10, 0);
-        CopyToWindowPixelBuffer(1, (const void *)sBlastoise1_Tiles, 0, 0);
-        CopyToWindowPixelBuffer(2, (const void *)sBlastoise2_Tiles, 0, 0);
+        CopyToWindowPixelBuffer(1, (const void *)gCreditsMonBlastoise1_Tiles, 0, 0);
+        CopyToWindowPixelBuffer(2, (const void *)gCreditsMonBlastoise2_Tiles, 0, 0);
         break;
     case CREDITSMON_PIKACHU:
         InitWindows(sWindowTemplates_Pikachu);
