@@ -3937,9 +3937,29 @@ extern const u32 gBattleAnimSpritePal_FlyingDirt[];
 extern const u16 gGraphics_TitleScreen_GameTitleLogoPals[];
 extern const u8 gGraphics_TitleScreen_GameTitleLogoTiles[];
 extern const u8 gGraphics_TitleScreen_GameTitleLogoMap[];
+extern const u8 gTitleScreen_LogoTiles1[];
+extern const u8 gTitleScreen_LogoTiles2[];
+extern const u8 gTitleScreen_LogoTiles3[];
 extern const u16 gGraphics_TitleScreen_BoxArtMonPals[];
 extern const u8 gGraphics_TitleScreen_BoxArtMonTiles[];
-extern const u8 gGraphics_TitleScreen_BoxArtMonMap[];
+
+extern const u32 gCreditsMonCharizard1_Tiles[];
+extern const u32 gCreditsMonCharizard2_Tiles[];
+extern const u32 gCreditsMonVenusaur1_Tiles[];
+extern const u32 gCreditsMonVenusaur2_Tiles[];
+extern const u32 gCreditsMonBlastoise1_Tiles[];
+extern const u32 gCreditsMonBlastoise2_Tiles[];
+
+extern const u32 gMonFrontPic_Charizard[];
+extern const u32 gMonFrontPic_Venusaur[];
+extern const u32 gMonFrontPic_Blastoise[];
+extern const u16 gTitleScreen_MonPal_Charizard[];
+extern const u16 gTitleScreen_BackgroundPals0[];
+extern const u16 gTitleScreen_BackgroundPals1[];
+extern const u16 gTitleScreen_BackgroundPals2[];
+extern const u16 gTitleScreen_MonPal_Venusaur[];
+extern const u16 gTitleScreen_MonPal_Blastoise[];
+
 extern u16 gGraphics_TitleScreen_BackgroundPals[]; // If this is const, title_screen.c does not match
 extern const u8 gGraphics_TitleScreen_CopyrightPressStartTiles[];
 extern const u8 gGraphics_TitleScreen_CopyrightPressStartMap[];
