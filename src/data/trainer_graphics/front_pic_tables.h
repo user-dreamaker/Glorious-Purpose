@@ -148,6 +148,14 @@ const struct MonCoords gTrainerFrontPicCoords[] =
     {.size = 8, .y_offset = 1},
     {.size = 8, .y_offset = 1},
     {.size = 8, .y_offset = 1},
+    {.size = 8, .y_offset = 1},
+    {.size = 8, .y_offset = 1},
+    {.size = 8, .y_offset = 1},
+    {.size = 8, .y_offset = 1},
+    {.size = 8, .y_offset = 1},
+    {.size = 8, .y_offset = 1},
+    {.size = 8, .y_offset = 1},
+    {.size = 8, .y_offset = 1},
 };
 
 const struct CompressedSpriteSheet gTrainerFrontPicTable[] =
@@ -300,6 +308,14 @@ const struct CompressedSpriteSheet gTrainerFrontPicTable[] =
     TRAINER_SPRITE(RUIN_MANIAC, gTrainerFrontPic_RuinManiac, 0x800),
     TRAINER_SPRITE(LADY, gTrainerFrontPic_Lady, 0x800),
     TRAINER_SPRITE(PAINTER, gTrainerFrontPic_Painter, 0x800),
+    TRAINER_SPRITE(LEADER_FALKNER, gTrainerFrontPic_LeaderFalkner, 0x800),
+    TRAINER_SPRITE(LEADER_BUGSY, gTrainerFrontPic_LeaderBugsy, 0x800),
+    TRAINER_SPRITE(LEADER_WHITNEY, gTrainerFrontPic_LeaderWhitney, 0x800),
+    TRAINER_SPRITE(LEADER_MORTY, gTrainerFrontPic_LeaderMorty, 0x800),
+    TRAINER_SPRITE(LEADER_CHUCK, gTrainerFrontPic_LeaderChuck, 0x800),
+    TRAINER_SPRITE(LEADER_JASMINE, gTrainerFrontPic_LeaderJasmine, 0x800),
+    TRAINER_SPRITE(LEADER_PRYCE, gTrainerFrontPic_LeaderPryce, 0x800),
+    TRAINER_SPRITE(LEADER_CLAIR, gTrainerFrontPic_LeaderClair, 0x800),
 };
 
 const struct CompressedSpritePalette gTrainerFrontPicPaletteTable[] =
@@ -452,4 +468,12 @@ const struct CompressedSpritePalette gTrainerFrontPicPaletteTable[] =
     TRAINER_PAL(RUIN_MANIAC, gTrainerPalette_RuinManiac),
     TRAINER_PAL(LADY, gTrainerPalette_Lady),
     TRAINER_PAL(PAINTER, gTrainerPalette_Painter),
+    TRAINER_PAL(LEADER_FALKNER, gTrainerPalette_LeaderFalkner),
+    TRAINER_PAL(LEADER_BUGSY, gTrainerPalette_LeaderBugsy),
+    TRAINER_PAL(LEADER_WHITNEY, gTrainerPalette_LeaderWhitney),
+    TRAINER_PAL(LEADER_MORTY, gTrainerPalette_LeaderMorty),
+    TRAINER_PAL(LEADER_CHUCK, gTrainerPalette_LeaderChuck),
+    TRAINER_PAL(LEADER_JASMINE, gTrainerPalette_LeaderJasmine),
+    TRAINER_PAL(LEADER_PRYCE, gTrainerPalette_LeaderPryce),
+    TRAINER_PAL(LEADER_CLAIR, gTrainerPalette_LeaderClair),
 };
