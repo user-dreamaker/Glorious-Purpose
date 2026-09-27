@@ -166,6 +166,14 @@
 #define TRAINER_PIC_RUIN_MANIAC           145
 #define TRAINER_PIC_LADY                  146
 #define TRAINER_PIC_PAINTER               147
+#define TRAINER_PIC_LEADER_FALKNER        148
+#define TRAINER_PIC_LEADER_BUGSY          149
+#define TRAINER_PIC_LEADER_WHITNEY        150
+#define TRAINER_PIC_LEADER_MORTY          151
+#define TRAINER_PIC_LEADER_CHUCK          152
+#define TRAINER_PIC_LEADER_JASMINE        153
+#define TRAINER_PIC_LEADER_PRYCE          154
+#define TRAINER_PIC_LEADER_CLAIR          155
 
 // The player back pics are assumed to alternate according to the gender values (MALE/FEMALE)
 #define TRAINER_BACK_PIC_RED                    0
