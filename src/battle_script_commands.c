@@ -5764,7 +5764,7 @@ static void Cmd_getmoneyreward(void)
     {
         moneyReward = ComputeWhiteOutMoneyLoss();
     }
-    PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 5, moneyReward);
+    PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 6, moneyReward);
     if (moneyReward)
         gBattlescriptCurrInstr += 5;
     else
