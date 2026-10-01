@@ -17,6 +17,9 @@
 #define GFXTAG_FOSSIL 7000
 
 #define MULTICHOICE(name) {.list = name, .count = ARRAY_COUNT(name)}
+#define SCROLLING_MULTICHOICE_THRESHOLD  6
+#define SCROLLING_MULTICHOICE_MAX_VISIBLE 6
+#define SCROLLING_MULTICHOICE_ARROW_PADDING 2
 
 struct MultichoiceListStruct
 {
@@ -30,6 +33,8 @@ static void DrawVerticalMultichoiceMenu(u8 left, u8 top, u8 mcId, u8 ignoreBpres
 static u8 GetMCWindowHeight(u8 count);
 static void CreateMCMenuInputHandlerTask(u8 ignoreBpress, u8 count, u8 windowId, u8 mcId);
 static void Task_MultichoiceMenu_HandleInput(u8 taskId);
+static void DrawScrollingMultichoiceMenu(u8 left, u8 top, u8 mcId, u8 ignoreBpress, u8 count, const struct MenuAction *list, u8 width);
+static void Task_ScrollingMultichoiceMenu_HandleInput(u8 taskId);
 static void MultiChoicePrintHelpDescription(u8 mcId);
 static void Task_YesNoMenu_HandleInput(u8 taskId);
 static void Hask_MultichoiceGridMenu_HandleInput(u8 taskId);
@@ -496,6 +501,498 @@ static const struct MenuAction sMultichoiceList_Exit[] = {
     { gOtherText_Exit }
 };
 
+// Gym Rematch rewards
+static const u8 sText_GymReward_HeldItem[] = _("HELD ITEM");
+static const u8 sText_GymReward_MoveTutor[] = _("MOVE TUTOR");
+static const u8 sText_GymReward_TM[] = _("TM");
+
+static const struct MenuAction sMultichoiceList_GymReward[] = {
+    { sText_GymReward_HeldItem },
+    { sText_GymReward_MoveTutor },
+    { sText_GymReward_TM }
+};
+
+static const u8 sText_BrockTutor_AncientPower[] = _("ANCIENT POWER");
+static const u8 sText_BrockTutor_RockSlide[] = _("ROCK SLIDE");
+static const u8 sText_BrockTutor_RockThrow[] = _("ROCK THROW");
+static const u8 sText_BrockTutor_Rollout[] = _("ROLLOUT");
+
+static const struct MenuAction sMultichoiceList_BrockTutor[] = {
+    { sText_BrockTutor_AncientPower },
+    { sText_BrockTutor_RockSlide },
+    { sText_BrockTutor_RockThrow },
+    { sText_BrockTutor_Rollout }
+};
+
+static const u8 sText_TM_HiddenPower[] = _("HIDDEN POWER");
+
+static const u8 sText_BrockTM_Sandstorm[] = _("SANDSTORM");
+static const u8 sText_BrockTM_RockTomb[] = _("ROCK TOMB");
+
+static const struct MenuAction sMultichoiceList_BrockTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_BrockTM_Sandstorm },
+    { sText_BrockTM_RockTomb }
+};
+
+static const u8 sText_MistyTutor_Bubble[] = _("BUBBLE");
+static const u8 sText_MistyTutor_HydroCannon[] = _("HYDRO CANNON");
+static const u8 sText_MistyTutor_HydroPump[] = _("HYDRO PUMP");
+
+static const struct MenuAction sMultichoiceList_MistyTutor[] = {
+    { sText_MistyTutor_Bubble },
+    { sText_MistyTutor_HydroCannon },
+    { sText_MistyTutor_HydroPump }
+};
+
+static const u8 sText_MistyTM_RainDance[] = _("RAIN DANCE");
+static const u8 sText_MistyTM_WaterPulse[] = _("WATER PULSE");
+
+static const struct MenuAction sMultichoiceList_MistyTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_MistyTM_RainDance },
+    { sText_MistyTM_WaterPulse }
+};
+
+static const u8 sText_SurgeTutor_ThunderPunch[] = _("THUNDER PUNCH");
+static const u8 sText_SurgeTutor_ThunderWave[] = _("THUNDER WAVE");
+static const u8 sText_SurgeTutor_ZapCannon[] = _("ZAP CANNON");
+
+static const struct MenuAction sMultichoiceList_SurgeTutor[] = {
+    { sText_SurgeTutor_ThunderPunch },
+    { sText_SurgeTutor_ThunderWave },
+    { sText_SurgeTutor_ZapCannon }
+};
+
+static const u8 sText_SurgeTM_ShockWave[] = _("SHOCK WAVE");
+static const u8 sText_SurgeTM_Thunder[] = _("THUNDER");
+static const u8 sText_SurgeTM_Thunderbolt[] = _("THUNDERBOLT");
+
+static const struct MenuAction sMultichoiceList_SurgeTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_SurgeTM_ShockWave },
+    { sText_SurgeTM_Thunder },
+    { sText_SurgeTM_Thunderbolt }
+};
+
+static const u8 sText_ErikaTutor_Absorb[] = _("ABSORB");
+static const u8 sText_ErikaTutor_FrenzyPlant[] = _("FRENZY PLANT");
+static const u8 sText_ErikaTutor_LeechSeed[] = _("LEECH SEED");
+static const u8 sText_ErikaTutor_PetalDance[] = _("PETAL DANCE");
+static const u8 sText_ErikaTutor_Synthesis[] = _("SYNTHESIS");
+
+static const struct MenuAction sMultichoiceList_ErikaTutor[] = {
+    { sText_ErikaTutor_Absorb },
+    { sText_ErikaTutor_FrenzyPlant },
+    { sText_ErikaTutor_LeechSeed },
+    { sText_ErikaTutor_PetalDance },
+    { sText_ErikaTutor_Synthesis }
+};
+
+static const u8 sText_ErikaTM_BulletSeed[] = _("BULLET SEED");
+static const u8 sText_ErikaTM_GigaDrain[] = _("GIGA DRAIN");
+static const u8 sText_ErikaTM_SolarBeam[] = _("SOLAR BEAM");
+
+static const struct MenuAction sMultichoiceList_ErikaTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_ErikaTM_BulletSeed },
+    { sText_ErikaTM_GigaDrain },
+    { sText_ErikaTM_SolarBeam }
+};
+
+static const u8 sText_KogaTutor_PoisonTail[] = _("POISON TAIL");
+
+static const struct MenuAction sMultichoiceList_KogaTutor[] = {
+    { sText_KogaTutor_PoisonTail }
+};
+
+static const u8 sText_KogaTM_SludgeBomb[] = _("SLUDGE BOMB");
+static const u8 sText_KogaTM_Toxic[] = _("TOXIC");
+
+static const struct MenuAction sMultichoiceList_KogaTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_KogaTM_SludgeBomb },
+    { sText_KogaTM_Toxic }
+};
+
+static const u8 sText_SabrinaTutor_Agility[] = _("AGILITY");
+static const u8 sText_SabrinaTutor_Amnesia[] = _("AMNESIA");
+static const u8 sText_SabrinaTutor_Barrier[] = _("BARRIER");
+static const u8 sText_SabrinaTutor_DreamEater[] = _("DREAM EATER");
+static const u8 sText_SabrinaTutor_Extrasensory[] = _("EXTRASENSORY");
+static const u8 sText_SabrinaTutor_FutureSight[] = _("FUTURE SIGHT");
+static const u8 sText_SabrinaTutor_Hypnosis[] = _("HYPNOSIS");
+static const u8 sText_SabrinaTutor_LightScreen[] = _("LIGHT SCREEN");
+static const u8 sText_SabrinaTutor_PsychoBoost[] = _("PSYCHO BOOST");
+static const u8 sText_SabrinaTutor_RolePlay[] = _("ROLE PLAY");
+
+static const struct MenuAction sMultichoiceList_SabrinaTutor[] = {
+    { sText_SabrinaTutor_Agility },
+    { sText_SabrinaTutor_Amnesia },
+    { sText_SabrinaTutor_Barrier },
+    { sText_SabrinaTutor_DreamEater },
+    { sText_SabrinaTutor_Extrasensory },
+    { sText_SabrinaTutor_FutureSight },
+    { sText_SabrinaTutor_Hypnosis },
+    { sText_SabrinaTutor_LightScreen },
+    { sText_SabrinaTutor_PsychoBoost },
+    { sText_SabrinaTutor_RolePlay }
+};
+
+static const u8 sText_SabrinaTM_CalmMind[] = _("CALM MIND");
+static const u8 sText_SabrinaTM_LightScreen[] = _("LIGHT SCREEN");
+static const u8 sText_SabrinaTM_Psychic[] = _("PSYCHIC");
+static const u8 sText_SabrinaTM_Reflect[] = _("REFLECT");
+static const u8 sText_SabrinaTM_Rest[] = _("REST");
+static const u8 sText_SabrinaTM_SkillSwap[] = _("SKILL SWAP");
+
+static const struct MenuAction sMultichoiceList_SabrinaTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_SabrinaTM_CalmMind },
+    { sText_SabrinaTM_LightScreen },
+    { sText_SabrinaTM_Psychic },
+    { sText_SabrinaTM_Reflect },
+    { sText_SabrinaTM_Rest },
+    { sText_SabrinaTM_SkillSwap }
+};
+
+static const u8 sText_BlaineTutor_BlastBurn[] = _("BLAST BURN");
+static const u8 sText_BlaineTutor_FirePunch[] = _("FIRE PUNCH");
+static const u8 sText_BlaineTutor_WillOWisp[] = _("WILL-O-WISP");
+
+static const struct MenuAction sMultichoiceList_BlaineTutor[] = {
+    { sText_BlaineTutor_BlastBurn },
+    { sText_BlaineTutor_FirePunch },
+    { sText_BlaineTutor_WillOWisp }
+};
+
+static const u8 sText_BlaineTM_FireBlast[] = _("FIRE BLAST");
+static const u8 sText_BlaineTM_Flamethrower[] = _("FLAMETHROWER");
+static const u8 sText_BlaineTM_Overheat[] = _("OVERHEAT");
+static const u8 sText_BlaineTM_SunnyDay[] = _("SUNNY DAY");
+
+static const struct MenuAction sMultichoiceList_BlaineTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_BlaineTM_FireBlast },
+    { sText_BlaineTM_Flamethrower },
+    { sText_BlaineTM_Overheat },
+    { sText_BlaineTM_SunnyDay }
+};
+
+static const u8 sText_GiovanniTutor_MudSlap[] = _("MUD-SLAP");
+static const u8 sText_GiovanniTutor_MudSport[] = _("MUD SPORT");
+static const u8 sText_GiovanniTutor_Spikes[] = _("SPIKES");
+
+static const struct MenuAction sMultichoiceList_GiovanniTutor[] = {
+    { sText_GiovanniTutor_MudSlap },
+    { sText_GiovanniTutor_MudSport },
+    { sText_GiovanniTutor_Spikes }
+};
+
+static const u8 sText_GiovanniTM_Dig[] = _("DIG");
+static const u8 sText_GiovanniTM_Earthquake[] = _("EARTHQUAKE");
+
+static const struct MenuAction sMultichoiceList_GiovanniTM[] = {
+    { sText_GiovanniTM_Dig },
+    { sText_GiovanniTM_Earthquake }
+};
+
+static const u8 sText_FalknerTutor_FeatherDance[] = _("FEATHER DANCE");
+static const u8 sText_FalknerTutor_Gust[] = _("GUST");
+static const u8 sText_FalknerTutor_SkyAttack[] = _("SKY ATTACK");
+
+static const struct MenuAction sMultichoiceList_FalknerTutor[] = {
+    { sText_FalknerTutor_FeatherDance },
+    { sText_FalknerTutor_Gust },
+    { sText_FalknerTutor_SkyAttack }
+};
+
+static const u8 sText_FalknerTM_AerialAce[] = _("AERIAL ACE");
+
+static const struct MenuAction sMultichoiceList_FalknerTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_FalknerTM_AerialAce }
+};
+
+static const u8 sText_BugsyTutor_FuryCutter[] = _("FURY CUTTER");
+
+static const struct MenuAction sMultichoiceList_BugsyTutor[] = {
+    { sText_BugsyTutor_FuryCutter }
+};
+
+static const struct MenuAction sMultichoiceList_BugsyTM[] = {
+    { sText_TM_HiddenPower }
+};
+
+static const u8 sText_WhitneyTutor_BatonPass[] = _("BATON PASS");
+static const u8 sText_WhitneyTutor_BellyDrum[] = _("BELLY DRUM");
+static const u8 sText_WhitneyTutor_BodySlam[] = _("BODY SLAM");
+static const u8 sText_WhitneyTutor_Charm[] = _("CHARM");
+static const u8 sText_WhitneyTutor_DefenseCurl[] = _("DEFENSE CURL");
+static const u8 sText_WhitneyTutor_DizzyPunch[] = _("DIZZY PUNCH");
+static const u8 sText_WhitneyTutor_DoubleEdge[] = _("DOUBLE-EDGE");
+static const u8 sText_WhitneyTutor_DoubleSlap[] = _("DOUBLESLAP");
+static const u8 sText_WhitneyTutor_Encore[] = _("ENCORE");
+static const u8 sText_WhitneyTutor_Endure[] = _("ENDURE");
+static const u8 sText_WhitneyTutor_Explosion[] = _("EXPLOSION");
+static const u8 sText_WhitneyTutor_ExtremeSpeed[] = _("EXTREMESPEED");
+static const u8 sText_WhitneyTutor_FalseSwipe[] = _("FALSE SWIPE");
+static const u8 sText_WhitneyTutor_Flail[] = _("FLAIL");
+static const u8 sText_WhitneyTutor_FollowMe[] = _("FOLLOW ME");
+static const u8 sText_WhitneyTutor_Foresight[] = _("FORESIGHT");
+static const u8 sText_WhitneyTutor_FuryAttack[] = _("FURY ATTACK");
+static const u8 sText_WhitneyTutor_Growth[] = _("GROWTH");
+static const u8 sText_WhitneyTutor_HealBell[] = _("HEAL BELL");
+static const u8 sText_WhitneyTutor_HelpingHand[] = _("HELPING HAND");
+static const u8 sText_WhitneyTutor_HornDrill[] = _("HORN DRILL");
+static const u8 sText_WhitneyTutor_LovelyKiss[] = _("LOVELY KISS");
+static const u8 sText_WhitneyTutor_MegaKick[] = _("MEGA KICK");
+static const u8 sText_WhitneyTutor_MegaPunch[] = _("MEGA PUNCH");
+static const u8 sText_WhitneyTutor_Metronome[] = _("METRONOME");
+static const u8 sText_WhitneyTutor_Mimic[] = _("MIMIC");
+static const u8 sText_WhitneyTutor_MindReader[] = _("MIND READER");
+static const u8 sText_WhitneyTutor_Moonlight[] = _("MOONLIGHT");
+static const u8 sText_WhitneyTutor_MorningSun[] = _("MORNING SUN");
+static const u8 sText_WhitneyTutor_PayDay[] = _("PAY DAY");
+static const u8 sText_WhitneyTutor_PsychUp[] = _("PSYCH UP");
+static const u8 sText_WhitneyTutor_QuickAttack[] = _("QUICK ATTACK");
+static const u8 sText_WhitneyTutor_Rage[] = _("RAGE");
+static const u8 sText_WhitneyTutor_RapidSpin[] = _("RAPID SPIN");
+static const u8 sText_WhitneyTutor_Refresh[] = _("REFRESH");
+static const u8 sText_WhitneyTutor_Safeguard[] = _("SAFEGUARD");
+static const u8 sText_WhitneyTutor_ScaryFace[] = _("SCARY FACE");
+static const u8 sText_WhitneyTutor_SelfDestruct[] = _("SELFDESTRUCT");
+static const u8 sText_WhitneyTutor_Sharpen[] = _("SHARPEN");
+static const u8 sText_WhitneyTutor_Sing[] = _("SING");
+static const u8 sText_WhitneyTutor_SleepTalk[] = _("SLEEP TALK");
+static const u8 sText_WhitneyTutor_Snore[] = _("SNORE");
+static const u8 sText_WhitneyTutor_SoftBoiled[] = _("SOFTBOILED");
+static const u8 sText_WhitneyTutor_SonicBoom[] = _("SONICBOOM");
+static const u8 sText_WhitneyTutor_Splash[] = _("SPLASH");
+static const u8 sText_WhitneyTutor_Substitute[] = _("SUBSTITUTE");
+static const u8 sText_WhitneyTutor_Swagger[] = _("SWAGGER");
+static const u8 sText_WhitneyTutor_SweetKiss[] = _("SWEET KISS");
+static const u8 sText_WhitneyTutor_SweetScent[] = _("SWEET SCENT");
+static const u8 sText_WhitneyTutor_Swift[] = _("SWIFT");
+static const u8 sText_WhitneyTutor_SwordsDance[] = _("SWORDS DANCE");
+static const u8 sText_WhitneyTutor_TeeterDance[] = _("TEETER DANCE");
+static const u8 sText_WhitneyTutor_Thrash[] = _("THRASH");
+static const u8 sText_WhitneyTutor_Tickle[] = _("TICKLE");
+static const u8 sText_WhitneyTutor_TriAttack[] = _("TRI ATTACK");
+static const u8 sText_WhitneyTutor_Whirlwind[] = _("WHIRLWIND");
+static const u8 sText_WhitneyTutor_Wish[] = _("WISH");
+static const u8 sText_WhitneyTutor_Yawn[] = _("YAWN");
+
+static const struct MenuAction sMultichoiceList_WhitneyTutor[] = {
+    { sText_WhitneyTutor_BatonPass },
+    { sText_WhitneyTutor_BellyDrum },
+    { sText_WhitneyTutor_BodySlam },
+    { sText_WhitneyTutor_Charm },
+    { sText_WhitneyTutor_DefenseCurl },
+    { sText_WhitneyTutor_DizzyPunch },
+    { sText_WhitneyTutor_DoubleEdge },
+    { sText_WhitneyTutor_DoubleSlap },
+    { sText_WhitneyTutor_Encore },
+    { sText_WhitneyTutor_Endure },
+    { sText_WhitneyTutor_Explosion },
+    { sText_WhitneyTutor_ExtremeSpeed },
+    { sText_WhitneyTutor_FalseSwipe },
+    { sText_WhitneyTutor_Flail },
+    { sText_WhitneyTutor_FollowMe },
+    { sText_WhitneyTutor_Foresight },
+    { sText_WhitneyTutor_FuryAttack },
+    { sText_WhitneyTutor_Growth },
+    { sText_WhitneyTutor_HealBell },
+    { sText_WhitneyTutor_HelpingHand },
+    { sText_WhitneyTutor_HornDrill },
+    { sText_WhitneyTutor_LovelyKiss },
+    { sText_WhitneyTutor_MegaKick },
+    { sText_WhitneyTutor_MegaPunch },
+    { sText_WhitneyTutor_Metronome },
+    { sText_WhitneyTutor_Mimic },
+    { sText_WhitneyTutor_MindReader },
+    { sText_WhitneyTutor_Moonlight },
+    { sText_WhitneyTutor_MorningSun },
+    { sText_WhitneyTutor_PayDay },
+    { sText_WhitneyTutor_PsychUp },
+    { sText_WhitneyTutor_QuickAttack },
+    { sText_WhitneyTutor_Rage },
+    { sText_WhitneyTutor_RapidSpin },
+    { sText_WhitneyTutor_Refresh },
+    { sText_WhitneyTutor_Safeguard },
+    { sText_WhitneyTutor_ScaryFace },
+    { sText_WhitneyTutor_SelfDestruct },
+    { sText_WhitneyTutor_Sharpen },
+    { sText_WhitneyTutor_Sing },
+    { sText_WhitneyTutor_SleepTalk },
+    { sText_WhitneyTutor_Snore },
+    { sText_WhitneyTutor_SoftBoiled },
+    { sText_WhitneyTutor_SonicBoom },
+    { sText_WhitneyTutor_Splash },
+    { sText_WhitneyTutor_Substitute },
+    { sText_WhitneyTutor_Swagger },
+    { sText_WhitneyTutor_SweetKiss },
+    { sText_WhitneyTutor_SweetScent },
+    { sText_WhitneyTutor_Swift },
+    { sText_WhitneyTutor_SwordsDance },
+    { sText_WhitneyTutor_TeeterDance },
+    { sText_WhitneyTutor_Thrash },
+    { sText_WhitneyTutor_Tickle },
+    { sText_WhitneyTutor_TriAttack },
+    { sText_WhitneyTutor_Whirlwind },
+    { sText_WhitneyTutor_Wish },
+    { sText_WhitneyTutor_Yawn }
+};
+
+static const u8 sText_WhitneyTM_Attract[] = _("ATTRACT");
+static const u8 sText_WhitneyTM_DoubleTeam[] = _("DOUBLE TEAM");
+static const u8 sText_WhitneyTM_Facade[] = _("FACADE");
+static const u8 sText_WhitneyTM_Frustration[] = _("FRUSTRATION");
+static const u8 sText_WhitneyTM_HyperBeam[] = _("HYPER BEAM");
+static const u8 sText_WhitneyTM_Protect[] = _("PROTECT");
+static const u8 sText_WhitneyTM_Return[] = _("RETURN");
+static const u8 sText_WhitneyTM_Roar[] = _("ROAR");
+static const u8 sText_WhitneyTM_Safeguard[] = _("SAFEGUARD");
+static const u8 sText_WhitneyTM_SecretPower[] = _("SECRET POWER");
+
+static const struct MenuAction sMultichoiceList_WhitneyTM[] = {
+    { sText_WhitneyTM_Attract },
+    { sText_WhitneyTM_DoubleTeam },
+    { sText_WhitneyTM_Facade },
+    { sText_WhitneyTM_Frustration },
+    { sText_WhitneyTM_HyperBeam },
+    { sText_WhitneyTM_Protect },
+    { sText_WhitneyTM_Return },
+    { sText_WhitneyTM_Roar },
+    { sText_WhitneyTM_Safeguard },
+    { sText_WhitneyTM_SecretPower }
+};
+
+static const u8 sText_MortyTutor_ConfuseRay[] = _("CONFUSE RAY");
+static const u8 sText_MortyTutor_Nightmare[] = _("NIGHTMARE");
+static const u8 sText_MortyTutor_NightShade[] = _("NIGHT SHADE");
+static const u8 sText_MortyTutor_BeatUp[] = _("BEAT UP");
+static const u8 sText_MortyTutor_Bite[] = _("BITE");
+static const u8 sText_MortyTutor_Crunch[] = _("CRUNCH");
+static const u8 sText_MortyTutor_FaintAttack[] = _("FAINT ATTACK");
+static const u8 sText_MortyTutor_Pursuit[] = _("PURSUIT");
+
+static const struct MenuAction sMultichoiceList_MortyTutor[] = {
+    { sText_MortyTutor_ConfuseRay },
+    { sText_MortyTutor_Nightmare },
+    { sText_MortyTutor_NightShade },
+    { sText_MortyTutor_BeatUp },
+    { sText_MortyTutor_Bite },
+    { sText_MortyTutor_Crunch },
+    { sText_MortyTutor_FaintAttack },
+    { sText_MortyTutor_Pursuit }
+};
+
+static const u8 sText_MortyTM_ShadowBall[] = _("SHADOW BALL");
+static const u8 sText_MortyTM_Snatch[] = _("SNATCH");
+static const u8 sText_MortyTM_Taunt[] = _("TAUNT");
+static const u8 sText_MortyTM_Thief[] = _("THIEF");
+static const u8 sText_MortyTM_Torment[] = _("TORMENT");
+
+static const struct MenuAction sMultichoiceList_MortyTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_MortyTM_ShadowBall },
+    { sText_MortyTM_Snatch },
+    { sText_MortyTM_Taunt },
+    { sText_MortyTM_Thief },
+    { sText_MortyTM_Torment }
+};
+
+static const u8 sText_MortyHeld_SpellTag[] = _("SPELL TAG");
+static const u8 sText_MortyHeld_BlackGlasses[] = _("BLACKGLASSES");
+
+static const struct MenuAction sMultichoiceList_MortyHeld[] = {
+    { sText_MortyHeld_SpellTag },
+    { sText_MortyHeld_BlackGlasses }
+};
+
+static const u8 sText_ChuckTutor_Counter[] = _("COUNTER");
+static const u8 sText_ChuckTutor_DynamicPunch[] = _("DYNAMICPUNCH");
+static const u8 sText_ChuckTutor_LowKick[] = _("LOW KICK");
+static const u8 sText_ChuckTutor_Reversal[] = _("REVERSAL");
+static const u8 sText_ChuckTutor_SeismicToss[] = _("SEISMIC TOSS");
+static const u8 sText_ChuckTutor_Submission[] = _("SUBMISSION");
+
+static const struct MenuAction sMultichoiceList_ChuckTutor[] = {
+    { sText_ChuckTutor_Counter },
+    { sText_ChuckTutor_DynamicPunch },
+    { sText_ChuckTutor_LowKick },
+    { sText_ChuckTutor_Reversal },
+    { sText_ChuckTutor_SeismicToss },
+    { sText_ChuckTutor_Submission }
+};
+
+static const u8 sText_ChuckTM_BrickBreak[] = _("BRICK BREAK");
+static const u8 sText_ChuckTM_BulkUp[] = _("BULK UP");
+static const u8 sText_ChuckTM_FocusPunch[] = _("FOCUS PUNCH");
+
+static const struct MenuAction sMultichoiceList_ChuckTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_ChuckTM_BrickBreak },
+    { sText_ChuckTM_BulkUp },
+    { sText_ChuckTM_FocusPunch }
+};
+
+static const u8 sText_JasmineTutor_MetalClaw[] = _("METAL CLAW");
+static const u8 sText_JasmineTutor_MetalSound[] = _("METAL SOUND");
+
+static const struct MenuAction sMultichoiceList_JasmineTutor[] = {
+    { sText_JasmineTutor_MetalClaw },
+    { sText_JasmineTutor_MetalSound }
+};
+
+static const u8 sText_JasmineTM_IronTail[] = _("IRON TAIL");
+static const u8 sText_JasmineTM_SteelWing[] = _("STEEL WING");
+
+static const struct MenuAction sMultichoiceList_JasmineTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_JasmineTM_IronTail },
+    { sText_JasmineTM_SteelWing }
+};
+
+static const u8 sText_PryceTutor_Haze[] = _("HAZE");
+static const u8 sText_PryceTutor_IcePunch[] = _("ICE PUNCH");
+static const u8 sText_PryceTutor_IcyWind[] = _("ICY WIND");
+static const u8 sText_PryceTutor_Mist[] = _("MIST");
+
+static const struct MenuAction sMultichoiceList_PryceTutor[] = {
+    { sText_PryceTutor_Haze },
+    { sText_PryceTutor_IcePunch },
+    { sText_PryceTutor_IcyWind },
+    { sText_PryceTutor_Mist }
+};
+
+static const u8 sText_PryceTM_Blizzard[] = _("BLIZZARD");
+static const u8 sText_PryceTM_Hail[] = _("HAIL");
+static const u8 sText_PryceTM_IceBeam[] = _("ICE BEAM");
+
+static const struct MenuAction sMultichoiceList_PryceTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_PryceTM_Blizzard },
+    { sText_PryceTM_Hail },
+    { sText_PryceTM_IceBeam }
+};
+
+static const u8 sText_ClairTutor_DragonRage[] = _("DRAGON RAGE");
+static const u8 sText_ClairTutor_Twister[] = _("TWISTER");
+
+static const struct MenuAction sMultichoiceList_ClairTutor[] = {
+    { sText_ClairTutor_DragonRage },
+    { sText_ClairTutor_Twister }
+};
+
+static const u8 sText_ClairTM_DragonClaw[] = _("DRAGON CLAW");
+
+static const struct MenuAction sMultichoiceList_ClairTM[] = {
+    { sText_TM_HiddenPower },
+    { sText_ClairTM_DragonClaw }
+};
+
 static const struct MultichoiceListStruct sMultichoiceLists[] = {
     [MULTICHOICE_YES_NO]                                     = MULTICHOICE(sMultichoiceList_YesNo),
     [MULTICHOICE_EEVEELUTIONS]                               = MULTICHOICE(sMultichoiceList_Eeveelutions),
@@ -562,6 +1059,40 @@ static const struct MultichoiceListStruct sMultichoiceLists[] = {
     [MULTICHOICE_62]                                         = MULTICHOICE(sMultichoiceList_62),
     [MULTICHOICE_JOIN_OR_LEAD]                               = MULTICHOICE(sMultichoiceList_JoinOrLead),
     [MULTICHOICE_TRAINER_TOWER_MODE]                         = MULTICHOICE(sMultichoiceList_TrainerTowerMode),
+    [MULTICHOICE_GYM_REWARD]                                 = MULTICHOICE(sMultichoiceList_GymReward),
+    [MULTICHOICE_BROCK_TUTOR]                                = MULTICHOICE(sMultichoiceList_BrockTutor),
+    [MULTICHOICE_BROCK_TM]                                   = MULTICHOICE(sMultichoiceList_BrockTM),
+    [MULTICHOICE_MISTY_TUTOR]                                = MULTICHOICE(sMultichoiceList_MistyTutor),
+    [MULTICHOICE_MISTY_TM]                                   = MULTICHOICE(sMultichoiceList_MistyTM),
+    [MULTICHOICE_SURGE_TUTOR]                                = MULTICHOICE(sMultichoiceList_SurgeTutor),
+    [MULTICHOICE_SURGE_TM]                                   = MULTICHOICE(sMultichoiceList_SurgeTM),
+    [MULTICHOICE_ERIKA_TUTOR]                                = MULTICHOICE(sMultichoiceList_ErikaTutor),
+    [MULTICHOICE_ERIKA_TM]                                   = MULTICHOICE(sMultichoiceList_ErikaTM),
+    [MULTICHOICE_KOGA_TUTOR]                                 = MULTICHOICE(sMultichoiceList_KogaTutor),
+    [MULTICHOICE_KOGA_TM]                                    = MULTICHOICE(sMultichoiceList_KogaTM),
+    [MULTICHOICE_SABRINA_TUTOR]                              = MULTICHOICE(sMultichoiceList_SabrinaTutor),
+    [MULTICHOICE_SABRINA_TM]                                 = MULTICHOICE(sMultichoiceList_SabrinaTM),
+    [MULTICHOICE_BLAINE_TUTOR]                               = MULTICHOICE(sMultichoiceList_BlaineTutor),
+    [MULTICHOICE_BLAINE_TM]                                  = MULTICHOICE(sMultichoiceList_BlaineTM),
+    [MULTICHOICE_GIOVANNI_TUTOR]                             = MULTICHOICE(sMultichoiceList_GiovanniTutor),
+    [MULTICHOICE_GIOVANNI_TM]                                = MULTICHOICE(sMultichoiceList_GiovanniTM),
+    [MULTICHOICE_FALKNER_TUTOR]                              = MULTICHOICE(sMultichoiceList_FalknerTutor),
+    [MULTICHOICE_FALKNER_TM]                                 = MULTICHOICE(sMultichoiceList_FalknerTM),
+    [MULTICHOICE_BUGSY_TUTOR]                                = MULTICHOICE(sMultichoiceList_BugsyTutor),
+    [MULTICHOICE_BUGSY_TM]                                   = MULTICHOICE(sMultichoiceList_BugsyTM),
+    [MULTICHOICE_WHITNEY_TUTOR]                              = MULTICHOICE(sMultichoiceList_WhitneyTutor),
+    [MULTICHOICE_WHITNEY_TM]                                 = MULTICHOICE(sMultichoiceList_WhitneyTM),
+    [MULTICHOICE_MORTY_TUTOR]                                = MULTICHOICE(sMultichoiceList_MortyTutor),
+    [MULTICHOICE_MORTY_TM]                                   = MULTICHOICE(sMultichoiceList_MortyTM),
+    [MULTICHOICE_MORTY_HELD]                                 = MULTICHOICE(sMultichoiceList_MortyHeld),
+    [MULTICHOICE_CHUCK_TUTOR]                                = MULTICHOICE(sMultichoiceList_ChuckTutor),
+    [MULTICHOICE_CHUCK_TM]                                   = MULTICHOICE(sMultichoiceList_ChuckTM),
+    [MULTICHOICE_JASMINE_TUTOR]                              = MULTICHOICE(sMultichoiceList_JasmineTutor),
+    [MULTICHOICE_JASMINE_TM]                                 = MULTICHOICE(sMultichoiceList_JasmineTM),
+    [MULTICHOICE_PRYCE_TUTOR]                                = MULTICHOICE(sMultichoiceList_PryceTutor),
+    [MULTICHOICE_PRYCE_TM]                                   = MULTICHOICE(sMultichoiceList_PryceTM),
+    [MULTICHOICE_CLAIR_TUTOR]                                = MULTICHOICE(sMultichoiceList_ClairTutor),
+    [MULTICHOICE_CLAIR_TM]                                   = MULTICHOICE(sMultichoiceList_ClairTM),
 };
 
 // From Cool to Berries goes unused
@@ -730,17 +1261,27 @@ static void DrawVerticalMultichoiceMenu(u8 left, u8 top, u8 mcId, u8 ignoreBpres
         width = (strWidth + 9) / 8 + 1;
         if (left + width > 28)
             left = 28 - width;
-        height = GetMCWindowHeight(count);
-        windowId = CreateWindowFromRect(left, top, width, height);
-        SetStdWindowBorderStyle(windowId, FALSE);
-        if (mcId == MULTICHOICE_GAME_CORNER_TMPRIZES
-         || mcId == MULTICHOICE_BIKE_SHOP
-         || mcId == MULTICHOICE_GAME_CORNER_BATTLE_ITEM_PRIZES)
-            MultichoiceList_PrintItems(windowId, FONT_NORMAL, 8, 2, 14, count, list, 0, 2);
+        if (count > SCROLLING_MULTICHOICE_THRESHOLD)
+        {
+            width += SCROLLING_MULTICHOICE_ARROW_PADDING;
+            if (left + width > 28)
+                left = 28 - width;
+            DrawScrollingMultichoiceMenu(left, top, mcId, ignoreBpress, count, list, width);
+        }
         else
-            MultichoiceList_PrintItems(windowId, FONT_NORMAL, 8, 2, 14, count, list, 0, 2);
-        Menu_InitCursor(windowId, FONT_NORMAL, 0, 2, 14, count, initPos);
-        CreateMCMenuInputHandlerTask(ignoreBpress, count, windowId, mcId);
+        {
+            height = GetMCWindowHeight(count);
+            windowId = CreateWindowFromRect(left, top, width, height);
+            SetStdWindowBorderStyle(windowId, FALSE);
+            if (mcId == MULTICHOICE_GAME_CORNER_TMPRIZES
+             || mcId == MULTICHOICE_BIKE_SHOP
+             || mcId == MULTICHOICE_GAME_CORNER_BATTLE_ITEM_PRIZES)
+                MultichoiceList_PrintItems(windowId, FONT_NORMAL, 8, 2, 14, count, list, 0, 2);
+            else
+                MultichoiceList_PrintItems(windowId, FONT_NORMAL, 8, 2, 14, count, list, 0, 2);
+            Menu_InitCursor(windowId, FONT_NORMAL, 0, 2, 14, count, initPos);
+            CreateMCMenuInputHandlerTask(ignoreBpress, count, windowId, mcId);
+        }
         ScheduleBgCopyTilemapToVram(0);
     }
 }
@@ -777,6 +1318,9 @@ static u8 GetMCWindowHeight(u8 count)
 #define tWrapAround    data[5]
 #define tWindowId      data[6]
 #define tMultichoiceId data[7]
+#define tScrollCount   data[8]
+
+static u16 sScrollingMultichoiceScrollOffset;
 
 static void CreateMCMenuInputHandlerTask(u8 ignoreBpress, u8 count, u8 windowId, u8 mcId)
 {
@@ -832,6 +1376,127 @@ static void Task_MultichoiceMenu_HandleInput(u8 taskId)
             DestroyScriptMenuWindow(tWindowId);
             DestroyTask(taskId);
             ScriptContext_Enable();
+        }
+    }
+}
+
+static void ScrollingMultichoiceMenu_Close(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    DestroyScriptMenuWindow(tWindowId);
+    DestroyTask(taskId);
+    ScriptContext_Enable();
+}
+
+static void ScrollingMultichoiceMenu_MoveToSelection(u8 taskId, u8 newSel)
+{
+    s16 *data = gTasks[taskId].data;
+    u8 windowId = tWindowId;
+    u8 mcId = tMultichoiceId;
+    const struct MenuAction *list = sMultichoiceLists[mcId].list;
+    u8 newOffset = sScrollingMultichoiceScrollOffset;
+
+    if (newSel < newOffset)
+        newOffset = newSel;
+    else if (newSel >= newOffset + SCROLLING_MULTICHOICE_MAX_VISIBLE)
+        newOffset = newSel - SCROLLING_MULTICHOICE_MAX_VISIBLE + 1;
+
+    if (newOffset != sScrollingMultichoiceScrollOffset)
+    {
+        sScrollingMultichoiceScrollOffset = newOffset;
+        FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
+        MultichoiceList_PrintItems(windowId, FONT_NORMAL, 8, 2, 14, SCROLLING_MULTICHOICE_MAX_VISIBLE, &list[newOffset], 0, 2);
+        Menu_InitCursor(windowId, FONT_NORMAL, 0, 2, 14, SCROLLING_MULTICHOICE_MAX_VISIBLE, newSel - newOffset);
+        ScheduleBgCopyTilemapToVram(0);
+    }
+    else
+    {
+        Menu_MoveCursor((s8)newSel - (s8)(sScrollingMultichoiceScrollOffset + Menu_GetCursorPos()));
+    }
+}
+
+static void DrawScrollingMultichoiceMenu(u8 left, u8 top, u8 mcId, u8 ignoreBpress, u8 count, const struct MenuAction *list, u8 width)
+{
+    u8 height;
+    u8 windowId;
+    u8 taskId;
+
+    sScrollingMultichoiceScrollOffset = 0;
+    height = GetMCWindowHeight(SCROLLING_MULTICHOICE_MAX_VISIBLE);
+    windowId = CreateWindowFromRect(left, top, width, height);
+    SetStdWindowBorderStyle(windowId, FALSE);
+    MultichoiceList_PrintItems(windowId, FONT_NORMAL, 8, 2, 14, SCROLLING_MULTICHOICE_MAX_VISIBLE, list, 0, 2);
+    Menu_InitCursor(windowId, FONT_NORMAL, 0, 2, 14, SCROLLING_MULTICHOICE_MAX_VISIBLE, 0);
+    taskId = CreateTask(Task_ScrollingMultichoiceMenu_HandleInput, 80);
+    gTasks[taskId].tIgnoreBPress = ignoreBpress;
+    if (count > 3)
+        gTasks[taskId].tWrapAround = TRUE;
+    else
+        gTasks[taskId].tWrapAround = FALSE;
+    gTasks[taskId].tWindowId = windowId;
+    gTasks[taskId].tMultichoiceId = mcId;
+    gTasks[taskId].tScrollCount = count;
+    MultiChoicePrintHelpDescription(mcId);
+}
+
+static void Task_ScrollingMultichoiceMenu_HandleInput(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u8 count = tScrollCount;
+    s16 sel;
+    s16 newSel;
+
+    if (!gPaletteFade.active)
+    {
+        if (sDelay != 0)
+        {
+            sDelay--;
+            return;
+        }
+        sel = (s16)sScrollingMultichoiceScrollOffset + Menu_GetCursorPos();
+        if (JOY_NEW(A_BUTTON))
+        {
+            PlaySE(SE_SELECT);
+            gSpecialVar_Result = sel;
+            ScrollingMultichoiceMenu_Close(taskId);
+            return;
+        }
+        if (JOY_NEW(B_BUTTON))
+        {
+            if (tIgnoreBPress)
+                return;
+            PlaySE(SE_SELECT);
+            gSpecialVar_Result = SCR_MENU_CANCEL;
+            ScrollingMultichoiceMenu_Close(taskId);
+            return;
+        }
+        if (JOY_NEW(DPAD_UP | DPAD_DOWN))
+        {
+            if (JOY_NEW(DPAD_UP))
+                newSel = sel - 1;
+            else
+                newSel = sel + 1;
+            if (tWrapAround)
+            {
+                if (newSel < 0)
+                    newSel = count - 1;
+                else if (newSel >= count)
+                    newSel = 0;
+            }
+            else
+            {
+                if (newSel < 0)
+                    newSel = 0;
+                else if (newSel >= count)
+                    newSel = count - 1;
+            }
+            if (newSel != sel)
+            {
+                PlaySE(SE_SELECT);
+                ScrollingMultichoiceMenu_MoveToSelection(taskId, (u8)newSel);
+            }
+            MultiChoicePrintHelpDescription(tMultichoiceId);
         }
     }
 }

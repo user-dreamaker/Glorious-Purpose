@@ -34,7 +34,7 @@ ViridianCity_Gym_Text_ExplainEarthBadgeTakeThis::
     .string "a POKéMON TRAINER.\p"
     .string "With it, you can challenge the\n"
     .string "POKéMON LEAGUE.\p"
-    .string "Also, take this TM.\p"
+    .string "Also, take this ITEM.\p"
     .string "Consider it a gift for your POKéMON\n"
     .string "LEAGUE challenge.$"
 

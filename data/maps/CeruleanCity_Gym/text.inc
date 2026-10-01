@@ -20,7 +20,7 @@ CeruleanCity_Gym_Text_ExplainCascadeBadge::
     .string "anytime, even out of battle.\p"
     .string "You can CUT down small trees to\n"
     .string "open new pathways.\p"
-    .string "You can also have my favorite TM.$"
+    .string "You can also have my favorite ITEM.$"
 
 CeruleanCity_Gym_Text_ReceivedTM03FromMisty::
     .string "{PLAYER} received TM03\n"
