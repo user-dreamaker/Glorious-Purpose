@@ -202,6 +202,20 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "Route25_EventScript_Man",
       "flag": "0"
+    },
+    {
+      "type": "object",
+      "graphics_id": "OBJ_EVENT_GFX_JASMINE",
+      "x": 60,
+      "y": 5,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NORMAL",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_Jasmine",
+      "flag": "0"
     }
   ],
   "warp_events": [
@@ -235,10 +249,10 @@
     },
     {
       "type": "hidden_item",
-      "x": 58,
+      "x": 60,
       "y": 6,
       "elevation": 3,
-      "item": "ITEM_ETHER",
+      "item": "ITEM_METAL_COAT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE25_ETHER",
       "quantity": 1,
       "underfoot": false

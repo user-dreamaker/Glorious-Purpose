@@ -109,18 +109,18 @@
       "dest_warp_id": "0"
     },
     {
-      "x": 10,
-      "y": 14,
-      "elevation": 3,
-      "dest_map": "MAP_SILPH_CO_4F",
-      "dest_warp_id": "3"
+      "x": 0,
+      "y": 0,
+      "elevation": 0,
+      "dest_map": "MAP_SILPH_CO_ELEVATOR",
+      "dest_warp_id": "0"
     },
     {
-      "x": 14,
-      "y": 9,
-      "elevation": 3,
-      "dest_map": "MAP_SILPH_CO_4F",
-      "dest_warp_id": "5"
+      "x": 0,
+      "y": 0,
+      "elevation": 0,
+      "dest_map": "MAP_SILPH_CO_ELEVATOR",
+      "dest_warp_id": "0"
     },
     {
       "x": 8,
@@ -130,11 +130,11 @@
       "dest_warp_id": "3"
     },
     {
-      "x": 14,
-      "y": 17,
-      "elevation": 3,
-      "dest_map": "MAP_SILPH_CO_4F",
-      "dest_warp_id": "4"
+      "x": 0,
+      "y": 0,
+      "elevation": 0,
+      "dest_map": "MAP_SILPH_CO_ELEVATOR",
+      "dest_warp_id": "0"
     },
     {
       "x": 13,
@@ -180,10 +180,10 @@
     },
     {
       "type": "hidden_item",
-      "x": 9,
-      "y": 9,
+      "x": 0,
+      "y": 0,
       "elevation": 0,
-      "item": "ITEM_HP_UP",
+      "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_SILPH_CO_10F_HP_UP",
       "quantity": 1,
       "underfoot": false

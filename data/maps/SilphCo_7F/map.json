@@ -158,8 +158,8 @@
     {
       "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
-      "x": 30,
-      "y": 11,
+      "x": 28,
+      "y": 10,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
       "movement_range_x": 1,
@@ -186,11 +186,11 @@
       "dest_warp_id": "1"
     },
     {
-      "x": 25,
-      "y": 17,
-      "elevation": 3,
-      "dest_map": "MAP_SILPH_CO_5F",
-      "dest_warp_id": "5"
+      "x": 0,
+      "y": 0,
+      "elevation": 0,
+      "dest_map": "MAP_SILPH_CO_ELEVATOR",
+      "dest_warp_id": "0"
     },
     {
       "x": 27,
@@ -204,7 +204,7 @@
       "y": 4,
       "elevation": 3,
       "dest_map": "MAP_SILPH_CO_3F",
-      "dest_warp_id": "2"
+      "dest_warp_id": "4"
     },
     {
       "x": 23,
@@ -333,10 +333,10 @@
     },
     {
       "type": "hidden_item",
-      "x": 22,
-      "y": 11,
+      "x": 0,
+      "y": 0,
       "elevation": 0,
-      "item": "ITEM_ZINC",
+      "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_SILPH_CO_7F_ZINC",
       "quantity": 1,
       "underfoot": false
