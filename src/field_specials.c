@@ -711,7 +711,7 @@ static u16 SampleResortGorgeousMon(void)
 static u16 SampleResortGorgeousReward(void)
 {
     if ((Random() % 100) >= 30)
-        return ITEM_LUXURY_BALL;
+        return ITEM_RARE_CANDY;
     else
         return sResortGorgeousDeluxeRewards[Random() % NELEMS(sResortGorgeousDeluxeRewards)];
 }
