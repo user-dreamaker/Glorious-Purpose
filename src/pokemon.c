@@ -2428,6 +2428,7 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     s32 damage = 0;
     s32 damageHelper;
     u8 type;
+    u8 moveCategory;
     u16 attack, defense;
     u16 spAttack, spDefense;
     u8 defenderHoldEffect;
@@ -2552,7 +2553,12 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     if (WEATHER_HAS_EFFECT && (gBattleWeather & B_WEATHER_HAIL) && IS_BATTLER_OF_TYPE(battlerIdDef, TYPE_ICE))
         defense = (15 * defense) / 10;
 
-    if (IS_TYPE_PHYSICAL(gBattleMoves[move]))
+    // Hidden Power uses a dynamic category (based on Nature); all other moves use their static category
+    moveCategory = gBattleMoves[move].category;
+    if (move == MOVE_HIDDEN_POWER)
+        moveCategory = gBattleStruct->dynamicMoveCategory;
+
+    if (moveCategory == CATEGORY_PHYSICAL)
     {
         if (gCritMultiplier == 2)
         {
@@ -2607,7 +2613,7 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     if (type == TYPE_MYSTERY)
         damage = 0; // is ??? type. does 0 damage.
 
-    if (IS_TYPE_SPECIAL(gBattleMoves[move]))
+    if (moveCategory == CATEGORY_SPECIAL)
     {
         if (gCritMultiplier == 2)
         {

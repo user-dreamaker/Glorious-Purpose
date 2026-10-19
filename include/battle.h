@@ -382,6 +382,7 @@ struct BattleStruct
     u8 field_11; // unused
     u8 wildVictorySong;
     u8 dynamicMoveType;
+    u8 dynamicMoveCategory; // 0 = Physical, 1 = Special (for Hidden Power)
     u8 wrappedBy[MAX_BATTLERS_COUNT];
     u16 assistPossibleMoves[PARTY_SIZE * MAX_MON_MOVES]; // 6 mons, each of them knowing 4 moves
     u8 focusPunchBattlerId;
