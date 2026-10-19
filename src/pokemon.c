@@ -2609,6 +2609,8 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         gBattleMovePower = (150 * gBattleMovePower) / 100;
     if (attacker->ability == ABILITY_RECKLESS && move != MOVE_STRUGGLE && (gBattleMoves[move].effect == EFFECT_RECOIL || gBattleMoves[move].effect == EFFECT_DOUBLE_EDGE || gBattleMoves[move].effect == EFFECT_VOLT_TACKLE))
         gBattleMovePower = (150 * gBattleMovePower) / 100;
+    if (move == MOVE_KNOCK_OFF && defender->item != ITEM_NONE && defender->ability != ABILITY_STICKY_HOLD)
+        gBattleMovePower = (150 * gBattleMovePower) / 100;
 
     // Self-destruct / Explosion cut defense in half
     if (gBattleMoves[gCurrentMove].effect == EFFECT_EXPLOSION)
@@ -2622,10 +2624,12 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     if (WEATHER_HAS_EFFECT && (gBattleWeather & B_WEATHER_HAIL) && IS_BATTLER_OF_TYPE(battlerIdDef, TYPE_ICE))
         defense = (15 * defense) / 10;
 
-    // Hidden Power uses a dynamic category (based on Nature); all other moves use their static category
+    // Hidden Power, Ancient Power & Secret Power use a dynamic category (based on Nature); all other moves use their static category
     moveCategory = gBattleMoves[move].category;
     if (move == MOVE_HIDDEN_POWER)
         moveCategory = gBattleStruct->dynamicMoveCategory;
+    else if (move == MOVE_ANCIENT_POWER || move == MOVE_SECRET_POWER)
+        moveCategory = CalcNatureBasedMoveCategory(attacker->personality);
 
     if (moveCategory == CATEGORY_PHYSICAL)
     {
@@ -5241,6 +5245,49 @@ u8 GetNature(struct Pokemon *mon)
 u8 GetNatureFromPersonality(u32 personality)
 {
     return personality % NUM_NATURES;
+}
+
+u8 CalcNatureBasedMoveCategory(u32 personality)
+{
+    switch (GetNatureFromPersonality(personality))
+    {
+    case NATURE_HARDY:   // ↑Atk, ↓Atk
+    case NATURE_LONELY:  // ↑Atk, ↓Def
+    case NATURE_BRAVE:   // ↑Atk, ↓Spd
+    case NATURE_ADAMANT: // ↑Atk, ↓SpAtk
+    case NATURE_NAUGHTY: // ↑Atk, ↓SpDef
+    case NATURE_DOCILE:  // ↑Def, ↓Def
+    case NATURE_RELAXED: // ↑Def, ↓Spd
+    case NATURE_IMPISH:  // ↑Def, ↓SpAtk
+    case NATURE_LAX:     // ↑Def, ↓SpDef
+    case NATURE_JOLLY:   // ↑Spd, ↓SpAtk
+    case NATURE_NAIVE:   // ↑Spd, ↓SpDef
+    case NATURE_CAREFUL: // ↑Sp.Def, ↓SpAtk
+        return CATEGORY_PHYSICAL;
+    case NATURE_BOLD:    // ↑Def, ↓Atk
+    case NATURE_TIMID:   // ↑Spd, ↓Atk
+    case NATURE_HASTY:   // ↑Spd, ↓Def
+    case NATURE_SERIOUS: // ↑Spd, ↓Spd
+    case NATURE_MODEST:  // ↑Sp.Atk, ↓Atk
+    case NATURE_MILD:    // ↑Sp.Atk, ↓Def
+    case NATURE_QUIET:   // ↑Sp.Atk, ↓Spd
+    case NATURE_BASHFUL: // ↑Sp.Atk, ↓Sp.Atk
+    case NATURE_RASH:    // ↑Sp.Atk, ↓SpDef
+    case NATURE_CALM:    // ↑Sp.Def, ↓Atk
+    case NATURE_GENTLE:  // ↑Sp.Def, ↓Def
+    case NATURE_SASSY:   // ↑Sp.Def, ↓Spd
+    case NATURE_QUIRKY:  // ↑Sp.Def, ↓SpDef
+    default:
+        return CATEGORY_SPECIAL;
+    }
+}
+
+// Ancient Power and Secret Power take their category from the user's Nature.
+// Hidden Power is handled separately: battles use gBattleStruct->dynamicMoveCategory
+// (set by Cmd_hiddenpowercalc) and the UI uses GetHiddenPowerCategory.
+u8 GetNatureBasedMoveCategory(struct Pokemon *mon)
+{
+    return CalcNatureBasedMoveCategory(GetMonData(mon, MON_DATA_PERSONALITY, NULL));
 }
 
 static bool8 SpeciesHasEnvyEvo(u16 species)

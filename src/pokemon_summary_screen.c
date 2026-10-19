@@ -3305,6 +3305,8 @@ static void PokeSum_DrawMoveTypeIcons(void)
             u8 category = gBattleMoves[sMonSummaryScreen->moveIds[i]].category;
             if (sMonSummaryScreen->moveIds[i] == MOVE_HIDDEN_POWER)
                 category = GetHiddenPowerCategory(&sMonSummaryScreen->currentMon);
+            else if (sMonSummaryScreen->moveIds[i] == MOVE_ANCIENT_POWER || sMonSummaryScreen->moveIds[i] == MOVE_SECRET_POWER)
+                category = GetNatureBasedMoveCategory(&sMonSummaryScreen->currentMon);
             BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], category + MENU_INFO_ICON_PHYSICAL, 3, GetMoveNamePrinterYpos(i) + 11);
         }
     }
@@ -3315,6 +3317,8 @@ static void PokeSum_DrawMoveTypeIcons(void)
             u8 category = gBattleMoves[sMonSummaryScreen->moveIds[4]].category;
             if (sMonSummaryScreen->moveIds[4] == MOVE_HIDDEN_POWER)
                 category = GetHiddenPowerCategory(&sMonSummaryScreen->currentMon);
+            else if (sMonSummaryScreen->moveIds[4] == MOVE_ANCIENT_POWER || sMonSummaryScreen->moveIds[4] == MOVE_SECRET_POWER)
+                category = GetNatureBasedMoveCategory(&sMonSummaryScreen->currentMon);
             BlitMenuInfoIcon(sMonSummaryScreen->windowIds[5], category + MENU_INFO_ICON_PHYSICAL, 3, GetMoveNamePrinterYpos(4) + 11);
         }
 }

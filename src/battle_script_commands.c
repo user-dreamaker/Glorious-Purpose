@@ -51,6 +51,7 @@ static bool8 IsTwoTurnsMove(u16 move);
 static void TrySetDestinyBondToHappen(void);
 static u8 AttacksThisTurn(u8 battlerId, u16 move); // Note: returns 1 if it's a charging turn, otherwise 2.
 static void CheckWonderGuardAndLevitate(void);
+static bool8 MoveHasPower(u16 move);
 static u8 ChangeStatBuffs(s8 statValue, u8 statId, u8, const u8 *BS_ptr);
 static void InitLevelUpBanner(void);
 static bool8 SlideInLevelUpBanner(void);
@@ -1068,11 +1069,11 @@ static void Cmd_accuracycheck(void)
 
     if ((gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE
         && !BtlCtrl_OakOldMan_TestState2Flag(1)
-        && gBattleMoves[move].power != 0
+        && MoveHasPower(move)
         && GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER)
      || (gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE
         && !BtlCtrl_OakOldMan_TestState2Flag(2)
-        && gBattleMoves[move].power == 0
+        && !MoveHasPower(move)
         && GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER)
      || (gBattleTypeFlags & BATTLE_TYPE_POKEDUDE))
     {
@@ -1140,8 +1141,16 @@ static void Cmd_accuracycheck(void)
             calc = (calc * 80) / 100; // 1.2 sand veil loss
         if (WEATHER_HAS_EFFECT && BattlerHasAbility(gBattlerTarget, ABILITY_SNOW_CLOAK) && gBattleWeather & B_WEATHER_HAIL)
             calc = (calc * 80) / 100; // 1.2 snow cloak loss
-        if (gBattleMons[gBattlerAttacker].ability == ABILITY_HUSTLE && IS_TYPE_PHYSICAL(gBattleMoves[move]))
-            calc = (calc * 80) / 100; // 1.2 hustle loss
+        if (gBattleMons[gBattlerAttacker].ability == ABILITY_HUSTLE)
+        {
+            u8 moveCategory = gBattleMoves[move].category;
+            if (move == MOVE_HIDDEN_POWER)
+                moveCategory = gBattleStruct->dynamicMoveCategory;
+            else if (move == MOVE_ANCIENT_POWER || move == MOVE_SECRET_POWER)
+                moveCategory = CalcNatureBasedMoveCategory(gBattleMons[gBattlerAttacker].personality);
+            if (moveCategory == CATEGORY_PHYSICAL)
+                calc = (calc * 80) / 100; // 1.2 hustle loss
+        }
         if (gBattleMons[gBattlerTarget].ability == ABILITY_TANGLED_FEET && (gBattleMons[gBattlerTarget].status2 & STATUS2_CONFUSION))
             calc = calc / 2; // 0.5 tangled feet loss
 
@@ -1337,6 +1346,13 @@ void AI_CalcDmg(u8 attacker, u8 defender)
         gBattleMoveDamage = gBattleMoveDamage * 15 / 10;
 }
 
+// Used to tell damaging moves apart from status moves. Hidden Power deals damage,
+// but its power is set at runtime by Cmd_hiddenpowercalc, so its data entry is 0.
+static bool8 MoveHasPower(u16 move)
+{
+    return (gBattleMoves[move].power != 0 || move == MOVE_HIDDEN_POWER);
+}
+
 static void ModulateDmgByType(u8 multiplier)
 {
     gBattleMoveDamage = gBattleMoveDamage * multiplier / 10;
@@ -1351,7 +1367,7 @@ static void ModulateDmgByType(u8 multiplier)
         gMoveResultFlags &= ~MOVE_RESULT_SUPER_EFFECTIVE;
         break;
     case TYPE_MUL_NOT_EFFECTIVE:
-        if (gBattleMoves[gCurrentMove].power && !(gMoveResultFlags & MOVE_RESULT_NO_EFFECT))
+        if (MoveHasPower(gCurrentMove) && !(gMoveResultFlags & MOVE_RESULT_NO_EFFECT))
         {
             if (gMoveResultFlags & MOVE_RESULT_SUPER_EFFECTIVE)
                 gMoveResultFlags &= ~MOVE_RESULT_SUPER_EFFECTIVE;
@@ -1360,7 +1376,7 @@ static void ModulateDmgByType(u8 multiplier)
         }
         break;
     case TYPE_MUL_SUPER_EFFECTIVE:
-        if (gBattleMoves[gCurrentMove].power && !(gMoveResultFlags & MOVE_RESULT_NO_EFFECT))
+        if (MoveHasPower(gCurrentMove) && !(gMoveResultFlags & MOVE_RESULT_NO_EFFECT))
         {
             if (gMoveResultFlags & MOVE_RESULT_NOT_VERY_EFFECTIVE)
                 gMoveResultFlags &= ~MOVE_RESULT_NOT_VERY_EFFECTIVE;
@@ -1460,7 +1476,7 @@ static void Cmd_typecalc(void)
 
     if (gBattleMons[gBattlerTarget].ability == ABILITY_WONDER_GUARD && AttacksThisTurn(gBattlerAttacker, gCurrentMove) == 2
      && (!(gMoveResultFlags & MOVE_RESULT_SUPER_EFFECTIVE) || ((gMoveResultFlags & (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)) == (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)))
-     && gBattleMoves[gCurrentMove].power)
+     && MoveHasPower(gCurrentMove))
     {
         gLastUsedAbility = ABILITY_WONDER_GUARD;
         gMoveResultFlags |= MOVE_RESULT_MISSED;
@@ -1495,7 +1511,7 @@ static void CheckWonderGuardAndLevitate(void)
     s32 i = 0;
     u8 moveType;
 
-    if (gCurrentMove == MOVE_STRUGGLE || !gBattleMoves[gCurrentMove].power)
+    if (gCurrentMove == MOVE_STRUGGLE || !MoveHasPower(gCurrentMove))
         return;
 
     GET_MOVE_TYPE(gCurrentMove, moveType);
@@ -1572,7 +1588,7 @@ static void CheckWonderGuardAndLevitate(void)
 
     if (gBattleMons[gBattlerTarget].ability == ABILITY_WONDER_GUARD && AttacksThisTurn(gBattlerAttacker, gCurrentMove) == 2)
     {
-        if (((flags & 2) || !(flags & 1)) && gBattleMoves[gCurrentMove].power)
+        if (((flags & 2) || !(flags & 1)) && MoveHasPower(gCurrentMove))
         {
             gLastUsedAbility = ABILITY_WONDER_GUARD;
             gBattleCommunication[MISS_TYPE] = B_MSG_AVOIDED_DMG;
@@ -1596,7 +1612,7 @@ static void ModulateDmgByType2(u8 multiplier, u16 move, u8 *flags)
         *flags &= ~MOVE_RESULT_SUPER_EFFECTIVE;
         break;
     case TYPE_MUL_NOT_EFFECTIVE:
-        if (gBattleMoves[move].power && !(*flags & MOVE_RESULT_NO_EFFECT))
+        if (MoveHasPower(move) && !(*flags & MOVE_RESULT_NO_EFFECT))
         {
             if (*flags & MOVE_RESULT_SUPER_EFFECTIVE)
                 *flags &= ~MOVE_RESULT_SUPER_EFFECTIVE;
@@ -1605,7 +1621,7 @@ static void ModulateDmgByType2(u8 multiplier, u16 move, u8 *flags)
         }
         break;
     case TYPE_MUL_SUPER_EFFECTIVE:
-        if (gBattleMoves[move].power && !(*flags & MOVE_RESULT_NO_EFFECT))
+        if (MoveHasPower(move) && !(*flags & MOVE_RESULT_NO_EFFECT))
         {
             if (*flags & MOVE_RESULT_NOT_VERY_EFFECTIVE)
                 *flags &= ~MOVE_RESULT_NOT_VERY_EFFECTIVE;
@@ -1616,7 +1632,7 @@ static void ModulateDmgByType2(u8 multiplier, u16 move, u8 *flags)
     }
 }
 
-u8 TypeCalc(u16 move, u8 attacker, u8 defender)
+u8 TypeCalcWithMoveType(u16 move, u8 typeOverride, u8 attacker, u8 defender)
 {
     s32 i = 0;
     u8 flags = 0;
@@ -1625,7 +1641,7 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
     if (move == MOVE_STRUGGLE)
         return 0;
 
-    moveType = gBattleMoves[move].type;
+    moveType = typeOverride;
 
     // check stab
     if (IS_BATTLER_OF_TYPE(attacker, moveType))
@@ -1693,7 +1709,7 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
     if (gBattleMons[defender].ability == ABILITY_WONDER_GUARD && !(flags & MOVE_RESULT_MISSED)
         && AttacksThisTurn(attacker, move) == 2
         && (!(flags & MOVE_RESULT_SUPER_EFFECTIVE) || ((flags & (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)) == (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)))
-        && gBattleMoves[move].power)
+        && MoveHasPower(move))
     {
         flags |= MOVE_RESULT_MISSED;
     }
@@ -1713,6 +1729,11 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
     }
 
     return flags;
+}
+
+u8 TypeCalc(u16 move, u8 attacker, u8 defender)
+{
+    return TypeCalcWithMoveType(move, gBattleMoves[move].type, attacker, defender);
 }
 
 u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
@@ -1774,7 +1795,7 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
     }
     if (targetAbility == ABILITY_WONDER_GUARD
      && (!(flags & MOVE_RESULT_SUPER_EFFECTIVE) || ((flags & (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)) == (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)))
-     && gBattleMoves[move].power)
+     && MoveHasPower(move))
         flags |= MOVE_RESULT_DOESNT_AFFECT_FOE;
     return flags;
 }
@@ -2082,6 +2103,8 @@ static void Cmd_datahpupdate(void)
                     u8 moveCategory = gBattleMoves[gCurrentMove].category;
                     if (gCurrentMove == MOVE_HIDDEN_POWER)
                         moveCategory = gBattleStruct->dynamicMoveCategory;
+                    else if (gCurrentMove == MOVE_ANCIENT_POWER || gCurrentMove == MOVE_SECRET_POWER)
+                        moveCategory = CalcNatureBasedMoveCategory(gBattleMons[gBattlerAttacker].personality);
 
                     if (moveCategory == CATEGORY_PHYSICAL && !(gHitMarker & HITMARKER_PASSIVE_DAMAGE) && gCurrentMove != MOVE_PAIN_SPLIT)
                     {
@@ -4442,7 +4465,7 @@ static void Cmd_moveend(void)
                 && GetBattlerSide(gBattlerAttacker) != GetBattlerSide(gBattlerTarget)
                 && !(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
                 && TARGET_TURN_DAMAGED
-                && gBattleMoves[gCurrentMove].power != 0
+                && MoveHasPower(gCurrentMove)
                 && gBattleMons[gBattlerTarget].statStages[STAT_ATK] < MAX_STAT_STAGE)
             {
                 gBattleMons[gBattlerTarget].statStages[STAT_ATK]++;
@@ -4714,7 +4737,9 @@ static void Cmd_typecalc2(void)
 {
     u8 flags = 0;
     s32 i = 0;
-    u8 moveType = gBattleMoves[gCurrentMove].type;
+    u8 moveType;
+
+    GET_MOVE_TYPE(gCurrentMove, moveType);
 
     if (BattlerHasAbility(gBattlerTarget, ABILITY_LEVITATE) && moveType == TYPE_GROUND && gCurrentMove != MOVE_BONEMERANG)
     {
@@ -4807,7 +4832,7 @@ static void Cmd_typecalc2(void)
         && !(flags & MOVE_RESULT_NO_EFFECT)
         && AttacksThisTurn(gBattlerAttacker, gCurrentMove) == 2
         && (!(flags & MOVE_RESULT_SUPER_EFFECTIVE) || ((flags & (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)) == (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)))
-        && gBattleMoves[gCurrentMove].power)
+        && MoveHasPower(gCurrentMove))
     {
         gLastUsedAbility = ABILITY_WONDER_GUARD;
         gMoveResultFlags |= MOVE_RESULT_MISSED;
