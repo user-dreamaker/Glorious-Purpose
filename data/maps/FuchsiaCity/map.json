@@ -427,10 +427,10 @@
     },
     {
       "type": "hidden_item",
-      "x": 33,
-      "y": 26,
+      "x": 9,
+      "y": 33,
       "elevation": 3,
-      "item": "ITEM_MAX_REVIVE",
+      "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_FUCHSIA_CITY_MAX_REVIVE",
       "quantity": 1,
       "underfoot": false

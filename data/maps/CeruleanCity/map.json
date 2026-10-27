@@ -381,8 +381,8 @@
     },
     {
       "type": "hidden_item",
-      "x": 18,
-      "y": 7,
+      "x": 31,
+      "y": 22,
       "elevation": 3,
       "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_CERULEAN_CITY_RARE_CANDY",

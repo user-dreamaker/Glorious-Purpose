@@ -213,7 +213,7 @@
       "x": 23,
       "y": 14,
       "elevation": 3,
-      "item": "ITEM_PP_UP",
+      "item": "ITEM_HEAL_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE13_PP_UP",
       "quantity": 1,
       "underfoot": false

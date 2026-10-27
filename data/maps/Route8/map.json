@@ -268,7 +268,7 @@
       "x": 42,
       "y": 10,
       "elevation": 3,
-      "item": "ITEM_RAWST_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE8_RAWST_BERRY",
       "quantity": 1,
       "underfoot": false
@@ -278,7 +278,7 @@
       "x": 38,
       "y": 11,
       "elevation": 3,
-      "item": "ITEM_LUM_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE8_LUM_BERRY",
       "quantity": 1,
       "underfoot": false
@@ -288,7 +288,7 @@
       "x": 42,
       "y": 15,
       "elevation": 3,
-      "item": "ITEM_LEPPA_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE8_LEPPA_BERRY",
       "quantity": 1,
       "underfoot": false

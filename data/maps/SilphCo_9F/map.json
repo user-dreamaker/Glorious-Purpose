@@ -81,18 +81,18 @@
       "dest_warp_id": "0"
     },
     {
-      "x": 22,
-      "y": 18,
-      "elevation": 3,
-      "dest_map": "MAP_SILPH_CO_5F",
-      "dest_warp_id": "3"
+      "x": 0,
+      "y": 0,
+      "elevation": 0,
+      "dest_map": "MAP_SILPH_CO_ELEVATOR",
+      "dest_warp_id": "0"
     },
     {
-      "x": 9,
-      "y": 4,
-      "elevation": 3,
-      "dest_map": "MAP_SILPH_CO_3F",
-      "dest_warp_id": "4"
+      "x": 0,
+      "y": 0,
+      "elevation": 0,
+      "dest_map": "MAP_SILPH_CO_ELEVATOR",
+      "dest_warp_id": "0"
     },
     {
       "x": 18,
@@ -113,10 +113,10 @@
   "bg_events": [
     {
       "type": "hidden_item",
-      "x": 11,
-      "y": 14,
-      "elevation": 3,
-      "item": "ITEM_MAX_POTION",
+      "x": 0,
+      "y": 0,
+      "elevation": 0,
+      "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_SILPH_CO_9F_MAX_POTION",
       "quantity": 1,
       "underfoot": false
@@ -251,10 +251,10 @@
     },
     {
       "type": "hidden_item",
-      "x": 5,
-      "y": 8,
+      "x": 0,
+      "y": 0,
       "elevation": 0,
-      "item": "ITEM_CALCIUM",
+      "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_SILPH_CO_9F_CALCIUM",
       "quantity": 1,
       "underfoot": false

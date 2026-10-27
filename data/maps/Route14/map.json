@@ -250,10 +250,10 @@
     },
     {
       "type": "hidden_item",
-      "x": 9,
-      "y": 20,
+      "x": 11,
+      "y": 18,
       "elevation": 3,
-      "item": "ITEM_ZINC",
+      "item": "ITEM_HEAL_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE14_ZINC",
       "quantity": 1,
       "underfoot": false
@@ -263,7 +263,7 @@
       "x": 19,
       "y": 53,
       "elevation": 3,
-      "item": "ITEM_PINAP_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE14_PINAP_BERRY",
       "quantity": 1,
       "underfoot": false

@@ -165,7 +165,7 @@
       "x": 43,
       "y": 2,
       "elevation": 3,
-      "item": "ITEM_GREAT_BALL",
+      "item": "ITEM_HEAL_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE4_GREAT_BALL",
       "quantity": 1,
       "underfoot": false
@@ -175,7 +175,7 @@
       "x": 5,
       "y": 4,
       "elevation": 3,
-      "item": "ITEM_PERSIM_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE4_PERSIM_BERRY",
       "quantity": 1,
       "underfoot": false
@@ -185,7 +185,7 @@
       "x": 67,
       "y": 17,
       "elevation": 3,
-      "item": "ITEM_RAZZ_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE4_RAZZ_BERRY",
       "quantity": 1,
       "underfoot": false

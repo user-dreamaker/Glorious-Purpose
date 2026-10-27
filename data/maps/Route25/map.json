@@ -202,6 +202,20 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "Route25_EventScript_Man",
       "flag": "0"
+    },
+    {
+      "type": "object",
+      "graphics_id": "OBJ_EVENT_GFX_JASMINE",
+      "x": 60,
+      "y": 10,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NORMAL",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_Jasmine",
+      "flag": "0"
     }
   ],
   "warp_events": [
@@ -225,20 +239,20 @@
     },
     {
       "type": "hidden_item",
-      "x": 14,
-      "y": 2,
+      "x": 60,
+      "y": 9,
       "elevation": 3,
-      "item": "ITEM_ELIXIR",
+      "item": "ITEM_HEAL_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE25_ELIXIR",
       "quantity": 1,
       "underfoot": false
     },
     {
       "type": "hidden_item",
-      "x": 58,
-      "y": 6,
+      "x": 60,
+      "y": 11,
       "elevation": 3,
-      "item": "ITEM_ETHER",
+      "item": "ITEM_HEAL_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE25_ETHER",
       "quantity": 1,
       "underfoot": false
@@ -248,7 +262,7 @@
       "x": 33,
       "y": 8,
       "elevation": 3,
-      "item": "ITEM_ORAN_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE25_ORAN_BERRY",
       "quantity": 1,
       "underfoot": false
@@ -258,7 +272,7 @@
       "x": 40,
       "y": 3,
       "elevation": 3,
-      "item": "ITEM_BLUK_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE25_BLUK_BERRY",
       "quantity": 1,
       "underfoot": false

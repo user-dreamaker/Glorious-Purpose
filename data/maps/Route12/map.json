@@ -160,8 +160,8 @@
     {
       "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
-      "x": 18,
-      "y": 36,
+      "x": 19,
+      "y": 37,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
       "movement_range_x": 1,
@@ -281,7 +281,7 @@
       "x": 18,
       "y": 57,
       "elevation": 3,
-      "item": "ITEM_HYPER_POTION",
+      "item": "ITEM_HEAL_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE12_HYPER_POTION",
       "quantity": 1,
       "underfoot": false
@@ -298,10 +298,10 @@
     },
     {
       "type": "hidden_item",
-      "x": 9,
-      "y": 116,
+      "x": 7,
+      "y": 111,
       "elevation": 3,
-      "item": "ITEM_RARE_CANDY",
+      "item": "ITEM_HEAL_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE12_RARE_CANDY",
       "quantity": 1,
       "underfoot": false

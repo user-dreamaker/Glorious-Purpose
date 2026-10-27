@@ -127,7 +127,7 @@
       "x": 8,
       "y": 29,
       "elevation": 5,
-      "item": "ITEM_RAWST_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_SEVEN_ISLAND_SEVAULT_CANYON_ENTRANCE_RAWST_BERRY",
       "quantity": 1,
       "underfoot": false

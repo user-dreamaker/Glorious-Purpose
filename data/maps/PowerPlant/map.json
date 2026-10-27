@@ -116,7 +116,7 @@
     {
       "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
-      "x": 30,
+      "x": 31,
       "y": 38,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
@@ -172,7 +172,7 @@
       "x": 29,
       "y": 16,
       "elevation": 3,
-      "item": "ITEM_MAX_ELIXIR",
+      "item": "ITEM_THUNDER_STONE",
       "flag": "FLAG_HIDDEN_ITEM_POWER_PLANT_MAX_ELIXIR",
       "quantity": 1,
       "underfoot": false

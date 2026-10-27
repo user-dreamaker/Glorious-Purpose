@@ -330,7 +330,7 @@
       "x": 15,
       "y": 66,
       "elevation": 3,
-      "item": "ITEM_CHERI_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_SEVEN_ISLAND_SEVAULT_CANYON_CHERI_BERRY",
       "quantity": 1,
       "underfoot": false

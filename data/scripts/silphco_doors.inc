@@ -364,10 +364,88 @@ SilphCo_2F_EventScript_Door2::
 
 SilphCo_3F_EventScript_Door1::
 	lockall
+	call SilphCo_3F_EventScript_DoorCheckGrunts
 	setvar VAR_TEMP_1, 3
 	setvar VAR_0x8004, FLAG_SILPH_3F_DOOR_1
 	goto_if_set FLAG_SILPH_3F_DOOR_1, EventScript_DoorUnlocked
 	goto EventScript_TryUnlockDoor
+	end
+
+SilphCo_3F_EventScript_DoorCheckGrunts::
+	@ 2F
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_CONNOR
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_JERRY
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_23
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_24
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	@ 3F
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_JOSE
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_25
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	@ 4F
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_RODNEY
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_26
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_27
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	@ 5F
+	checkflag TRAINER_FLAGS_START + TRAINER_JUGGLER_DALTON
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_BEAU
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_28
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_29
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	@ 6F
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_TAYLOR
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_30
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_31
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	@ 7F
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_JOSHUA
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_33
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_34
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_35
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	@ 8F
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_PARKER
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_32
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_36
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	@ 9F
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_ED
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_37
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_38
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	@ 10F
+	checkflag TRAINER_FLAGS_START + TRAINER_SCIENTIST_TRAVIS
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_39
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	@ 11F
+	checkflag TRAINER_FLAGS_START + TRAINER_TEAM_ROCKET_GRUNT_40
+	goto_if FALSE, SilphCo_3F_EventScript_DoorUnavailable
+	return
+
+SilphCo_3F_EventScript_DoorUnavailable::
+	textcolor NPC_TEXT_COLOR_FEMALE
+	msgbox SilphCo_3F_Text_TemporarilyUnavailable
+	releaseall
 	end
 
 SilphCo_3F_EventScript_Door2::

@@ -189,7 +189,7 @@
       "x": 15,
       "y": 76,
       "elevation": 3,
-      "item": "ITEM_ASPEAR_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_SIX_ISLAND_WATER_PATH_ASPEAR_BERRY",
       "quantity": 1,
       "underfoot": false
@@ -199,7 +199,7 @@
       "x": 3,
       "y": 8,
       "elevation": 3,
-      "item": "ITEM_ORAN_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_SIX_ISLAND_WATER_PATH_ORAN_BERRY",
       "quantity": 1,
       "underfoot": false
@@ -209,7 +209,7 @@
       "x": 13,
       "y": 63,
       "elevation": 3,
-      "item": "ITEM_PINAP_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_SIX_ISLAND_WATER_PATH_PINAP_BERRY",
       "quantity": 1,
       "underfoot": false

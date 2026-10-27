@@ -71,10 +71,10 @@
   "bg_events": [
     {
       "type": "hidden_item",
-      "x": 58,
-      "y": 28,
+      "x": 57,
+      "y": 2,
       "elevation": 3,
-      "item": "ITEM_LAVA_COOKIE",
+      "item": "ITEM_MASTER_BALL",
       "flag": "FLAG_HIDDEN_ITEM_SSANNE_EXTERIOR_LAVA_COOKIE",
       "quantity": 1,
       "underfoot": false

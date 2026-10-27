@@ -157,7 +157,7 @@
       "x": 10,
       "y": 7,
       "elevation": 3,
-      "item": "ITEM_NEST_BALL",
+      "item": "ITEM_ENERGY_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_FIVE_ISLAND_RESORT_GORGEOUS_NEST_BALL",
       "quantity": 1,
       "underfoot": false

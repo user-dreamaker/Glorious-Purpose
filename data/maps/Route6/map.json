@@ -149,7 +149,7 @@
       "x": 5,
       "y": 5,
       "elevation": 3,
-      "item": "ITEM_SITRUS_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE6_SITRUS_BERRY",
       "quantity": 1,
       "underfoot": false
@@ -159,7 +159,7 @@
       "x": 19,
       "y": 5,
       "elevation": 3,
-      "item": "ITEM_RARE_CANDY",
+      "item": "ITEM_HEAL_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE6_RARE_CANDY",
       "quantity": 1,
       "underfoot": false

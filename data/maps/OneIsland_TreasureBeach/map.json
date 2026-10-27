@@ -98,7 +98,7 @@
       "x": 15,
       "y": 22,
       "elevation": 3,
-      "item": "ITEM_ULTRA_BALL",
+      "item": "ITEM_ENERGY_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ONE_ISLAND_TREASURE_BEACH_ULTRA_BALL",
       "quantity": 1,
       "underfoot": false
@@ -108,7 +108,7 @@
       "x": 16,
       "y": 33,
       "elevation": 3,
-      "item": "ITEM_ULTRA_BALL",
+      "item": "ITEM_ENERGY_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_ONE_ISLAND_TREASURE_BEACH_ULTRA_BALL_2",
       "quantity": 1,
       "underfoot": false

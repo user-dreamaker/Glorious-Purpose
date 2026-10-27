@@ -284,10 +284,10 @@
     },
     {
       "type": "hidden_item",
-      "x": 6,
-      "y": 3,
+      "x": 15,
+      "y": 17,
       "elevation": 3,
-      "item": "ITEM_POKE_BALL",
+      "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_PEWTER_CITY_POKE_BALL",
       "quantity": 1,
       "underfoot": false

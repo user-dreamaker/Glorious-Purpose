@@ -146,7 +146,7 @@
       "x": 6,
       "y": 24,
       "elevation": 3,
-      "item": "ITEM_NET_BALL",
+      "item": "ITEM_ENERGY_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_SIX_ISLAND_OUTCAST_ISLAND_NET_BALL",
       "quantity": 1,
       "underfoot": false

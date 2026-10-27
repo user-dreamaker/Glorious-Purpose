@@ -118,7 +118,7 @@
       "x": 15,
       "y": 7,
       "elevation": 3,
-      "item": "ITEM_RAZZ_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_FIVE_ISLAND_MEMORIAL_PILLAR_RAZZ_BERRY",
       "quantity": 1,
       "underfoot": false
@@ -128,7 +128,7 @@
       "x": 17,
       "y": 22,
       "elevation": 3,
-      "item": "ITEM_SITRUS_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_FIVE_ISLAND_MEMORIAL_PILLAR_SITRUS_BERRY",
       "quantity": 1,
       "underfoot": false
@@ -138,7 +138,7 @@
       "x": 14,
       "y": 25,
       "elevation": 3,
-      "item": "ITEM_BLUK_BERRY",
+      "item": "ITEM_ENERGY_ROOT",
       "flag": "FLAG_HIDDEN_ITEM_FIVE_ISLAND_MEMORIAL_PILLAR_BLUK_BERRY",
       "quantity": 1,
       "underfoot": false
